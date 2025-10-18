@@ -65,6 +65,7 @@ names(fam) <- c("FID","IID","PID","MID","SEX","PHENO")
 NsubjFam=dim(fam)[1]
 
 if (NsubjFam != NsubjFA) {
+       print(NsubjFam); print(NsubjFA)
   stop("Number of Subjects with genotype data do not match those with FA measures. Please make sure your files are correct.")
 }
 
