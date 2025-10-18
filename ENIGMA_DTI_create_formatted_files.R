@@ -1,6 +1,5 @@
-#
+# * Written for ENIGMA-DTI-GWAS by Gabriella Blokland, Nina Roth Mota
 # * Inspired by createDatPed.R and createDatPed_flexible_files_plasticity.R
-# * Modified for ENIGMA-DTI-GWAS by Gabriella Blokland, Nina Roth Mota
 # * Last edit 2025-10-07, by gblokland
 
 ###### Basic INFO
