@@ -1,13 +1,18 @@
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#                        %%%  ENIGMA DTI %%%
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#%% This is a function to print out plots and stats for Quality Control of ENIGMA-DTI measures 
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#%% Written by Gabriella Blokland, based on script from Neda Jahanshad / Derrek Hibar
-#%% Last update September 2025
-#%% Questions or Comments??
-#%% enigma.dtigenetics@gmail.com
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#
+#  ENIGMA DTI GWAS
+#
+# This is a function to print out plots and stats for Quality Control of ENIGMA-DTI measures 
+#############################################################################################
+# Written by Gabriella Blokland, based on script from Neda Jahanshad / Derrek Hibar
+# Last update September 2025
+# Questions or Comments:
+# enigma.dtigenetics@gmail.com
+#############################################################################################
+
+## to run:
+## ${Rbin} --no-save --slave --args ${1} ${2} ...   ${8} <  ./.R
+## R --no-save --slave --args ${covarFILE} ${phenoFILE} ${ageColumnHeader} ${sexColumnHeader} ${maleIndicator} \
+## ${CaseControlCohort} ${affectedStatusColumnHeader} ${affectedIndicator} ${related} ${pheno_covar_dir} ${ALL_ROIS} ${eName} <  ${run_directory}/ENIGMA_DTI_phenotype_and_covariate_sumstats.R
 
 #Check and install argparse if not already installed
 if (!requireNamespace("argparse", quietly = TRUE)) {
@@ -25,6 +30,19 @@ parser$add_argument("--rois", default = "AverageFA;BCC;GCC;SCC;CC;CGC;CGH;CR;EC;
 parser$add_argument("--outPDF", default = "ENIGMA_DTI_allROI_histograms.pdf", help = "Output PDF for histograms")
 parser$add_argument("--outTXT", default = "ENIGMA_DTI_allROI_stats.txt", help = "Output TXT for statistics")
 
+parser$add_argument("--covarFILE", default = "${COHORT}_enigma_dti_gwas.covar", required = TRUE, help = "Input text file containing covariates")
+parser$add_argument("--phenoFILE", default = "${COHORT}_enigma_dti_gwas.pheno", required = TRUE, help = "Input text file containing phenotypes (MRI/DTI)")
+parser$add_argument("--ageColumnHeader", default = "Age", help = "Name of the Age variable")
+parser$add_argument("--sexColumnHeader", default = "Sex", help = "Name of the Sex variable")
+parser$add_argument("--maleIndicator", default = "1", help = "value used for male individuals")
+parser$add_argument("--CaseControlCohort", default = "1", help = "CaseControlCohort yes(1) or no(0)")
+parser$add_argument("--affectedStatusColumnHeader", default = "AffectionStatus", help = "Column header for Affection Status (case-control status)")
+parser$add_argument("--affectedIndicator", default = "2", help = "value used for affected individuals")
+parser$add_argument("--related", default = "0", help = "related cohort yes(1) or no(0)")
+parser$add_argument("--pheno_covar_dir", default = "./QC_ENIGMA/", help = "Output directory")
+parser$add_argument("--ALL_ROIS", default = "AverageFA;BCC;GCC;SCC;CC;CGC;CGH;CR;EC;FX;FXST;IC;IFO;PTR;SFO;SLF;SS;UNC;CST;ACR;ALIC;PCR;PLIC;RLIC;SCR;ACR.L;ACR.R;ALIC.L;ALIC.R;CGC.L;CGC.R;CGH.L;CGH.R;CR.L;CR.R;CST.L;CST.R;EC.L;EC.R;FX.ST.L;FX.ST.R;IC.L;IC.R;IFO.L;IFO.R;PCR.L;PCR.R;PLIC.L;PLIC.R;PTR.L;PTR.R;RLIC.L;RLIC.R;SCR.L;SCR.R;SFO.L;SFO.R;SLF.L;SLF.R;SS.L;SS.R;UNC.L;UNC.R", help = "Semicolon-separated list of ROIs")
+parser$add_argument("--eName", default = "ENIGMA_DTI_GWAS", help = "Output label for ENIGMA project")
+
 args <- parser$parse_args()
 
 # Extract arguments
@@ -35,21 +53,42 @@ rois <- args$rois
 outPDF <- args$outPDF
 outTXT <- args$outTXT
 
+covarFILE <- args$covarFILE
+phenoFILE <- args$phenoFILE
+ageColumnHeader <- args$ageColumnHeader
+sexColumnHeader <- args$sexColumnHeader
+maleIndicator <- args$maleIndicator
+CaseControlCohort <- args$CaseControlCohort
+affectedStatusColumnHeader <- args$affectedStatusColumnHeader
+affectedIndicator <- args$affectedIndicator
+related <- args$related
+pheno_covar_dir <- args$pheno_covar_dir
+rois <- args$ALL_ROIS
+eName <- args$eName
+
+# Read covariates CSV file
+covarTable <- read.table(covarFILE, header = TRUE)
+colTable <- names(covarTable)
+print(colTable)
+
 # Create output directory if it doesn't exist
 dir.create(outD, showWarnings = FALSE)
 
-# Read input CSV file
-Table <- read.csv(CSVfile, header = TRUE)
-colTable <- names(Table)
+# Read phenotypes CSV file
+phenoTable <- read.table(phenoFILE, header = TRUE)
+colTable <- names(phenoTable)
 print(colTable)
 
 # Replace "x" or "X" values with NA
 for (m in seq_along(colTable)) {
   ind <- which(Table[, m] == "x")
   ind2 <- which(Table[, m] == "X")
-  Table[ind, m] <- NA
-  Table[ind2, m] <- NA
+  phenoTable[ind, m] <- NA
+  phenoTable[ind2, m] <- NA
 }
+
+# Merge covar and pheno tables
+Table <- merge(covarTable, phenoTable, by=c("FID","IID"), all=TRUE)
 
 # Remove rows with NA values
 Table <- Table[complete.cases(Table), ]
@@ -115,14 +154,25 @@ if (Nrois > 0) {
         paste("Outliers (5-sd):", paste(as.character(Table[c(minO, maxO), 1]), collapse = ","))
       }
       
-      # Case-Control group
-      group_var <- Table$group  # Assuming 'group' column exists and has values 'case' and 'control'
-      group_case <- DATA[group_var == "case"]
-      group_control <- DATA[group_var == "control"]
+      # Check if both groups exist in the data
+      if (all(c("1", "2") %in% unique(Table$AffectionStatus))) {
       
-      # Calculate Cohen's d for case-control comparison
-      cohens_d <- calculate_cohens_d(group_case, group_control)
+        ### Case-Control group
+        #group_var <- Table$group  # Assuming 'group' column exists and has values 'case' and 'control'
+        #group_case <- DATA[group_var == "case"]
+        #group_control <- DATA[group_var == "control"]
+        group_var <- Table$AffectionStatus  # Assuming 'group' column exists and has values 'case' and 'control'
+        group_case <- DATA[group_var == "2"]
+        group_control <- DATA[group_var == "1"]
+     
+        ### Calculate Cohen's d for case-control comparison
+        cohens_d <- calculate_cohens_d(group_case, group_control)
       
+      } else {
+        # If one group is missing, set result to NA
+        cohens_d <- NA
+        message("Only one group in AffectionStatus, Cohen's d set to NA")
+      }
       stats <- c(ROI, N, mu, sdev, minV, maxV, minSubj, maxSubj, outliers, cohens_d)
       write.table(t(as.matrix(stats)), file = paste0(outD,"/",outTXT), append = TRUE, quote = FALSE, col.names = FALSE, row.names = FALSE, sep = "\t")
       
