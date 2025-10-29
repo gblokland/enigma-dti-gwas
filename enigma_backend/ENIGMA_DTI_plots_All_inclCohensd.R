@@ -129,8 +129,8 @@ eName <- args$eName
 
 # Read covariates CSV file
 covarTable <- read.table(covarFILE, header = TRUE)
-colTable <- names(covarTable)
-print(colTable)
+colCovarTable <- names(covarTable)
+print(colCovarTable)
 
 # Create output directory if it doesn't exist
 dir.create(outDir, showWarnings = FALSE)
@@ -142,8 +142,8 @@ print(colTable)
 
 # Replace "x" or "X" values with NA
 for (m in seq_along(colTable)) {
-  ind <- which(Table[, m] == "x")
-  ind2 <- which(Table[, m] == "X")
+  ind <- which(phenoTable[, m] == "x")
+  ind2 <- which(phenoTable[, m] == "X")
   phenoTable[ind, m] <- NA
   phenoTable[ind2, m] <- NA
 }
