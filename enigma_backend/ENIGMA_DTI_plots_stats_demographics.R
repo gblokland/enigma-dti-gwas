@@ -276,16 +276,7 @@ generate_overlapping_histograms <- function(
     plot(
       hist_list[[1]],
       col = adjustcolor(colors[1], alpha.f = 0.5),
-      main = paste0(
-        cohort,
-        ": Overlapping Histograms of ",
-        covariate,
-        " by ",
-        group_var,
-        " (",
-        group_label,
-        ")"
-      ),
+      main = paste0(cohort, ": Overlapping Histograms of ", covariate, " by ", group_var, " (", group_label, ")"),
       xlab = covariate,
       xlim = range(unlist(lapply(hist_list, function(h) h$breaks))),
       ylim = range(unlist(lapply(hist_list, function(h) h$counts))),
@@ -313,12 +304,7 @@ generate_overlapping_histograms <- function(
       fill = adjustcolor(colors[1:length(hist_list)], alpha.f = 0.5)
     )
   } else {
-    warning(paste(
-      "No valid data for overlapping histograms by",
-      group_var,
-      "in",
-      group_label
-    ))
+    warning(paste("No valid data for overlapping histograms by", group_var, "in", group_label))
   }
 }
 
