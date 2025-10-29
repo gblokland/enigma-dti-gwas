@@ -9,6 +9,8 @@
 ### enigma.dtigenetics@gmail.com
 #############################################################################################
 
+options(repos = c(CRAN = "https://cloud.r-project.org/"))
+
 # Check and install argparse if not already installed
 if (!requireNamespace("argparse", quietly = TRUE)) {
   install.packages("argparse")

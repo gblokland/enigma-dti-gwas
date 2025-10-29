@@ -14,6 +14,8 @@
 ## R --no-save --slave --args ${covarFILE} ${phenoFILE} ${ageColumnHeader} ${sexColumnHeader} ${maleIndicator} \
 ## ${CaseControlCohort} ${affectedStatusColumnHeader} ${affectedIndicator} ${related} ${pheno_covar_dir} ${ALL_ROIS} ${eName} <  ${run_directory}/ENIGMA_DTI_phenotype_and_covariate_sumstats.R
 
+options(repos = c(CRAN = "https://cloud.r-project.org/"))
+
 #Check and install argparse if not already installed
 if (!requireNamespace("argparse", quietly = TRUE)) {
   install.packages("argparse")
