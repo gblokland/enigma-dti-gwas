@@ -227,7 +227,7 @@ p <- ggplot(Table, aes(fill = AffectionStatus)) +
   geom_histogram(
     aes(x = Age, y = ..count..),
     colour = "black",
-    size = 0.2,
+    linewidth = 0.2,
     bins = 30
   ) +
   xlim(range(Table[, "Age"])) +
@@ -275,7 +275,7 @@ plot_histogram <- function(df, feature) {
       aes(xintercept = mean(eval(parse(text = feature)))),
       color = "black",
       linetype = "dashed",
-      size = 1
+      linewidth = 1
     ) +
     labs(x = feature, y = "Density")
   print(plt)
@@ -299,7 +299,7 @@ plot_multi_histogram <- function(df, feature, label_column) {
       aes(xintercept = mean(eval(parse(text = feature)))),
       color = "black",
       linetype = "dashed",
-      size = 1
+      slinewidth = 1
     ) +
     labs(x = feature, y = "Density")
   plt + guides(fill = guide_legend(title = label_column))
