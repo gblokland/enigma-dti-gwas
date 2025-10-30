@@ -190,6 +190,17 @@ MD_range <- c(0.5e-3, 1.0e-3)
 RD_range <- c(0.3e-3, 0.8e-3)
 AD_range <- c(1.0e-3, 2.0e-3)
 
+# Map metric to range
+range_map <- list(
+  FA = FA_range,
+  MD = MD_range,
+  RD = RD_range,
+  AD = AD_range
+)
+
+# Select the correct range
+x_limits <- range_map[[metric]]
+
 dev.new()
 p <- ggplot(TableLongMetric, aes(fill = AffectionStatus)) +
   geom_histogram(
@@ -198,7 +209,7 @@ p <- ggplot(TableLongMetric, aes(fill = AffectionStatus)) +
     bins = 30
   ) +
   facet_wrap(~parsedROIs, ncol = 8, scales = "free_x") +
-  xlim(ifelse(metric=="FA", FA_range, ifelse(metric=="MD", MD_range, ifelse(metric=="RD", RD_range, AD_range)))) +
+  xlim(x_limits) +
   theme_set(theme_bw()) +
   xlab("Phenotype Value") +
   ylab("Number of Subjects") +
