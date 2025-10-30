@@ -145,6 +145,7 @@ dir.create(outDir, showWarnings = FALSE)
 covar <- read.table(covarFILE, header = TRUE)
 pheno <- read.table(phenoFILE, header = TRUE)
 Table <- merge(covar, pheno, by = c("FID", "IID"), all = TRUE)
+print(head(Table))
 
 # Parse ROIs
 parsedROIs <- unlist(strsplit(rois, ";"))
