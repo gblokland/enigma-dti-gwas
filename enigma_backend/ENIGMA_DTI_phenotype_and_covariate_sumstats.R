@@ -311,7 +311,7 @@ plot_multi_histogram <- function(df, feature, label_column) {
 
 #https://www.geeksforgeeks.org/how-to-export-multiple-plots-to-pdf-in-r/
 # Open pdf file
-pdf(file = paste0(outDir, cohort, ".pdf"))
+#pdf(file = paste0(outDir, cohort, ".pdf"))
 
 ## create a 2X2 grid
 #par( mfrow= c(2,2) ) #Only needed when plotting to same page; if this is left out each plot is plotted on a different page
@@ -465,8 +465,12 @@ if (n_CON > 5 & n_AFF > 5) {
   cohens_d_results$comparison <- "AFF-CON_All"
   cohens_d_results$cohort <- cohort
   
+  # Save results as csv
+  write.csv(cohens_d_results,
+          file = paste0(outDir, cohort, "_cohens_d_results.csv"),
+          row.names = FALSE)
+
   # Plot
-  library(ggplot2)
   p <- ggplot(cohens_d_results, aes(x = variable, y = cohens_d_smd, fill = colour)) +
     geom_bar(stat = "identity", colour = "black", position = "dodge") +
     geom_errorbar(aes(ymin = cohens_d_smd - cohens_d_se,
@@ -491,5 +495,5 @@ if (n_CON > 5 & n_AFF > 5) {
   
   # Save
   plot_fd <- paste0(outDir, cohort, "_cohensd_bar_graph_AFF-CON.png")
-  ggsave(plot_fd, p, height = 24, width = 18, units = "cm", dpi = 600)
+  ggsave(plot_fd, p, height = 30, width = 18, units = "cm", dpi = 600)
 }
