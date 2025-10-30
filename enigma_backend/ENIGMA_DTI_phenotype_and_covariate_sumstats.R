@@ -496,7 +496,7 @@ if (n_CON > 5 & n_AFF > 5) {
                       ymax = cohens_d_smd + cohens_d_se),
                   width = 0.25, position = position_dodge(0.9)) +
     coord_flip() +
-    facet_wrap(~metric, ncol = 2, scales = "fixed_x") +
+    facet_wrap(~metric, ncol = 2, scales = "fixed") +
     scale_y_continuous(limits = c(-1, 1), breaks = seq(-1, 1, 0.25)) +
     scale_x_discrete(labels = cohens_d_results$varlabel) +
     geom_hline(yintercept = 0) +
