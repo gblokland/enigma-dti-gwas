@@ -143,6 +143,7 @@ dir.create(outDir, showWarnings = FALSE)
 #eName <- "ENIGMA-DTI-GWAS"
 
 covar <- read.table(covarFILE, header = TRUE)
+covar <- covar[ , !(names(covar) %in% c("FA_AverageFA", "MD_AverageMD", "RD_AverageRD", "AD_AverageAD"))]
 pheno <- read.table(phenoFILE, header = TRUE)
 Table <- merge(covar, pheno, by = c("FID", "IID"), all = TRUE)
 print(head(Table))
@@ -157,16 +158,21 @@ roiLabels <- gsub("_", " ", parsedROIs)
 roiColors <- setNames(rainbow(length(parsedROIs)), parsedROIs)
 
 
-#Reshape from wide to long
+# Identify varying vs non-varying columns
+varying_cols <- grep("^(FA|MD|AD|RD)_", names(Table), value = TRUE)
+id_cols <- setdiff(names(Table), varying_cols)
+
+# Reshape from wide → long
 TableLong <- reshape(
   Table,
-  varying = names(Table)[3:ncol(Table)],   # columns to pivot
+  varying = varying_cols,
   v.names = "Value",
   timevar = "Variable",
-  times = names(Table)[3:ncol(Table)],
-  idvar = c("FID", "IID", "Age", "Sex", "AffectionStatus"),
+  times = varying_cols,
+  idvar = id_cols,
   direction = "long"
 )
+print(head(TableLong))
 
 #Histograms of phenotypes by AffectionStatus
 for (metric in c("FA", "MD", "AD", "RD")) {
