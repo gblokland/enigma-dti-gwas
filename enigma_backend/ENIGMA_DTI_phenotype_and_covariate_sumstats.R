@@ -514,8 +514,8 @@ cohens_d_results <- cohens_d_results %>%
       legend.title = element_blank(),
       legend.position = "none"
     ) +
-    annotate("text", x = nrow(cohens_d_results) - 0.5, y = 0.7, label = paste("n AFF =", n_AFF)) +
-    annotate("text", x = nrow(cohens_d_results) - 1.5, y = 0.7, label = paste("n CON =", n_CON))
+    annotate("text", x = nrow(cohens_d_results)/4 - 0.5, y = 0.7, label = paste("n AFF =", n_AFF)) +
+    annotate("text", x = nrow(cohens_d_results)/4 - 1.5, y = 0.7, label = paste("n CON =", n_CON))
   
   # Save
   plot_fd <- paste0(outDir, cohort, "_cohensd_bar_graph_AFF-CON.png")
