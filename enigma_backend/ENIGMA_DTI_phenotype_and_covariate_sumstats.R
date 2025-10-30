@@ -144,11 +144,10 @@ Table <- merge(covar, pheno, by = c("FID", "IID"), all = TRUE)
 parsedROIs <- unlist(strsplit(rois, ";"))
 Nrois <- length(parsedROIs)
 writeLines(paste0("Nrois = ", Nrois))
-
-
 roiLabels <- gsub("_", " ", parsedROIs)
 roiColors <- setNames(rainbow(length(parsedROIs)), parsedROIs)
 
+Table$AffectionStatus <- factor(Table$AffectionStatus, levels = c(1, 0), labels = c("Affected", "Control"))
 
 # Identify varying vs non-varying columns
 varying_cols <- grep("^(FA|MD|AD|RD)_", names(Table), value = TRUE)
@@ -221,7 +220,7 @@ graphics.off()
 }
 
 
-#Histogram of age range
+#Histogram of Age range by AffectionStatus
 dev.new()
 p <- ggplot(Table, aes(fill = AffectionStatus)) +
   geom_histogram(
@@ -307,27 +306,29 @@ plot_multi_histogram <- function(df, feature, label_column) {
 
 #https://www.geeksforgeeks.org/how-to-export-multiple-plots-to-pdf-in-r/
 # Open pdf file
-pdf(file = paste0(cohort, ".pdf"))
+pdf(file = paste0(outDir, cohort, ".pdf"))
 
 ## create a 2X2 grid
 #par( mfrow= c(2,2) ) #Only needed when plotting to same page; if this is left out each plot is plotted on a different page
 
+# Check intracranial volume to see whether sex assignments are correct 
+# -> ICV should be larger for men.
 # draw plots
-for (phenotype in c("ICV")) {
-  plot_histogram(Table, phenotype)
-  plot_multi_histogram(Table, phenotype, 'Sex')
-  plot_multi_histogram(Table, phenotype, 'AffectionStatus')
-}
+if ("ICV" %in% names(Table)) {
+  for (phenotype in c("ICV")) {
+    plot_histogram(Table, phenotype)
+    plot_multi_histogram(Table, phenotype, 'Sex')
+    plot_multi_histogram(Table, phenotype, 'AffectionStatus')
+  }
 
-if (is.numeric(Table_orig$SEX)) {
-  Table_orig$SEX <- factor(
-    Table_orig$SEX,
-    levels = c(0, 1),
-    labels = c("Female", "Male")
-  )
-}
+#if (is.numeric(Table$Sex)) {
+#  Table$Sex <- factor(
+#    Table$Sex,
+#    levels = c(0, 1),
+#    labels = c("Female", "Male")
+#  )
+#}
 
-# Check intracranial volume to see whether sex assignments are correct -> ICV should be larger for men.
 # Check unique values in the 'Sex' column
 print(unique(Table$Sex))
 
@@ -381,6 +382,7 @@ ggsave(
   dpi = 600
 )
 
+} #end if ("ICV" %in% names(Table)) {
 
 # Descriptives: mean, median, standard deviation, min, max for each covariate
 
@@ -395,8 +397,8 @@ ggsave(
 # Initialize results vector
 cohens_d_results <- vector()
 
-# Subset table for the current cohort
-Table <- Table_orig[Table_orig$cohort == cohort, ]
+# Subset table for the current cohort - do we need this if there are Dummy variables?
+#Table <- Table_orig[Table_orig$cohort == cohort, ]
 
 # Count group sizes
 n_CON <- nrow(Table[Table$AffectionStatus == "Control", ])
