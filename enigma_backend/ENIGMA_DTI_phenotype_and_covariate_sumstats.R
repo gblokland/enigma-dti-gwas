@@ -509,14 +509,14 @@ cohens_d_results <- cohens_d_results %>%
     theme(
       panel.background = element_rect(fill = "white", colour = "grey90"),
       strip.text = element_text(size = 12, face = "bold"),
-      axis.text.x = element_text(angle = 0, hjust = 0.5, colour = "black", size = 8, face = "bold"),
-      axis.text.y = element_text(angle = 0, hjust = 1, colour = "black", size = 8, face = "bold"),
+      axis.text.x = element_text(angle = 0, hjust = 0.5, colour = "black", size = 7, face = "bold"),
+      axis.text.y = element_text(angle = 0, hjust = 1, colour = "black", size = 7, face = "bold"),
       axis.line = element_line(colour = "black"),
       legend.title = element_blank(),
       legend.position = "none"
     ) +
-    annotate("text", x = nrow(cohens_d_results)/4 - 1.5, y = 0.7, label = paste("n AFF =", n_AFF)) +
-    annotate("text", x = nrow(cohens_d_results)/4 - 3.5, y = 0.7, label = paste("n CON =", n_CON))
+    annotate("text", x = nrow(cohens_d_results)/4 - 2, y = 0.7, label = paste("n AFF =", n_AFF)) +
+    annotate("text", x = nrow(cohens_d_results)/4 - 4, y = 0.7, label = paste("n CON =", n_CON))
   
   # Save
   plot_fd <- paste0(outDir, cohort, "_cohensd_bar_graph_AFF-CON.png")
