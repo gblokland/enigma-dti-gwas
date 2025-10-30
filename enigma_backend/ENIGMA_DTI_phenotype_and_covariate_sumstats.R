@@ -1,7 +1,7 @@
 #ENIGMA-DTI-GWAS 2025
 #Author: Gabriella Blokland
 #Last Modified: September 2025
-#############################################################################################
+###########################################################################
 
 options(repos = c(CRAN = "https://cloud.r-project.org/"))
 
@@ -27,14 +27,6 @@ if (!requireNamespace("reshape", quietly = TRUE)) {
 }
 suppressMessages(suppressWarnings(library(reshape)))
 
-# # get command line args (excluding defaults like --file)
-# args <- commandArgs(trailingOnly = TRUE)
-# # first argument = cohort name
-# cohort <- args[1]
-# # 2nd argument = output directory
-# outDir <- args[2]
-# # 3rd argument = Semicolon-separated list of ROIs
-# rois <- "AverageFA;BCC;GCC;SCC;CC;CGC;CGH;CR;EC;FX;FXST;IC;IFO;PTR;SFO;SLF;SS;UNC;CST;ACR;ALIC;PCR;PLIC;RLIC;SCR;ACR.L;ACR.R;ALIC.L;ALIC.R;CGC.L;CGC.R;CGH.L;CGH.R;CR.L;CR.R;CST.L;CST.R;EC.L;EC.R;FX.ST.L;FX.ST.R;IC.L;IC.R;IFO.L;IFO.R;PCR.L;PCR.R;PLIC.L;PLIC.R;PTR.L;PTR.R;RLIC.L;RLIC.R;SCR.L;SCR.R;SFO.L;SFO.R;SLF.L;SLF.R;SS.L;SS.R;UNC.L;UNC.R"
 
 # Set up argument parser
 parser <- ArgumentParser(description = "QC script for ENIGMA DTI")
@@ -133,14 +125,6 @@ eName <- args$eName
 
 # Create output directory if it doesn't exist
 dir.create(outDir, showWarnings = FALSE)
-#Table <- read.csv("Table.csv") #For initial testing
-
-#cohort <- "DMS" # <-- change this as needed
-#covarFILE <- paste0(cohort, "_enigma_dti_gwas.covar")
-#phenoFILE <- paste0(cohort, "_enigma_dti_gwas.pheno")
-#rois <- "AverageFA;BCC;GCC;SCC;CC;CGC;CGH;CR;EC;FX;FXST;IC;IFO;PTR;SFO;SLF;SS;UNC;CST;ACR;ALIC;PCR;PLIC;RLIC;SCR;ACR.L;ACR.R;ALIC.L;ALIC.R;CGC.L;CGC.R;CGH.L;CGH.R;CR.L;CR.R;CST.L;CST.R;EC.L;EC.R;FX.ST.L;FX.ST.R;IC.L;IC.R;IFO.L;IFO.R;PCR.L;PCR.R;PLIC.L;PLIC.R;PTR.L;PTR.R;RLIC.L;RLIC.R;SCR.L;SCR.R;SFO.L;SFO.R;SLF.L;SLF.R;SS.L;SS.R;UNC.L;UNC.R"
-#outDir <- "./QC_ENIGMA/"
-#eName <- "ENIGMA-DTI-GWAS"
 
 covar <- read.table(covarFILE, header = TRUE)
 covar <- covar[ , !(names(covar) %in% c("FA_AverageFA", "MD_AverageMD", "RD_AverageRD", "AD_AverageAD"))]
@@ -172,7 +156,7 @@ TableLong <- reshape(
   idvar = id_cols,
   direction = "long"
 )
-print(head(TableLong))
+#print(head(TableLong))
 
 #Histograms of phenotypes by AffectionStatus
 for (metric in c("FA", "MD", "AD", "RD")) {
@@ -182,7 +166,7 @@ print(head(TableLongMetric))
 dev.new()
 p <- ggplot(TableLongMetric, aes(fill = AffectionStatus)) +
   geom_histogram(
-    aes_string(x = value, y = "..count.."),
+    aes(x = !!sym(value), y = ..count..),
     colour = "black",
     size = 0.2,
     bins = 30
@@ -226,7 +210,7 @@ graphics.off()
 dev.new()
 p <- ggplot(Table, aes(fill = AffectionStatus)) +
   geom_histogram(
-    aes_string(x = Age, y = "..count.."),
+    aes(x = !!sym(Age), y = ..count..),
     colour = "black",
     size = 0.2,
     bins = 30
@@ -287,10 +271,7 @@ plot_histogram <- function(df, feature) {
 plot_multi_histogram <- function(df, feature, label_column) {
   plt <- ggplot(
     df,
-    aes(
-      x = eval(parse(text = feature)),
-      fill = eval(parse(text = label_column))
-    )
+    aes(x = eval(parse(text = feature)), fill = eval(parse(text = label_column)))
   ) +
     geom_histogram(
       alpha = 0.7,
