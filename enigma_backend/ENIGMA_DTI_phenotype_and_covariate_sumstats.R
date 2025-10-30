@@ -143,7 +143,10 @@ Table <- merge(covar, pheno, by = c("FID", "IID"), all = TRUE)
 # Parse ROIs
 parsedROIs <- unlist(strsplit(rois, ";"))
 Nrois <- length(parsedROIs)
+
 writeLines(paste0("Nrois = ", Nrois))
+writeLines(paste0("ROIs: ", parsedROIs))
+
 roiLabels <- gsub("_", " ", parsedROIs)
 roiColors <- setNames(rainbow(length(parsedROIs)), parsedROIs)
 
