@@ -188,7 +188,7 @@ FA_range <- c(0, 1)
 # MD, RD, AD ranges (×10^-3 mm²/s)
 MD_range <- c(0.5e-3, 1.0e-3)
 RD_range <- c(0.3e-3, 0.8e-3)
-AD_range <- c(1.0e-3, 2.0e-3)
+AD_range <- c(1.0e-3, 1.75e-3)
 
 # Map metric to range
 range_map <- list(
