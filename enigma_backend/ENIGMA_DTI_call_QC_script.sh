@@ -59,7 +59,7 @@ Rscript ${ENIGMA_DTI_GWAS_dir}/SCRIPTS/enigma_backend/ENIGMA_DTI_plots_All_inclC
 
 Rscript ENIGMA_DTI_plots_stats_demographics.R \
 --cohort ${COHORT} \
---CSVfile "${ENIGMA_DTI_GWAS_dir}/pheno_covar/Covariates.csv" \
+--covarFILE "${ENIGMA_DTI_GWAS_dir}/pheno_covar/${COHORT}_enigma_dti_gwas.covar" \
 --outDir "${ENIGMA_DTI_GWAS_dir}/QC_ENIGMA/" \
 --outPDF "${COHORT}_ENIGMA_DTI_Age_histograms.pdf" \
 --outTXT "${COHORT}_ENIGMA_DTI_Age_stats.txt"

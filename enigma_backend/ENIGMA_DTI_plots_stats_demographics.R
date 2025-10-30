@@ -125,8 +125,8 @@ eName <- args$eName
 # Create output directory if it doesn't exist
 dir.create(outDir, showWarnings = FALSE)
 
-# Read input CSV file
-Table <- read.csv(CSVfile, header = TRUE)
+# Read input file
+Table <- read.table(covarFILE, header = TRUE)
 colTable <- names(Table)
 print(colTable)
 
