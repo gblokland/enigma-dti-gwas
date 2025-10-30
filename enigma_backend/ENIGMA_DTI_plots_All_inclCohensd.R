@@ -215,10 +215,9 @@ if (Nrois > 0) {
         writeLines(paste0("maxO = ", maxO))
 
         outliers <- if (length(minO) + length(maxO) > 0) {
-          paste(
-            "Outliers (5-sd):",
-            paste(as.character(Table[c(minO, maxO), 1]), collapse = ",")
-          )
+          paste("Outliers (5-sd):", paste(as.character(Table[c(minO, maxO), 1]), collapse = ","))
+        } else {
+          NA
         }
 
         # Check if both groups exist in the data
@@ -232,6 +231,7 @@ if (Nrois > 0) {
           group_control <- DATA[group_var == "1"]
           ### Calculate Cohen's d for case-control comparison
           cohens_d <- calculate_cohens_d(group_case, group_control)
+          writeLines(paste0("Cohen's d = ", cohens_d))
         } else {
           # If one group is missing, set result to NA
           cohens_d <- NA
