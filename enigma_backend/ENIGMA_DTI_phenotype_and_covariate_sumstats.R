@@ -150,8 +150,8 @@ id_cols <- setdiff(names(Table), varying_cols)
 TableLong <- reshape(
   Table,
   varying = varying_cols,
-  v.names = "value",
-  timevar = "variable",
+  v.names = "Value",
+  timevar = "Variable",
   times = varying_cols,
   idvar = id_cols,
   direction = "long"
@@ -167,7 +167,7 @@ print(head(TableLongMetric))
 dev.new()
 p <- ggplot(TableLongMetric, aes(fill = AffectionStatus)) +
   geom_histogram(
-    aes(x = !!sym(value), y = ..count..),
+    aes(x = !!sym(Value), y = ..count..),
     colour = "black",
     size = 0.2,
     bins = 30
