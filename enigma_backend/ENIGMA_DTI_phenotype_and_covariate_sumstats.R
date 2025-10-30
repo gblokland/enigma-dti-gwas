@@ -162,10 +162,6 @@ TableLong <- reshape(
 for (metric in c("FA", "MD", "AD", "RD")) {
 TableLongMetric <- TableLong[grepl(paste0("^", metric), TableLong$Variable), ]
 rownames(TableLongMetric) <- 1:nrow(TableLongMetric)
-# Only if unique and correct length
-#if(length(unique(TableLong$FID)) == nrow(TableLong)) {
-#  rownames(TableLong) <- TableLong$FID
-#}
 print(head(TableLongMetric))
 
 dev.new()
@@ -173,11 +169,10 @@ p <- ggplot(TableLongMetric, aes(fill = AffectionStatus)) +
   geom_histogram(
     aes(x = Value, y = ..count..),
     colour = "black",
-    size = 0.2,
     bins = 30
   ) +
   facet_wrap(~parsedROIs, ncol = 8, scales = "free_x") +
-  xlim(range(Table[, paste0(metric, "_", parsedROIs[i])])) +
+  xlim(range(Table[, paste0(metric, "_", parsedROIs)])) +
   theme_set(theme_bw()) +
   xlab(axis_label) +
   ylab("Number of Subjects") +
@@ -215,7 +210,7 @@ graphics.off()
 dev.new()
 p <- ggplot(Table, aes(fill = AffectionStatus)) +
   geom_histogram(
-    aes(x = !!sym(Age), y = ..count..),
+    aes(x = Age, y = ..count..),
     colour = "black",
     size = 0.2,
     bins = 30
