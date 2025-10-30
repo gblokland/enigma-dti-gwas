@@ -183,6 +183,13 @@ TableLongMetric <- TableLong[grepl(paste0("^", metric), TableLong$Variable), ]
 rownames(TableLongMetric) <- 1:nrow(TableLongMetric)
 print(head(TableLongMetric))
 
+# FA range (unitless)
+FA_range <- c(0, 1)
+# MD, RD, AD ranges (×10^-3 mm²/s)
+MD_range <- c(0.5e-3, 1.0e-3)
+RD_range <- c(0.3e-3, 0.8e-3)
+AD_range <- c(1.0e-3, 2.0e-3)
+
 dev.new()
 p <- ggplot(TableLongMetric, aes(fill = AffectionStatus)) +
   geom_histogram(
@@ -191,7 +198,7 @@ p <- ggplot(TableLongMetric, aes(fill = AffectionStatus)) +
     bins = 30
   ) +
   facet_wrap(~parsedROIs, ncol = 8, scales = "free_x") +
-  xlim(range(0,1)) +
+  xlim(ifelse(metric=="FA", FA_range, ifelse(metric=="MD", MD_range, ifelse(metric=="RD", RD_range, AD_range)))) +
   theme_set(theme_bw()) +
   xlab("Phenotype Value") +
   ylab("Number of Subjects") +
