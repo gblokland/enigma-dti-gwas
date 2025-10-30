@@ -63,18 +63,10 @@ Rscript ${ENIGMA_DTI_GWAS_dir}/SCRIPTS/enigma_backend/ENIGMA_DTI_phenotype_and_c
 --outDir "${ENIGMA_DTI_GWAS_dir}/QC_ENIGMA/" \
 
 
-Rscript ${ENIGMA_DTI_GWAS_dir}/SCRIPTS/enigma_backend/ENIGMA_DTI_plots_stats_demographics-simple-GB.R \
---cohort ${COHORT} \
---CSVfile "${ENIGMA_DTI_GWAS_dir}/pheno_covar/Covariates.csv" \
---outDir "${ENIGMA_DTI_GWAS_dir}/QC_ENIGMA/" \
---outPDF "${COHORT}_ENIGMA_DTI_Age_histograms.pdf" \
---outTXT "${COHORT}_ENIGMA_DTI_Age_stats.txt"
+#Rscript ${ENIGMA_DTI_GWAS_dir}/SCRIPTS/enigma_backend/ENIGMA_DTI_plots_stats_demographics-simple-GB.R \
+#--cohort ${COHORT} \
+#--CSVfile "${ENIGMA_DTI_GWAS_dir}/pheno_covar/Covariates.csv" \
+#--outDir "${ENIGMA_DTI_GWAS_dir}/QC_ENIGMA/" \
+#--outPDF "${COHORT}_ENIGMA_DTI_Age_histograms.pdf" \
+#--outTXT "${COHORT}_ENIGMA_DTI_Age_stats.txt"
 
-#Rscript ENIGMA_DTI_plots_qc_script.R \
-Rscript ENIGMA_DTI_plots_ALL-GB.R \
---cohort ${COHORT} \
---outDir "${ENIGMA_DTI_GWAS_dir}/QC_ENIGMA/" \
---CSVfile "${ENIGMA_DTI_GWAS_dir}/pheno_covar/combinedROItable_FA.csv" \
---rois "AverageFA;BCC;GCC;SCC;CC;CGC;CGH;CR;EC;FX;FXST;IC;IFO;PTR;SFO;SLF;SS;UNC;CST;ACR;ALIC;PCR;PLIC;RLIC;SCR;ACR.L;ACR.R;ALIC.L;ALIC.R;CGC.L;CGC.R;CGH.L;CGH.R;CR.L;CR.R;CST.L;CST.R;EC.L;EC.R;FX.ST.L;FX.ST.R;IC.L;IC.R;IFO.L;IFO.R;PCR.L;PCR.R;PLIC.L;PLIC.R;PTR.L;PTR.R;RLIC.L;RLIC.R;SCR.L;SCR.R;SFO.L;SFO.R;SLF.L;SLF.R;SS.L;SS.R;UNC.L;UNC.R" \
---outPDF "${COHORT}_ENIGMA_DTI_allROI_histograms.pdf" \
---outTXT "${COHORT}_ENIGMA_DTI_allROI_stats.txt"

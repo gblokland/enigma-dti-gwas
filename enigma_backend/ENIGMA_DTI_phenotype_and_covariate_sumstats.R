@@ -490,7 +490,7 @@ if (n_CON > 5 & n_AFF > 5) {
           row.names = FALSE)
 
 cohens_d_results <- cohens_d_results %>%
-  mutate(varlabel = factor(varlabel, levels = unique(varlabel[order(cohens_d_smd)])))
+  mutate(varlabel = factor(varlabel, levels = unique(varlabel[order(variable)])))
 
   # Plot
   p <- ggplot(cohens_d_results, aes(x = varlabel, y = cohens_d_smd, fill = colour)) +
