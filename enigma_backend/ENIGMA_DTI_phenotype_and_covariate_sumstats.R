@@ -147,7 +147,9 @@ writeLines(paste0("Nrois = ", Nrois))
 roiLabels <- gsub("_", " ", parsedROIs)
 roiColors <- setNames(rainbow(length(parsedROIs)), parsedROIs)
 
-Table$AffectionStatus <- factor(Table$AffectionStatus, levels = c(1, 0), labels = c("Affected", "Control"))
+Table$AffectionStatus <- factor(Table$AffectionStatus, 
+  levels = c(1, 0), 
+  labels = c("Affected", "Control"))
 
 # Identify varying vs non-varying columns
 varying_cols <- grep("^(FA|MD|AD|RD)_", names(Table), value = TRUE)
@@ -181,7 +183,7 @@ print(head(TableLongMetric))
 dev.new()
 p <- ggplot(TableLongMetric, aes(fill = AffectionStatus)) +
   geom_histogram(
-    aes(x = Value, y = ..count..),
+    aes(x = Value, y = after_stat(count)),
     colour = "black",
     bins = 30
   ) +
@@ -224,7 +226,7 @@ graphics.off()
 dev.new()
 p <- ggplot(Table, aes(fill = AffectionStatus)) +
   geom_histogram(
-    aes(x = Age, y = ..count..),
+    aes(x = Age, y = after_stat(count)),
     colour = "black",
     linewidth = 0.2,
     bins = 30
@@ -417,10 +419,10 @@ if (n_CON > 5 & n_AFF > 5) {
 
   for (i in seq_along(parsedROIs)) {
     for (metric in c("FA", "MD", "AD", "RD")) {
-    if (!all(is.na(Table[, parsedROIs[i]]))) {
+    if (!all(is.na(Table[, paste0(metric, "_", parsedROIs[i])]))) {
       # Compute Cohen's d manually
-      group_aff <- Table[Table$AffectionStatus == "Affected", parsedROIs[i]]
-      group_con <- Table[Table$AffectionStatus == "Control", parsedROIs[i]]
+      group_aff <- Table[Table$AffectionStatus == "Affected", paste0(metric, "_", parsedROIs[i])]
+      group_con <- Table[Table$AffectionStatus == "Control", paste0(metric, "_", parsedROIs[i])]
 
       pooled_sd <- sqrt(
         (sum((group_con - mean(group_con, na.rm = TRUE))^2, na.rm = TRUE) +
@@ -428,9 +430,7 @@ if (n_CON > 5 & n_AFF > 5) {
           (length(na.omit(group_con)) + length(na.omit(group_aff)) - 2)
       )
 
-      cohens_d[i] <- (mean(group_aff, na.rm = TRUE) -
-        mean(group_con, na.rm = TRUE)) /
-        pooled_sd
+      cohens_d[i] <- (mean(group_aff, na.rm = TRUE) - mean(group_con, na.rm = TRUE)) / pooled_sd
 
       # t-test
       TT <- t.test(group_aff, group_con)
@@ -451,7 +451,7 @@ if (n_CON > 5 & n_AFF > 5) {
       cohens_d_se[i] <- NA
     }
 
-    variable[i] <- parsedROIs[i]
+    variable[i] <- paste0(metric, "_", parsedROIs[i])
     varlabel[i] <- roiLabels[i]
     colour[i] <- roiColors[i]
     }
