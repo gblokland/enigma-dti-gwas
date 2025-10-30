@@ -25,7 +25,7 @@ suppressMessages(suppressWarnings(library(MBESS)))
 if (!requireNamespace("reshape2", quietly = TRUE)) {
   install.packages("reshape2")
 }
-suppressMessages(suppressWarnings(library(MBESS)))
+suppressMessages(suppressWarnings(library(reshape2)))
 
 # # get command line args (excluding defaults like --file)
 # args <- commandArgs(trailingOnly = TRUE)
