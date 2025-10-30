@@ -494,7 +494,8 @@ cohens_d_results <- cohens_d_results %>%
 
   # Plot
   p <- ggplot(cohens_d_results, aes(x = varlabel, y = cohens_d_smd, fill = colour)) +
-    geom_bar(stat = "identity", colour = "black", position = "dodge") +
+    #geom_bar(stat = "identity", colour = "black", position = "dodge") +
+    geom_col(colour = "black", position = "dodge") +
     geom_errorbar(aes(ymin = cohens_d_smd - cohens_d_se,
                       ymax = cohens_d_smd + cohens_d_se),
                   width = 0.25, position = position_dodge(0.9)) +
