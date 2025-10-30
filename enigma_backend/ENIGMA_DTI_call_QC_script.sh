@@ -33,7 +33,7 @@ cd $ENIGMA_DTI_GWAS_dir
 #wget "~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_plots_stats_demographics.R"
 #wget "~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_plots_stats_demographics-simple-GB.R"
 
-git clone git@github.com:gblokland/enigma-dti-gwas.git SCRIPTS
+rm -rf SCRIPTS; git clone git@github.com:gblokland/enigma-dti-gwas.git SCRIPTS
 
 
 ls ${ENIGMA_DTI_GWAS_dir}/QC_ENIGMA/

@@ -166,8 +166,8 @@ id_cols <- setdiff(names(Table), varying_cols)
 TableLong <- reshape(
   Table,
   varying = varying_cols,
-  v.names = "Value",
-  timevar = "Variable",
+  v.names = "value",
+  timevar = "variable",
   times = varying_cols,
   idvar = id_cols,
   direction = "long"
