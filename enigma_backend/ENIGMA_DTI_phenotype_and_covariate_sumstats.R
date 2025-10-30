@@ -160,7 +160,8 @@ TableLong <- reshape(
 
 #Histograms of phenotypes by AffectionStatus
 for (metric in c("FA", "MD", "AD", "RD")) {
-TableLongMetric <- TableLong[grepl(metric, TableLong$variable), ]
+TableLongMetric <- TableLong[grepl((paste0("^", metric), TableLong$variable), ]
+rownames(TableLongMetric) <- seq(1:nrow(TableLongMetric))
 print(head(TableLongMetric))
 
 dev.new()
