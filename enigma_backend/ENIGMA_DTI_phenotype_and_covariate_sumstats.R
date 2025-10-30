@@ -130,7 +130,7 @@ covar <- read.table(covarFILE, header = TRUE)
 covar <- covar[ , !(names(covar) %in% c("FA_AverageFA", "MD_AverageMD", "RD_AverageRD", "AD_AverageAD"))]
 pheno <- read.table(phenoFILE, header = TRUE)
 Table <- merge(covar, pheno, by = c("FID", "IID"), all = TRUE)
-print(head(Table))
+#print(head(Table))
 
 # Parse ROIs
 parsedROIs <- unlist(strsplit(rois, ";"))
@@ -160,7 +160,7 @@ TableLong <- reshape(
 
 #Histograms of phenotypes by AffectionStatus
 for (metric in c("FA", "MD", "AD", "RD")) {
-TableLongMetric <- TableLong[grepl((paste0("^", metric), TableLong$variable), ]
+TableLongMetric <- TableLong[grepl(paste0("^", metric), TableLong$variable), ]
 rownames(TableLongMetric) <- seq(1:nrow(TableLongMetric))
 print(head(TableLongMetric))
 
