@@ -171,7 +171,7 @@ print(head(TableLongMetric))
 dev.new()
 p <- ggplot(TableLongMetric, aes(fill = AffectionStatus)) +
   geom_histogram(
-    aes(x = !!sym(Value), y = ..count..),
+    aes(x = Value, y = ..count..),
     colour = "black",
     size = 0.2,
     bins = 30
