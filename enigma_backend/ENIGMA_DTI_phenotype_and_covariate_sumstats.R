@@ -22,10 +22,10 @@ if (!requireNamespace("MBESS", quietly = TRUE)) {
   install.packages("MBESS")
 }
 suppressMessages(suppressWarnings(library(MBESS)))
-if (!requireNamespace("reshape2", quietly = TRUE)) {
-  install.packages("reshape2")
+if (!requireNamespace("reshape", quietly = TRUE)) {
+  install.packages("reshape")
 }
-suppressMessages(suppressWarnings(library(reshape2)))
+suppressMessages(suppressWarnings(library(reshape)))
 
 # # get command line args (excluding defaults like --file)
 # args <- commandArgs(trailingOnly = TRUE)
@@ -157,7 +157,15 @@ roiColors <- setNames(rainbow(length(parsedROIs)), parsedROIs)
 
 
 #Reshape from wide to long
-TableLong <- reshape2(Table, direction = "long")
+TableLong <- reshape(
+  Table,
+  varying = names(Table)[3:ncol(Table)],   # columns to pivot
+  v.names = "Value",
+  timevar = "Variable",
+  times = names(Table)[3:ncol(Table)],
+  idvar = c("FID", "IID", "Age", "Sex", "AffectionStatus"),
+  direction = "long"
+)
 
 #Histograms of phenotypes by AffectionStatus
 for (metric in c("FA", "MD", "AD", "RD")) {
