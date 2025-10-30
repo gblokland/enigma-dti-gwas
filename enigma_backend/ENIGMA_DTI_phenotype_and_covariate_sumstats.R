@@ -161,7 +161,11 @@ TableLong <- reshape(
 #Histograms of phenotypes by AffectionStatus
 for (metric in c("FA", "MD", "AD", "RD")) {
 TableLongMetric <- TableLong[grepl(paste0("^", metric), TableLong$variable), ]
-rownames(TableLongMetric) <- 1:nrow(TableLongMetric)
+#rownames(TableLongMetric) <- 1:nrow(TableLongMetric)
+# Only if unique and correct length
+if(length(unique(TableLong$FID)) == nrow(TableLong)) {
+  rownames(TableLong) <- TableLong$FID
+}
 print(head(TableLongMetric))
 
 dev.new()
