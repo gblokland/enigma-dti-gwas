@@ -486,11 +486,14 @@ if (n_CON > 5 & n_AFF > 5) {
   
   # Save results as csv
   write.csv(cohens_d_results,
-          file = paste0(outDir, cohort, "_cohens_d_results.csv"),
+          file = paste0(outDir, cohort, "_cohensd_results.csv"),
           row.names = FALSE)
 
+cohens_d_results <- cohens_d_results %>%
+  mutate(varlabel = factor(varlabel, levels = unique(varlabel[order(cohens_d_smd)])))
+
   # Plot
-  p <- ggplot(cohens_d_results, aes(x = variable, y = cohens_d_smd, fill = colour)) +
+  p <- ggplot(cohens_d_results, aes(x = varlabel, y = cohens_d_smd, fill = colour)) +
     geom_bar(stat = "identity", colour = "black", position = "dodge") +
     geom_errorbar(aes(ymin = cohens_d_smd - cohens_d_se,
                       ymax = cohens_d_smd + cohens_d_se),
@@ -498,7 +501,7 @@ if (n_CON > 5 & n_AFF > 5) {
     coord_flip() +
     facet_wrap(~metric, ncol = 2, scales = "free_y") +
     scale_y_continuous(limits = c(-1, 1), breaks = seq(-1, 1, 0.25)) +
-    scale_x_discrete(labels = cohens_d_results$varlabel) +
+    #scale_x_discrete(labels = cohens_d_results$varlabel) +
     geom_hline(yintercept = 0) +
     xlab("") + ylab("Cohen's d ± SE") +
     theme_bw() +
