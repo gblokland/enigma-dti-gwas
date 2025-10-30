@@ -187,7 +187,7 @@ p <- ggplot(TableLongMetric, aes(fill = AffectionStatus)) +
     bins = 30
   ) +
   facet_wrap(~parsedROIs, ncol = 8, scales = "free_x") +
-  xlim(range(Table[, paste0(metric, "_", parsedROIs)])) +
+  xlim(range(0,1)) +
   theme_set(theme_bw()) +
   xlab("Phenotype Value") +
   ylab("Number of Subjects") +
