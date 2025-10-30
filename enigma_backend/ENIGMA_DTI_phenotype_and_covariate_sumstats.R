@@ -495,5 +495,5 @@ if (n_CON > 5 & n_AFF > 5) {
   
   # Save
   plot_fd <- paste0(outDir, cohort, "_cohensd_bar_graph_AFF-CON.png")
-  ggsave(plot_fd, p, height = 30, width = 18, units = "cm", dpi = 600)
+  ggsave(plot_fd, p, height = 40, width = 18, units = "cm", dpi = 600)
 }
