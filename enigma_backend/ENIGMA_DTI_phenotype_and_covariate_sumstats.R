@@ -147,7 +147,7 @@ Nrois <- length(parsedROIs)
 writeLines(paste0("Nrois = ", Nrois))
 writeLines(paste0("ROIs: ", parsedROIs))
 
-roiLabels <- gsub(".L", " Left", gsub(".R", " Right", parsedROIs))
+roiLabels <- gsub("\\.L", " Left", gsub("\\.R", " Right", parsedROIs))
 roiColors <- setNames(rainbow(length(parsedROIs)), parsedROIs)
 
 Table$AffectionStatus <- factor(Table$AffectionStatus, 
