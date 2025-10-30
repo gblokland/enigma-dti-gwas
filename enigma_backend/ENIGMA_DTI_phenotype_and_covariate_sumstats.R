@@ -26,6 +26,14 @@ if (!requireNamespace("reshape", quietly = TRUE)) {
   install.packages("reshape")
 }
 suppressMessages(suppressWarnings(library(reshape)))
+if (!requireNamespace("dplyr", quietly = TRUE)) {
+  install.packages("dplyr")
+}
+suppressMessages(suppressWarnings(library(dplyr)))
+if (!requireNamespace("stringr", quietly = TRUE)) {
+  install.packages("stringr")
+}
+suppressMessages(suppressWarnings(library(stringr)))
 
 
 # Set up argument parser
@@ -157,6 +165,13 @@ TableLong <- reshape(
   direction = "long"
 )
 #print(head(TableLong))
+TableLong <- TableLong %>%
+  mutate(
+    Metric = str_extract(Variable, "^(FA|MD|AD|RD)"),
+    Tract = str_extract(Variable, "(?<=_)[A-Z]+"),
+    Side = str_extract(Variable, "(L|R)$"),
+    parsedROIs = paste0(Tract, ifelse(is.na(Side), "", paste0(".", Side)))
+  )
 
 #Histograms of phenotypes by AffectionStatus
 for (metric in c("FA", "MD", "AD", "RD")) {
