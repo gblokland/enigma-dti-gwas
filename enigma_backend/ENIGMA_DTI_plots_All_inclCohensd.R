@@ -217,7 +217,7 @@ if (Nrois > 0) {
         outliers <- if (length(minO) + length(maxO) > 0) {
           paste("Outliers (5-sd):", paste(as.character(Table[c(minO, maxO), 1]), collapse = ","))
         } else {
-          NA
+          "None"
         }
 
         # Check if both groups exist in the data
