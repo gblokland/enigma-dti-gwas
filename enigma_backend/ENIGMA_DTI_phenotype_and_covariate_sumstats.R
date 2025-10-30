@@ -44,6 +44,53 @@ parser$add_argument(
   help = "Cohort name"
 )
 parser$add_argument(
+  "--covarFILE",
+  default = "${COHORT}_enigma_dti_gwas.covar",
+  required = TRUE,
+  help = "Input text file containing covariates"
+)
+parser$add_argument(
+  "--phenoFILE",
+  default = "${COHORT}_enigma_dti_gwas.pheno",
+  required = TRUE,
+  help = "Input text file containing phenotypes (MRI/DTI)"
+)
+parser$add_argument(
+  "--ageColumnHeader",
+  default = "Age",
+  help = "Name of the Age variable"
+)
+parser$add_argument(
+  "--sexColumnHeader",
+  default = "Sex",
+  help = "Name of the Sex variable"
+)
+parser$add_argument(
+  "--maleIndicator",
+  default = "1",
+  help = "value used for male individuals"
+)
+parser$add_argument(
+  "--CaseControlCohort",
+  default = "1",
+  help = "CaseControlCohort yes(1) or no(0)"
+)
+parser$add_argument(
+  "--affectedStatusColumnHeader",
+  default = "AffectionStatus",
+  help = "Column header for Affection Status (case-control status)"
+)
+parser$add_argument(
+  "--affectedIndicator",
+  default = "2",
+  help = "value used for affected individuals"
+)
+parser$add_argument(
+  "--related",
+  default = "0",
+  help = "related cohort yes(1) or no(0)"
+)
+parser$add_argument(
   "--rois",
   default = "AverageFA;BCC;GCC;SCC;CC;CGC;CGH;CR;EC;FX;FXST;IC;IFO;PTR;SFO;SLF;SS;UNC;CST;ACR;ALIC;PCR;PLIC;RLIC;SCR;ACR.L;ACR.R;ALIC.L;ALIC.R;CGC.L;CGC.R;CGH.L;CGH.R;CR.L;CR.R;CST.L;CST.R;EC.L;EC.R;FX.ST.L;FX.ST.R;IC.L;IC.R;IFO.L;IFO.R;PCR.L;PCR.R;PLIC.L;PLIC.R;PTR.L;PTR.R;RLIC.L;RLIC.R;SCR.L;SCR.R;SFO.L;SFO.R;SLF.L;SLF.R;SS.L;SS.R;UNC.L;UNC.R",
   help = "Semicolon-separated list of ROIs"
@@ -64,15 +111,36 @@ parser$add_argument(
   help = "Output label for ENIGMA project"
 )
 
+args <- parser$parse_args()
+
+# Extract arguments
+cohort <- args$cohort
+covarFILE <- args$covarFILE
+phenoFILE <- args$phenoFILE
+ageColumnHeader <- args$ageColumnHeader
+sexColumnHeader <- args$sexColumnHeader
+maleIndicator <- args$maleIndicator
+CaseControlCohort <- args$CaseControlCohort
+affectedStatusColumnHeader <- args$affectedStatusColumnHeader
+affectedIndicator <- args$affectedIndicator
+related <- args$related
+rois <- args$rois
+pheno_covar_dir <- args$pheno_covar_dir
+outDir <- args$outDir
+outPDF <- args$outPDF
+outTXT <- args$outTXT
+eName <- args$eName
+
+# Create output directory if it doesn't exist
+dir.create(outDir, showWarnings = FALSE)
 #Table <- read.csv("Table.csv") #For initial testing
 
-cohort <- "DMS" # <-- change this as needed
-rois <- "AverageFA;BCC;GCC;SCC;CC;CGC;CGH;CR;EC;FX;FXST;IC;IFO;PTR;SFO;SLF;SS;UNC;CST;ACR;ALIC;PCR;PLIC;RLIC;SCR;ACR.L;ACR.R;ALIC.L;ALIC.R;CGC.L;CGC.R;CGH.L;CGH.R;CR.L;CR.R;CST.L;CST.R;EC.L;EC.R;FX.ST.L;FX.ST.R;IC.L;IC.R;IFO.L;IFO.R;PCR.L;PCR.R;PLIC.L;PLIC.R;PTR.L;PTR.R;RLIC.L;RLIC.R;SCR.L;SCR.R;SFO.L;SFO.R;SLF.L;SLF.R;SS.L;SS.R;UNC.L;UNC.R"
-outDir <- "./QC_ENIGMA/"
-eName <- "ENIGMA-DTI-GWAS"
-
-covarFILE <- paste0(cohort, "_enigma_dti_gwas.covar")
-phenoFILE <- paste0(cohort, "_enigma_dti_gwas.pheno")
+#cohort <- "DMS" # <-- change this as needed
+#covarFILE <- paste0(cohort, "_enigma_dti_gwas.covar")
+#phenoFILE <- paste0(cohort, "_enigma_dti_gwas.pheno")
+#rois <- "AverageFA;BCC;GCC;SCC;CC;CGC;CGH;CR;EC;FX;FXST;IC;IFO;PTR;SFO;SLF;SS;UNC;CST;ACR;ALIC;PCR;PLIC;RLIC;SCR;ACR.L;ACR.R;ALIC.L;ALIC.R;CGC.L;CGC.R;CGH.L;CGH.R;CR.L;CR.R;CST.L;CST.R;EC.L;EC.R;FX.ST.L;FX.ST.R;IC.L;IC.R;IFO.L;IFO.R;PCR.L;PCR.R;PLIC.L;PLIC.R;PTR.L;PTR.R;RLIC.L;RLIC.R;SCR.L;SCR.R;SFO.L;SFO.R;SLF.L;SLF.R;SS.L;SS.R;UNC.L;UNC.R"
+#outDir <- "./QC_ENIGMA/"
+#eName <- "ENIGMA-DTI-GWAS"
 
 covar <- read.table(covarFILE, header = TRUE)
 pheno <- read.table(phenoFILE, header = TRUE)
@@ -94,6 +162,7 @@ TableLong <- reshape2(Table, direction = "long")
 #Histograms of phenotypes by AffectionStatus
 for (metric in c("FA", "MD", "AD", "RD")) {
 TableLongMetric <- TableLong[grepl(metric, TableLong$variable), ]
+print(head(TableLongMetric))
 
 dev.new()
 p <- ggplot(TableLongMetric, aes(fill = AffectionStatus)) +
