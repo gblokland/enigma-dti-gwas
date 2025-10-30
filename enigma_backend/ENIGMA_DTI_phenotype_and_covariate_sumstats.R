@@ -465,6 +465,7 @@ if (n_CON > 5 & n_AFF > 5) {
       # Combine results into a row
       row <- data.frame(
         colour = roiColors[i],
+        metric = metric,
         variable = col_name,
         varlabel = roiLabels[i],
         cohens_d_smd = ci$smd,
@@ -480,7 +481,7 @@ if (n_CON > 5 & n_AFF > 5) {
   # Factor levels
   cohens_d_results$variable <- factor(cohens_d_results$variable, levels = cohens_d_results$variable)
   cohens_d_results$colour <- factor(cohens_d_results$colour, levels = unique(cohens_d_results$colour))
-  cohens_d_results$comparison <- "AFF-CON_All"
+  cohens_d_results$comparison <- "AFF-CON"
   cohens_d_results$cohort <- cohort
   
   # Save results as csv
@@ -495,6 +496,7 @@ if (n_CON > 5 & n_AFF > 5) {
                       ymax = cohens_d_smd + cohens_d_se),
                   width = 0.25, position = position_dodge(0.9)) +
     coord_flip() +
+    facet_wrap(~metric, ncol = 2, scales = "fixed_x") +
     scale_y_continuous(limits = c(-1, 1), breaks = seq(-1, 1, 0.25)) +
     scale_x_discrete(labels = cohens_d_results$varlabel) +
     geom_hline(yintercept = 0) +
