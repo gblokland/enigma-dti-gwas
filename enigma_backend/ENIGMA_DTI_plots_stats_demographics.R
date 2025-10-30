@@ -3,7 +3,7 @@
 ####
 ### This is a function to print out plots/stats for Quality Control of ENIGMA-DTI Covariates
 #############################################################################################
-### Written by Gabriella Blokland, based on script from Neda Jahanshad / Derrek Hibar
+### Author: Gabriella Blokland, based on script from Neda Jahanshad / Derrek Hibar
 ### Last update October 2025
 ### Questions or Comments:
 ### enigma.dtigenetics@gmail.com
@@ -278,7 +278,7 @@ generate_overlapping_histograms <- function(
     plot(
       hist_list[[1]],
       col = adjustcolor(colors[1], alpha.f = 0.5),
-      main = paste0(cohort, ": Overlapping Histograms of ", covariate, " by ", group_var, " (", group_label, ")"),
+      main = paste0(cohort, ": Histograms of ", covariate, " by ", group_var, " (", group_label, ")"),
       xlab = covariate,
       xlim = range(unlist(lapply(hist_list, function(h) h$breaks))),
       ylim = range(unlist(lapply(hist_list, function(h) h$counts))),

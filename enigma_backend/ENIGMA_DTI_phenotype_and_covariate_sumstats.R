@@ -1,6 +1,9 @@
-#ENIGMA-DTI-GWAS 2025
-#Author: Gabriella Blokland
-#Last Modified: September 2025
+### ENIGMA-DTI-GWAS 2025
+### This is a function to print out plots/stats for Quality Control 
+### and Basic Statistics of ENIGMA-DTI Phenotypes and Covariates
+###########################################################################
+### Author: Gabriella Blokland
+### Last update: October 2025
 ###########################################################################
 
 options(repos = c(CRAN = "https://cloud.r-project.org/"))
