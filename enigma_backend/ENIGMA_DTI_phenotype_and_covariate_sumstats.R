@@ -201,7 +201,7 @@ range_map <- list(
 # Select the correct range
 x_limits <- range_map[[metric]]
 
-dev.new()
+#dev.new() #Causes empty Rplots.pdf to get written
 p <- ggplot(TableLongMetric, aes(fill = AffectionStatus)) +
   geom_histogram(
     aes(x = Value, y = after_stat(count)),
@@ -244,7 +244,7 @@ graphics.off()
 
 
 #Histogram of Age range by AffectionStatus
-dev.new()
+#dev.new() #Causes empty Rplots.pdf to get written
 p <- ggplot(Table, aes(fill = AffectionStatus)) +
   geom_histogram(
     aes(x = Age, y = after_stat(count)),
