@@ -237,8 +237,8 @@ p <- ggplot(TableLongMetric, aes(fill = AffectionStatus)) +
   scale_y_continuous(expand = c(0, 0))
 plot_fd <- paste0(outDir, cohort, "_histogram_multi-panel_", metric, "_by_AffectionStatus.pdf")
 ggsave(filename = plot_fd, p, height = 24, width = 36, units = "cm", scale = 1, dpi = 600)
-dev.off()
-graphics.off()
+#dev.off()
+#graphics.off()
 
 }
 
@@ -280,8 +280,8 @@ p <- ggplot(Table, aes(fill = AffectionStatus)) +
   scale_y_continuous(expand = c(0, 0))
 plot_fd <- paste0(outDir, cohort, "_histogram_Age.pdf")
 ggsave(filename = plot_fd, p, height = 24, width = 36, units = "cm", scale = 1, dpi = 600)
-dev.off()
-graphics.off()
+#dev.off()
+#graphics.off()
 
 #Single histogram:
 plot_histogram <- function(df, feature) {
