@@ -147,7 +147,7 @@ Nrois <- length(parsedROIs)
 writeLines(paste0("Nrois = ", Nrois))
 writeLines(paste0("ROIs: ", parsedROIs))
 
-roiLabels <- gsub("_", " ", parsedROIs)
+roiLabels <- gsub(".L", " Left", gsub(".R", " Right", parsedROIs))
 roiColors <- setNames(rainbow(length(parsedROIs)), parsedROIs)
 
 Table$AffectionStatus <- factor(Table$AffectionStatus, 
@@ -399,115 +399,84 @@ ggsave(
 ### Cohen's d can be calculated as the difference between the means divided by the pooled SD
 ### pooled SD = SQRT((SUM((subject_value - mean_value)^2)) / (total number of observations - number of AffectionStatuss))
 
-# Initialize results vector
-cohens_d_results <- vector()
-
-# Subset table for the current cohort - do we need this if there are Dummy variables?
-#Table <- Table_orig[Table_orig$cohort == cohort, ]
+# Initialize results dataframe
+cohens_d_results <- data.frame()
 
 # Count group sizes
-n_CON <- nrow(Table[Table$AffectionStatus == "Control", ])
-n_AFF <- nrow(Table[Table$AffectionStatus == "Affected", ])
+n_CON <- sum(Table$AffectionStatus == "Control", na.rm = TRUE)
+n_AFF <- sum(Table$AffectionStatus == "Affected", na.rm = TRUE)
 
 # Run analysis only if both groups have sufficient data
 if (n_CON > 5 & n_AFF > 5) {
-  cohens_d <- vector()
-  cohens_d_smd <- vector()
-  cohens_d_cilb <- vector()
-  cohens_d_ciub <- vector()
-  cohens_d_se <- vector()
-  variable <- vector()
-  varlabel <- vector()
-  colour <- vector()
 
-  for (i in seq_along(parsedROIs)) {
-    for (metric in c("FA", "MD", "AD", "RD")) {
-    if (!all(is.na(Table[, paste0(metric, "_", parsedROIs[i])]))) {
-      # Compute Cohen's d manually
-      group_aff <- Table[Table$AffectionStatus == "Affected", paste0(metric, "_", parsedROIs[i])]
-      group_con <- Table[Table$AffectionStatus == "Control", paste0(metric, "_", parsedROIs[i])]
-
-      pooled_sd <- sqrt(
-        (sum((group_con - mean(group_con, na.rm = TRUE))^2, na.rm = TRUE) +
-          sum((group_aff - mean(group_aff, na.rm = TRUE))^2, na.rm = TRUE)) /
-          (length(na.omit(group_con)) + length(na.omit(group_aff)) - 2)
+  # Loop over metrics and ROIs
+  for (metric in c("FA", "MD", "AD", "RD")) {
+    for (i in seq_along(parsedROIs)) {
+      col_name <- paste0(metric, "_", parsedROIs[i])
+      
+      if (!all(is.na(Table[[col_name]]))) {
+        group_aff <- Table$AffectionStatus == "Affected"
+        group_con <- Table$AffectionStatus == "Control"
+        
+        x_aff <- Table[group_aff, col_name]
+        x_con <- Table[group_con, col_name]
+        
+        # Pooled SD
+        pooled_sd <- sqrt(
+          (sum((x_aff - mean(x_aff, na.rm = TRUE))^2, na.rm = TRUE) +
+             sum((x_con - mean(x_con, na.rm = TRUE))^2, na.rm = TRUE)) /
+            (length(na.omit(x_aff)) + length(na.omit(x_con)) - 2)
+        )
+        
+        # Cohen's d
+        d <- (mean(x_aff, na.rm = TRUE) - mean(x_con, na.rm = TRUE)) / pooled_sd
+        
+        # t-test
+        TT <- t.test(x_aff, x_con)
+        N1 <- length(na.omit(x_aff))
+        N2 <- length(na.omit(x_con))
+        
+        # Confidence intervals and SE (ci.smd from MBESS)
+        ci <- ci.smd(ncp = TT$statistic, n.1 = N1, n.2 = N2, conf.level = 0.95)
+        
+      } else {
+        d <- NA
+        ci <- list(smd = NA, Lower.Conf.Limit.smd = NA, Upper.Conf.Limit.smd = NA)
+      }
+      
+      # Combine results into a row
+      row <- data.frame(
+        colour = roiColors[i],
+        variable = col_name,
+        varlabel = roiLabels[i],
+        cohens_d_smd = ci$smd,
+        cohens_d_cilb = ci$Lower.Conf.Limit.smd,
+        cohens_d_ciub = ci$Upper.Conf.Limit.smd,
+        cohens_d_se = (ci$Upper.Conf.Limit.smd - ci$Lower.Conf.Limit.smd)/3.92
       )
-
-      cohens_d[i] <- (mean(group_aff, na.rm = TRUE) - mean(group_con, na.rm = TRUE)) / pooled_sd
-
-      # t-test
-      TT <- t.test(group_aff, group_con)
-      N1 <- length(na.omit(group_aff))
-      N2 <- length(na.omit(group_con))
-
-      # Confidence intervals and SE
-      ci <- ci.smd(ncp = TT$statistic, n.1 = N1, n.2 = N2, conf.level = .95)
-      cohens_d_smd[i] <- ci$smd
-      cohens_d_cilb[i] <- ci$Lower.Conf.Limit.smd
-      cohens_d_ciub[i] <- ci$Upper.Conf.Limit.smd
-      cohens_d_se[i] <- (cohens_d_ciub[i] - cohens_d_cilb[i]) / 3.92
-    } else {
-      cohens_d[i] <- NA
-      cohens_d_smd[i] <- NA
-      cohens_d_cilb[i] <- NA
-      cohens_d_ciub[i] <- NA
-      cohens_d_se[i] <- NA
-    }
-
-    variable[i] <- paste0(metric, "_", parsedROIs[i])
-    varlabel[i] <- roiLabels[i]
-    colour[i] <- roiColors[i]
+      
+      cohens_d_results <- rbind(cohens_d_results, row)
     }
   }
-
-  # Combine results into a dataframe
-  cohens_d <- data.frame(
-    colour,
-    variable,
-    varlabel,
-    cohens_d_smd,
-    cohens_d_cilb,
-    cohens_d_ciub,
-    cohens_d_se
-  )
-
-  cohens_d$variable <- factor(
-    as.character(cohens_d$variable),
-    levels = parsedROIs,
-    labels = parsedROIs
-  )
-  cohens_d$colour <- factor(
-    as.character(cohens_d$colour),
-    levels = unique(roiColors),
-    labels = unique(roiColors)
-  )
-  cohens_d$comparison <- paste("AFF-CON_", "All", sep = "")
-  cohens_d$cohort <- cohort
-
-  cohens_d_results <- rbind(cohens_d_results, cohens_d)
-
+  
+  # Factor levels
+  cohens_d_results$variable <- factor(cohens_d_results$variable, levels = cohens_d_results$variable)
+  cohens_d_results$colour <- factor(cohens_d_results$colour, levels = unique(cohens_d_results$colour))
+  cohens_d_results$comparison <- "AFF-CON_All"
+  cohens_d_results$cohort <- cohort
+  
   # Plot
-  dev.new()
-  par(mar = c(0, 0, 0, 0))
-  ggplot(cohens_d, aes(fill = colour)) +
-    geom_bar(
-      aes_string(x = "variable", y = "cohens_d_smd"),
-      colour = "black",
-      stat = "identity",
-      position = "dodge"
-    ) +
-    geom_errorbar(
-      aes(
-        x = variable,
-        ymin = cohens_d_smd - cohens_d_se,
-        ymax = cohens_d_smd + cohens_d_se
-      ),
-      stat = "identity",
-      position = "dodge",
-      width = .25
-    ) +
-    xlab("") +
-    ylab("Cohen's d Effect Size ± Standard Error") +
+  library(ggplot2)
+  p <- ggplot(cohens_d_results, aes(x = variable, y = cohens_d_smd, fill = colour)) +
+    geom_bar(stat = "identity", colour = "black", position = "dodge") +
+    geom_errorbar(aes(ymin = cohens_d_smd - cohens_d_se,
+                      ymax = cohens_d_smd + cohens_d_se),
+                  width = 0.25, position = position_dodge(0.9)) +
+    coord_flip() +
+    scale_y_continuous(limits = c(-1, 1), breaks = seq(-1, 1, 0.25)) +
+    scale_x_discrete(labels = cohens_d_results$varlabel) +
+    geom_hline(yintercept = 0) +
+    xlab("") + ylab("Cohen's d ± SE") +
     theme_bw() +
     theme(
       panel.background = element_rect(fill = "white", colour = "grey90"),
@@ -515,21 +484,12 @@ if (n_CON > 5 & n_AFF > 5) {
       axis.text.y = element_text(angle = 0, hjust = 1, colour = "black", size = 10, face = "bold"),
       axis.line = element_line(colour = "black"),
       legend.title = element_blank(),
-      legend.position = "none",
-      axis.ticks.x = element_line(colour = "black"),
-      axis.ticks.y = element_line(colour = "black"),
-      axis.title.x = element_text(angle = 0, hjust = 0.5, colour = "black")
+      legend.position = "none"
     ) +
-    scale_x_discrete(expand = c(0, 0), labels = cohens_d$varlabel) +
-    scale_y_continuous(limits = c(-1, 1), breaks = round(seq(-1, 1, 0.25), 2)) +
-    geom_hline(yintercept = 0) +
-    coord_flip() +
-    annotate("text", x = nvar - 0.5, y = 0.7, label = paste("n AFF =", n_AFF)) +
-    annotate("text", x = nvar - 1.5, y = 0.7, label = paste("n CON =", n_CON))
-
-  #plot_fd <- paste0(outDir, cohort, "_cohensd_bar_graph_AFF-CON_", correction, ".png")
+    annotate("text", x = nrow(cohens_d_results) - 0.5, y = 0.7, label = paste("n AFF =", n_AFF)) +
+    annotate("text", x = nrow(cohens_d_results) - 1.5, y = 0.7, label = paste("n CON =", n_CON))
+  
+  # Save
   plot_fd <- paste0(outDir, cohort, "_cohensd_bar_graph_AFF-CON.png")
-  ggsave(filename = plot_fd, height = 24, width = 18, units = "cm", scale = 1, dpi = 600)
-  dev.off()
-  graphics.off()
+  ggsave(plot_fd, p, height = 24, width = 18, units = "cm", dpi = 600)
 }
