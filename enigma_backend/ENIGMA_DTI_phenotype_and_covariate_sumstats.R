@@ -174,7 +174,7 @@ p <- ggplot(TableLongMetric, aes(fill = AffectionStatus)) +
   facet_wrap(~parsedROIs, ncol = 8, scales = "free_x") +
   xlim(range(Table[, paste0(metric, "_", parsedROIs)])) +
   theme_set(theme_bw()) +
-  xlab(axis_label) +
+  xlab("Phenotype Value") +
   ylab("Number of Subjects") +
   ggtitle(metric) +
   theme(
@@ -217,7 +217,7 @@ p <- ggplot(Table, aes(fill = AffectionStatus)) +
   ) +
   xlim(range(Table[, "Age"])) +
   theme_set(theme_bw()) +
-  xlab(axis_label) +
+  xlab("Age (Years)") +
   ylab("Number of Subjects") +
   ggtitle("Age") +
   theme(
