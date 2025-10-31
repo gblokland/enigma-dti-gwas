@@ -98,6 +98,7 @@ dir.create(outFolder, showWarnings = FALSE)
 #ALL_ROIS <- args[11]
 #ALL_ROIS <- as.character(parse(text=ALL_ROIS))
 ALL_ROIS <- c("ACR","ACR.L","ACR.R","ALIC","ALIC.L","ALIC.R","GlobalAverage","BCC","CC","CGC","CGC.L","CGC.R","CGH","CGH.L","CGH.R","CR","CR.L","CR.R","CST","CST.L","CST.R","EC","EC.L","EC.R","FX","FX.ST.L","FX.ST.R","FXST","GCC","IC","IC.L","IC.R","IFO","IFO.L","IFO.R","PCR","PCR.L","PCR.R","PLIC","PLIC.L","PLIC.R","PTR","PTR.L","PTR.R","RLIC","RLIC.L","RLIC.R","SCC","SCR","SCR.L","SCR.R","SFO","SFO.L","SFO.R","SLF","SLF.L","SLF.R","SS","SS.L","SS.R","UNC","UNC.L","UNC.R")
+ALL_ROIS <- c(paste0("FA_", ALL_ROIS), paste0("MD_", ALL_ROIS), paste0("AD_", ALL_ROIS), paste0("RD_", ALL_ROIS))
 
 run_dir <- args[13]
 
@@ -166,7 +167,7 @@ if (Ldups > 0){
 
 numsubjects = length(merged_temp$IID);
 
-writeLines(paste0('VERSION: ',format(Sys.Date(),"%m/%d/%Y")),con=zz,sep="\n")
+writeLines(paste0('VERSION: ',format(Sys.Date(),"%m/%d/%Y")), con=zz, sep="\n")
 
 # check whether we should also write files for subjects below AND above 18
 possible_subsets <- list(c(1,0,0),c("all","child","adult"),c(list(merged_temp,NULL,NULL)))
@@ -191,19 +192,19 @@ for (s in c(1:3)) {
     cat('\n')	
     cat(sprintf("PROCESSING %s SUBJECTS",suffix))
     writeLines(paste(''))
-    writeLines(sprintf('PROCESSING %s SUBJECTS',suffix),con=zz,sep="\n")
+    writeLines(sprintf('PROCESSING %s SUBJECTS',suffix), con=zz, sep="\n")
     columnnames = colnames(merged_temp);
     
     ### if no related individuals, create dummy paternal and maternal IDs
     # otherwise break to make sure these are entered
     if (related==0) {
-      writeLines(paste('STUDY DESIGN: There are no related individuals.'),con=zz,sep="\n")
+      writeLines(paste('STUDY DESIGN: There are no related individuals.'), con=zz, sep="\n")
     } 
     if (related==1) {
-      writeLines(paste('STUDY DESIGN: There are related individuals.'),con=zz,sep="\n")
+      writeLines(paste('STUDY DESIGN: There are related individuals.'), con=zz, sep="\n")
     } 
     if ( (length(merged_temp[,which(columnnames=="MID")])==0 ) || (length(merged_temp[,which(columnnames=="PID")])	==0) ) {
-      p=matrix(0,nrow=dim(merged_temp)[1],ncol=1)
+      p=matrix(0, nrow=dim(merged_temp)[1], ncol=1)
       merged_temp$PID=p
       merged_temp$MID=p
       cat("Adding in artifical MID and PID\n")
@@ -243,25 +244,25 @@ unique(bad_vals)
     
     ## Print some basic stats on age and sex to the RUN_NOTES.txt
     writeLines(paste(''))
-    writeLines(paste('Distribution stats for age in the selected group:'),con=zz,sep="\n")
-    writeLines(paste('		mean:',age_mean),con=zz,sep="\n")
-    writeLines(paste('		median:',age_md),con=zz,sep="\n")
-    writeLines(paste('		min:',min_age),con=zz,sep="\n")
-    writeLines(paste('		max:',max_age),con=zz,sep="\n")
-    writeLines(paste('There are',Nm,'males in this study.'),con=zz,sep="\n")
-    writeLines(paste('There are',Nf,'females in this study.'),con=zz,sep="\n")
+    writeLines(paste('Distribution stats for age in the selected group:'), con=zz, sep="\n")
+    writeLines(paste('		mean:',age_mean), con=zz, sep="\n")
+    writeLines(paste('		median:',age_md), con=zz, sep="\n")
+    writeLines(paste('		min:',min_age), con=zz, sep="\n")
+    writeLines(paste('		max:',max_age), con=zz, sep="\n")
+    writeLines(paste('There are',Nm,'males in this study.'), con=zz, sep="\n")
+    writeLines(paste('There are',Nf,'females in this study.'), con=zz, sep="\n")
     
     ##################### GB added #########################
     # TO DO:
     ## Print some basic stats on other covariates to the RUN_NOTES.txt
     writeLines(paste(''))
-    writeLines(paste('Distribution stats for age in the selected group:'),con=zz,sep="\n")
-    writeLines(paste('		mean:',age_mean),con=zz,sep="\n")
-    writeLines(paste('		median:',age_md),con=zz,sep="\n")
-    writeLines(paste('		min:',min_age),con=zz,sep="\n")
-    writeLines(paste('		max:',max_age),con=zz,sep="\n")
-    writeLines(paste('There are',Nm,'males in this study.'),con=zz,sep="\n")
-    writeLines(paste('There are',Nf,'females in this study.'),con=zz,sep="\n")
+    writeLines(paste('Distribution stats for age in the selected group:'), con=zz, sep="\n")
+    writeLines(paste('		mean:',age_mean), con=zz, sep="\n")
+    writeLines(paste('		median:',age_md), con=zz, sep="\n")
+    writeLines(paste('		min:',min_age), con=zz, sep="\n")
+    writeLines(paste('		max:',max_age), con=zz, sep="\n")
+    writeLines(paste('There are',Nm,'males in this study.'), con=zz, sep="\n")
+    writeLines(paste('There are',Nf,'females in this study.'), con=zz, sep="\n")
     ##################### end GB added #########################
     
     age_sexC=age*sexC
