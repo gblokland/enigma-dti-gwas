@@ -81,7 +81,7 @@ outFolder=cmdargs[12]
 dir.create(outFolder, showWarnings = FALSE)
 
 #ALL_ROIS=cmdargs[11]
-A#LL_ROIS=as.character(parse(text=ALL_ROIS))
+#ALL_ROIS=as.character(parse(text=ALL_ROIS))
 
 eName=cmdargs[13]
 
