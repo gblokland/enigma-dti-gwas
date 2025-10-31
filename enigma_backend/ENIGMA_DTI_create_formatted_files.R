@@ -26,9 +26,9 @@
 
 options(stringsAsFactors = FALSE)
 
-# Output files will include .dat and .ped files with all necessary covariates
+# Output files will include .covar and .pheno files with all necessary covariates
 # standard covariates include age, sex, age^2, age-x-sex, age^2-x-sex, and 4 MDS components
-# for DTI additional covariates, depending on model, are AverageFA, AverageMD, AverageAD, AverageRD
+# for DTI additional covariates, depending on model, are GlobalAverageFA, GlobalAverageMD, GlobalAverageAD, GlobalAverageRD
 ###### sex and interaction terms not included if single-sex study
 ###### AffectionStatus included if patients are included
 ###### AffectionStatus2 etc. included if multiple patient groups are present
@@ -37,55 +37,55 @@ options(stringsAsFactors = FALSE)
 ###### Each patient group needs its own dummy covariate column
 ####################################################################
 
-cmdargs = commandArgs(trailingOnly=T);
+cmdargs <- commandArgs(trailingOnly=T);
 
 ####
-csvFILE=cmdargs[1]
-localfamFILE=cmdargs[2] # IS THIS NEEDED HERE? DO WE NEED TO CHECK MATCHING SUBJECTS AGAIN?
+csvFILE <- cmdargs[1]
+localfamFILE <- cmdargs[2] # IS THIS NEEDED HERE? DO WE NEED TO CHECK MATCHING SUBJECTS AGAIN?
 #Another function that greps from a fam file and the covariates and phenotype file to check whether the merge between genotype and phenotype worked, and no data are lost or mismatched that shouldn’t be. FID and IID columns should match (same ID format) and there shouldn’t be (many) more subjects in one file compared to the other.
 ####
-pcaFILE=cmdargs[3]
-combinedROItableFILE=cmdargs[4]
-ageColumnHeader=cmdargs[5]
-sexColumnHeader=cmdargs[6]
+pcaFILE <- cmdargs[3]
+combinedROItableFILE <- cmdargs[4]
+ageColumnHeader <- cmdargs[5]
+sexColumnHeader <- cmdargs[6]
 
-maleIndicator=cmdargs[7]
+maleIndicator <- cmdargs[7]
 
-if (is.na(as.numeric(maleIndicator)) == "TRUE"){
+if (is.na(as.numeric(maleIndicator)) == "TRUE") {
   maleIndicator=maleIndicator
 } else {
   maleIndicator=as.numeric(maleIndicator)
 }
 
-CaseControlCohort=cmdargs[8]  ## have a column where all healthy are marked as 0s and all patients as 1
+CaseControlCohort <- cmdargs[8]  ## have a column where all healthy are marked as 0s and all patients as 1
 
-if (is.na(as.numeric(CaseControlCohort)) == "TRUE"){
+if (is.na(as.numeric(CaseControlCohort)) == "TRUE") {
   CaseControlCohort=CaseControlCohort
 } else {
   CaseControlCohort=as.numeric(CaseControlCohort)
 }
 
-affectionStatusColumnHeader=cmdargs[9] 
+affectionStatusColumnHeader <- cmdargs[9] 
 
-affectedIndicator=cmdargs[10] ## what is the number or letter or string used to identify an affected individual?
+affectedIndicator <- cmdargs[10] ## what is the number or letter or string used to identify an affected individual?
 
-related=cmdargs[11]  ## does your dataset contain related individuals (0 for no, 1 for yes)
+related <- cmdargs[11]  ## does your dataset contain related individuals (0 for no, 1 for yes)
 
-if (is.na(as.numeric(related)) == "TRUE"){
-  related=related
+if (is.na(as.numeric(related)) == "TRUE") {
+  related <- related
 } else {
-  related=as.numeric(related)
+  related <- as.numeric(related)
 }
 
-outFolder=cmdargs[12]
+outFolder <- cmdargs[12]
 dir.create(outFolder, showWarnings = FALSE)
 
-#ALL_ROIS=cmdargs[11]
-#ALL_ROIS=as.character(parse(text=ALL_ROIS))
+#ALL_ROIS <- cmdargs[11]
+#ALL_ROIS <- as.character(parse(text=ALL_ROIS))
 
-run_dir=cmdargs[13]
+run_dir <- cmdargs[13]
 
-eName=cmdargs[14]
+eName <- cmdargs[14]
 
 paste0(outFolder, "/", eName, "_RUN_NOTES.txt")
 
