@@ -1,0 +1,1 @@
+./extract_icv.sh subjlist.txt /path/to/subjects_dir

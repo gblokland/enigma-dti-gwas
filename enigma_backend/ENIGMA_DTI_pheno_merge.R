@@ -123,9 +123,10 @@ if (NsubjFam != NsubjFA) {
 # write.csv(Avg_ALL,paste0(outFolder,"/DTI_Measures_ENIGMA_ALL_Avg.csv"),quote=F,row.names=F)
 
 print(colnames(FA)); print(colnames(AD)); print(colnames(MD)); print(colnames(RD)); 
-colnames(AD)[colnames(AD) == "AverageFA"] ="AverageAD"
-colnames(MD)[colnames(MD) == "AverageFA"] ="AverageMD"
-colnames(RD)[colnames(RD) == "AverageFA"] ="AverageRD"
+colnames(FA)[colnames(FA) == "AverageFA"] ="GlobalAverage"
+colnames(AD)[colnames(AD) == "AverageFA"] ="GlobalAverage"
+colnames(MD)[colnames(MD) == "AverageFA"] ="GlobalAverage"
+colnames(RD)[colnames(RD) == "AverageFA"] ="GlobalAverage"
 colnames(FA)[2:length(colnames(FA))] <- paste0("FA_", colnames(FA)[2:length(colnames(FA))])
 colnames(AD)[2:length(colnames(AD))] <- paste0("AD_", colnames(AD)[2:length(colnames(AD))])
 colnames(MD)[2:length(colnames(MD))] <- paste0("MD_", colnames(MD)[2:length(colnames(MD))])
