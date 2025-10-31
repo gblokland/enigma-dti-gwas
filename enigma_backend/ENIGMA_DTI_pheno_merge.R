@@ -3,7 +3,7 @@
 # Last edit 2025 August
 
 ####################################################################
-cmdargs = commandArgs(trailingOnly=T);
+cmdargs = commandArgs(trailingOnly=T)
 csvFILE_FA=cmdargs[1]
 csvFILE_MD=cmdargs[2]
 csvFILE_AD=cmdargs[3]

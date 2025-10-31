@@ -1,18 +1,20 @@
 # * Written for ENIGMA-DTI-GWAS by Gabriella Blokland, Nina Roth Mota
 # * Inspired by createDatPed.R and createDatPed_flexible_files_plasticity.R
-# * Last edit 2025-10-07, by gblokland
+# * Last edit 2025-10-31, by gblokland
 
 ###### Basic INFO
 
 ###################################################################
 ## to run:
 # ${Rbin} --no-save --slave --args ${1} ${2} ...   ${10} <  ./.R
-# R --no-save --slave --args ${csvFILE} ${combinedROItableFILE} ${ageColumnHeader} ${sexColumnHeader} ${maleIndicator} ${CaseControlCohort} ${related} ${affectionStatusColumnHeader} ${pheno_covar_dir} <  ${run_directory}/ENIGMA_DTI_create_formatted_files.R
+# R --no-save --slave --args ${csvFILE} ${localfamFILE} ${combinedROItableFILE} ${pcaFILE} ${ageColumnHeader} ${sexColumnHeader} ${maleIndicator} ${CaseControlCohort} ${related} ${affectionStatusColumnHeader} ${pheno_covar_dir} <  ${run_directory}/ENIGMA_DTI_create_formatted_files.R
 ###################################################################
 
-# 10 INPUTS
-######  path to your *_PCACovariates.eigenvec file
+# 14 INPUTS
+######  path to your Covariates.csv file
+######  path to your local *.fam file
 ######  path to your combinedROItableFILE (merged output from TBSS pipeline) file: Phenotypes.csv
+######  path to your *_PCACovariates.eigenvec file
 ######  the column header for your age covariate
 ######  the column header for your sex covariate
 ######  what is the indicator for males in the sex column (M? 1? 2? ... )
@@ -20,6 +22,7 @@
 ######  does your dataset contain related individuals (0 for no, 1 for yes)
 ######  output folder to write formatted files into (doesn't have to exist yet!)
 ######  list of ROIs to run
+######  run_directory = SCRIPTS directory 
 ######  eName; used in output 
 
 ####################################################################
@@ -37,19 +40,31 @@ options(stringsAsFactors = FALSE)
 ###### Each patient group needs its own dummy covariate column
 ####################################################################
 
-cmdargs <- commandArgs(trailingOnly=T);
+options(repos = c(CRAN = "https://cloud.r-project.org/"))
+
+# Check and install argparse if not already installed
+if (!requireNamespace("argparse", quietly = TRUE)) {
+  install.packages("argparse")
+}
+library(argparse)
+
+# Set up argument parser
+parser <- ArgumentParser(description = "Formatting script for ENIGMA DTI GWAS")
+
+args <- commandArgs(trailingOnly = TRUE)
+print(args)
 
 ####
-csvFILE <- cmdargs[1]
-localfamFILE <- cmdargs[2] # IS THIS NEEDED HERE? DO WE NEED TO CHECK MATCHING SUBJECTS AGAIN?
+csvFILE <- args[1]
+localfamFILE <- args[2] # IS THIS NEEDED HERE? DO WE NEED TO CHECK MATCHING SUBJECTS AGAIN?
 #Another function that greps from a fam file and the covariates and phenotype file to check whether the merge between genotype and phenotype worked, and no data are lost or mismatched that shouldn’t be. FID and IID columns should match (same ID format) and there shouldn’t be (many) more subjects in one file compared to the other.
 ####
-pcaFILE <- cmdargs[3]
-combinedROItableFILE <- cmdargs[4]
-ageColumnHeader <- cmdargs[5]
-sexColumnHeader <- cmdargs[6]
+pcaFILE <- args[3]
+combinedROItableFILE <- args[4]
+ageColumnHeader <- args[5]
+sexColumnHeader <- args[6]
 
-maleIndicator <- cmdargs[7]
+maleIndicator <- args[7]
 
 if (is.na(as.numeric(maleIndicator)) == "TRUE") {
   maleIndicator=maleIndicator
@@ -57,7 +72,7 @@ if (is.na(as.numeric(maleIndicator)) == "TRUE") {
   maleIndicator=as.numeric(maleIndicator)
 }
 
-CaseControlCohort <- cmdargs[8]  ## have a column where all healthy are marked as 0s and all patients as 1
+CaseControlCohort <- args[8]  ## have a column where all healthy are marked as 0s and all patients as 1
 
 if (is.na(as.numeric(CaseControlCohort)) == "TRUE") {
   CaseControlCohort=CaseControlCohort
@@ -65,11 +80,11 @@ if (is.na(as.numeric(CaseControlCohort)) == "TRUE") {
   CaseControlCohort=as.numeric(CaseControlCohort)
 }
 
-affectionStatusColumnHeader <- cmdargs[9] 
+affectionStatusColumnHeader <- args[9] 
 
-affectedIndicator <- cmdargs[10] ## what is the number or letter or string used to identify an affected individual?
+affectedIndicator <- args[10] ## what is the number or letter or string used to identify an affected individual?
 
-related <- cmdargs[11]  ## does your dataset contain related individuals (0 for no, 1 for yes)
+related <- args[11]  ## does your dataset contain related individuals (0 for no, 1 for yes)
 
 if (is.na(as.numeric(related)) == "TRUE") {
   related <- related
@@ -77,15 +92,15 @@ if (is.na(as.numeric(related)) == "TRUE") {
   related <- as.numeric(related)
 }
 
-outFolder <- cmdargs[12]
+outFolder <- args[12]
 dir.create(outFolder, showWarnings = FALSE)
 
-#ALL_ROIS <- cmdargs[11]
+#ALL_ROIS <- args[11]
 #ALL_ROIS <- as.character(parse(text=ALL_ROIS))
 
-run_dir <- cmdargs[13]
+run_dir <- args[13]
 
-eName <- cmdargs[14]
+eName <- args[14]
 
 paste0(outFolder, "/", eName, "_RUN_NOTES.txt")
 
