@@ -83,18 +83,22 @@ dir.create(outFolder, showWarnings = FALSE)
 #ALL_ROIS=cmdargs[11]
 #ALL_ROIS=as.character(parse(text=ALL_ROIS))
 
-eName=cmdargs[13]
+run_dir=cmdargs[13]
+
+eName=cmdargs[14]
+
+paste0(outFolder, "/", eName, "_RUN_NOTES.txt")
 
 #Open a text file for writing (by subsequent commands)
-zz <- file(paste(outFolder,"/","RUN_NOTES.txt",sep=""),"w")
+zz <- file(paste0(outFolder, "/", eName, "_RUN_NOTES.txt"), "w")
 
 ####################################################################
 
-source('ENIGMA_functions_DTI.R')
+source(paste0(run_dir, "/enigma_backend/ENIGMA_functions_DTI.R"))
 
 ####################################################################
 
-ALL_IDS=c("FID","IID","MID","PID","Sex");
+ALL_IDS=c("FID", "IID", "MID", "PID", "Sex");
 
 Nids=length(ALL_IDS)
 Nrois=length(ALL_ROIS)
@@ -242,9 +246,6 @@ unique(bad_vals)
     writeLines(paste('		max:',max_age),con=zz,sep="\n")
     writeLines(paste('There are',Nm,'males in this study.'),con=zz,sep="\n")
     writeLines(paste('There are',Nf,'females in this study.'),con=zz,sep="\n")
-
-    ###source("ENIGMA_DTI_phenotype_and_covariate_sumstats.R") # REDUNDANT NOW BECAUSE OF ENIGMA_DTI_plots_stats_demographics-GB.R
-    
     ##################### end GB added #########################
     
     age_sexC=age*sexC
