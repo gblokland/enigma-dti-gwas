@@ -98,7 +98,10 @@ dir.create(outFolder, showWarnings = FALSE)
 #ALL_ROIS <- args[11]
 #ALL_ROIS <- as.character(parse(text=ALL_ROIS))
 ALL_ROIS <- c("ACR","ACR.L","ACR.R","ALIC","ALIC.L","ALIC.R","GlobalAverage","BCC","CC","CGC","CGC.L","CGC.R","CGH","CGH.L","CGH.R","CR","CR.L","CR.R","CST","CST.L","CST.R","EC","EC.L","EC.R","FX","FX.ST.L","FX.ST.R","FXST","GCC","IC","IC.L","IC.R","IFO","IFO.L","IFO.R","PCR","PCR.L","PCR.R","PLIC","PLIC.L","PLIC.R","PTR","PTR.L","PTR.R","RLIC","RLIC.L","RLIC.R","SCC","SCR","SCR.L","SCR.R","SFO","SFO.L","SFO.R","SLF","SLF.L","SLF.R","SS","SS.L","SS.R","UNC","UNC.L","UNC.R")
-ALL_ROIS <- c(paste0("FA_", ALL_ROIS), paste0("MD_", ALL_ROIS), paste0("AD_", ALL_ROIS), paste0("RD_", ALL_ROIS))
+ALL_ROIS <- c(paste0("FA_", ALL_ROIS), 
+paste0("MD_", ALL_ROIS), 
+paste0("AD_", ALL_ROIS), 
+paste0("RD_", ALL_ROIS))
 
 run_dir <- args[13]
 

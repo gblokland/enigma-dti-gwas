@@ -36,7 +36,19 @@ cd $ENIGMA_DTI_GWAS_dir
 rm -rf SCRIPTS; git clone git@github.com:gblokland/enigma-dti-gwas.git SCRIPTS
 
 
+csvFILE_FA="${pheno_covar_dir}/combinedROItable_FA.csv"
+csvFILE_MD="${pheno_covar_dir}/combinedROItable_MD.csv"
+csvFILE_AD="${pheno_covar_dir}/combinedROItable_AD.csv"
+csvFILE_RD="${pheno_covar_dir}/combinedROItable_RD.csv"
+#localfamFILE="$HOME/enigma/DTIgenetics/${datafile}_QC4.fam"
+localfamFILE="$HOME/enigma/DTIgenetics/DMS_ANCESTRY_ANALYST_DATE_QC4.fam"
+outFolder=$pheno_covar_dir
+
+
 ls ${ENIGMA_DTI_GWAS_dir}/QC_ENIGMA/
+
+
+
 
 
 Rscript ${ENIGMA_DTI_GWAS_dir}/SCRIPTS/enigma_backend/ENIGMA_DTI_plots_All_inclCohensd.R \

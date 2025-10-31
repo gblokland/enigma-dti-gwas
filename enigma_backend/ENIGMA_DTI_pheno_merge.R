@@ -15,8 +15,7 @@ outFolder=cmdargs[6]
 ROIS=c("ACR","ACR.L","ACR.R","ALIC","ALIC.L","ALIC.R","AverageFA","BCC","CC","CGC","CGC.L","CGC.R",
        "CGH","CGH.L","CGH.R","CR","CR.L","CR.R","CST","CST.L","CST.R","EC","EC.L","EC.R",
        "FX","FX.ST.L","FX.ST.R","FXST","GCC","IC","IC.L","IC.R","IFO","IFO.L","IFO.R","PCR",
-       "PCR.L","PCR.R","PLIC","PLIC.L","PLIC.R","PTR","PTR.L","PTR.R","RLIC","RLIC.L","RLIC.R","SCC",
-       "SCR","SCR.L","SCR.R","SFO","SFO.L","SFO.R","SLF","SLF.L","SLF.R","SS","SS.L","SS.R","UNC","UNC.L","UNC.R")
+       "PCR.L","PCR.R","PLIC","PLIC.L","PLIC.R","PTR","PTR.L","PTR.R","RLIC","RLIC.L","RLIC.R","SCC","SCR","SCR.L","SCR.R","SFO","SFO.L","SFO.R","SLF","SLF.L","SLF.R","SS","SS.L","SS.R","UNC","UNC.L","UNC.R")
 
 ROIS2=c("FA","MD","AD","RD")
 
@@ -41,22 +40,22 @@ NsubjRD=dim(RD)[1]
 subjectNames=FA[,1]
 
 if (NsubjFA != NsubjMD) {
-  stop("Number of Subjects with FA measures do not match those with MD. Please make sure your files are correct.")
+  stop("Number of Subjects with FA measures does not match N with MD. Please make sure your files are correct.")
 }
 if (NsubjFA != NsubjAD) {
-  stop("Number of Subjects with FA measures do not match those with AD. Please make sure your files are correct.")
+  stop("Number of Subjects with FA measures does not match N with AD. Please make sure your files are correct.")
 }
 if (NsubjFA != NsubjRD) {
-  stop("Number of Subjects with FA measures do not match those with RD. Please make sure your files are correct.")
+  stop("Number of Subjects with FA measures does not match N with RD. Please make sure your files are correct.")
 }
 if (NsubjMD != NsubjAD) {
-  stop("Number of Subjects with MD measures do not match those with AD. Please make sure your files are correct.")
+  stop("Number of Subjects with MD measures does not match N with AD. Please make sure your files are correct.")
 }
 if (NsubjMD != NsubjRD) {
-  stop("Number of Subjects with MD measures do not match those with RD. Please make sure your files are correct.")
+  stop("Number of Subjects with MD measures does not match N with RD. Please make sure your files are correct.")
 }
 if (NsubjAD != NsubjRD) {
-  stop("Number of Subjects with AD measures do not match those with RD. Please make sure your files are correct.")
+  stop("Number of Subjects with AD measures does not match N with RD. Please make sure your files are correct.")
 }
 
 fam <- data.frame(read.table(localfamFILE,colClasses = "character")) # if you have column names with unstandard symbols ("-") use this
@@ -66,7 +65,7 @@ NsubjFam=dim(fam)[1]
 
 if (NsubjFam != NsubjFA) {
        print(NsubjFam); print(NsubjFA)
-  stop("Number of Subjects with genotype data do not match those with FA measures. Please make sure your files are correct.")
+  warning("Number of Subjects with genotype data does not match N with FA measures. Please make sure your files are correct.")
 }
 
 
