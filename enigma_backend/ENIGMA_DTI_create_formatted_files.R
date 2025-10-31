@@ -40,15 +40,16 @@ options(stringsAsFactors = FALSE)
 cmdargs = commandArgs(trailingOnly=T);
 
 ####
-localfamFILE=cmdargs[1] # IS THIS NEEDED HERE? DO WE NEED TO CHECK MATCHING SUBJECTS AGAIN?
+csvFILE=cmdargs[1]
+localfamFILE=cmdargs[2] # IS THIS NEEDED HERE? DO WE NEED TO CHECK MATCHING SUBJECTS AGAIN?
 #Another function that greps from a fam file and the covariates and phenotype file to check whether the merge between genotype and phenotype worked, and no data are lost or mismatched that shouldn’t be. FID and IID columns should match (same ID format) and there shouldn’t be (many) more subjects in one file compared to the other.
 ####
-pcaFILE=cmdargs[1]
-combinedROItableFILE=cmdargs[2]
-ageColumnHeader=cmdargs[3]
-sexColumnHeader=cmdargs[4]
+pcaFILE=cmdargs[3]
+combinedROItableFILE=cmdargs[4]
+ageColumnHeader=cmdargs[5]
+sexColumnHeader=cmdargs[6]
 
-maleIndicator=cmdargs[5]
+maleIndicator=cmdargs[7]
 
 if (is.na(as.numeric(maleIndicator)) == "TRUE"){
   maleIndicator=maleIndicator
@@ -56,7 +57,7 @@ if (is.na(as.numeric(maleIndicator)) == "TRUE"){
   maleIndicator=as.numeric(maleIndicator)
 }
 
-CaseControlCohort=cmdargs[6]  ## have a column where all healthy are marked as 0s and all patients as 1
+CaseControlCohort=cmdargs[8]  ## have a column where all healthy are marked as 0s and all patients as 1
 
 if (is.na(as.numeric(CaseControlCohort)) == "TRUE"){
   CaseControlCohort=CaseControlCohort
@@ -64,11 +65,11 @@ if (is.na(as.numeric(CaseControlCohort)) == "TRUE"){
   CaseControlCohort=as.numeric(CaseControlCohort)
 }
 
-affectionStatusColumnHeader=cmdargs[7] 
+affectionStatusColumnHeader=cmdargs[9] 
 
-affectedIndicator=cmdargs[8] ## what is the number or letter or string used to identify an affected individual?
+affectedIndicator=cmdargs[10] ## what is the number or letter or string used to identify an affected individual?
 
-related=cmdargs[9]  ## does your dataset contain related individuals (0 for no, 1 for yes)
+related=cmdargs[11]  ## does your dataset contain related individuals (0 for no, 1 for yes)
 
 if (is.na(as.numeric(related)) == "TRUE"){
   related=related
@@ -76,13 +77,13 @@ if (is.na(as.numeric(related)) == "TRUE"){
   related=as.numeric(related)
 }
 
-outFolder=cmdargs[10]
+outFolder=cmdargs[12]
 dir.create(outFolder, showWarnings = FALSE)
 
-ALL_ROIS=cmdargs[11]
-ALL_ROIS=as.character(parse(text=ALL_ROIS))
+#ALL_ROIS=cmdargs[11]
+A#LL_ROIS=as.character(parse(text=ALL_ROIS))
 
-eName=cmdargs[12]
+eName=cmdargs[13]
 
 #Open a text file for writing (by subsequent commands)
 zz <- file(paste(outFolder,"/","RUN_NOTES.txt",sep=""),"w")
