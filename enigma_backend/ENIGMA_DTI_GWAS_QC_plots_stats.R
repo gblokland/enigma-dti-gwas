@@ -104,6 +104,19 @@ if (!all(c("FID","IID") %in% names(covar)) || !all(c("FID","IID") %in% names(phe
 Table <- merge(covar, pheno, by = c("FID", "IID"), all = TRUE)
 message("Merged table rows: ", nrow(Table))
 
+# Normalize group variable
+Table$AffectionStatus <- trimws(as.character(Table$AffectionStatus))
+Table$AffectionStatus <- tolower(Table$AffectionStatus)
+Table$AffectionStatus <- ifelse(Table$AffectionStatus %in% c("affected", "1", "case"),
+                                "Affected",
+                                ifelse(Table$AffectionStatus %in% c("control", "0", "healthy"),
+                                       "Control", NA))
+Table$AffectionStatus <- factor(Table$AffectionStatus, levels = c("Control", "Affected"))
+
+# Check
+table(Table$AffectionStatus)
+
+
 # ---------------- ROIs and labels ----------------
 parsedROIs <- unlist(strsplit(rois, ";"))
 parsedROIs <- parsedROIs[parsedROIs != ""]
