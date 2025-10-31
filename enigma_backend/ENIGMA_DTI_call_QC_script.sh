@@ -63,7 +63,7 @@ Rscript ${ENIGMA_DTI_GWAS_dir}/SCRIPTS/enigma_backend/ENIGMA_DTI_phenotype_and_c
 --outDir "${ENIGMA_DTI_GWAS_dir}/QC_ENIGMA/" \
 
 
-Rscript ENIGMA_DTI_GWAS_QC_plots_stats.R \
+Rscript ${ENIGMA_DTI_GWAS_dir}/SCRIPTS/enigma_backend/ENIGMA_DTI_GWAS_QC_plots_stats.R \
 --cohort ${COHORT} \
 --covarFILE "${ENIGMA_DTI_GWAS_dir}/pheno_covar/${COHORT}_enigma_dti_gwas.covar" \
 --phenoFILE "${ENIGMA_DTI_GWAS_dir}/pheno_covar/${COHORT}_enigma_dti_gwas.pheno" \
