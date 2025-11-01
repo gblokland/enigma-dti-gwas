@@ -425,7 +425,9 @@ for (s in c(1:3)) {
 
       # remove covariates without variance in the healthy group - TO FIX
       
-      FullInfoFile_healthy <- subset(FullInfoFile_healthy,rowSums(data.frame(sapply(FullInfoFile_healthy[,patients_covars],as.numeric))[,,drop=FALSE])==0);
+      #FullInfoFile_healthy <- subset(FullInfoFile_healthy,rowSums(data.frame(sapply(FullInfoFile_healthy[,patients_covars],as.numeric))[,,drop=FALSE])==0);
+
+      FullInfoFile_healthy <- FullInfoFile_healthy[complete.cases(FullInfoFile_healthy[, patients_covars]), ]
 
       if (nrow(FullInfoFile_healthy) > 0) {
         VarNames=colnames(FullInfoFile_healthy)
