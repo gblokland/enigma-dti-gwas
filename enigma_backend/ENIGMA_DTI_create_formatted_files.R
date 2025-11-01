@@ -7,23 +7,25 @@
 ###################################################################
 ## to run:
 # ${Rbin} --no-save --slave --args ${1} ${2} ...   ${10} <  ./.R
-# R --no-save --slave --args ${csvFILE} ${localfamFILE} ${pcaFILE} ${combinedROItableFILE} ${ageColumnHeader} ${sexColumnHeader} ${maleIndicator} ${CaseControlCohort} ${affectionStatusColumnHeader} ${affectedIndicator} ${related} ${pheno_covar_dir} ${run_dir} ${eName} <  ${run_directory}/ENIGMA_DTI_create_formatted_files.R
+# R --no-save --slave --args ${csvFILE} ${localfamFILE} ${pcaFILE} ${combinedROItableFILE} ${ageColumnHeader} ${sexColumnHeader} ${maleIndicator} ${CaseControlCohort} ${affectionStatusColumnHeader} ${affectedIndicator} ${related} ${outDir} ${run_dir} ${eName} <  ${run_directory}/ENIGMA_DTI_create_formatted_files.R
 ###################################################################
 
 # 14 INPUTS
-######  path to your Covariates.csv file
-######  path to your local *.fam file
-######  path to your combinedROItableFILE (merged output from TBSS pipeline) file: Phenotypes.csv
-######  path to your *_PCACovariates.eigenvec file
-######  the column header for your age covariate
-######  the column header for your sex covariate
-######  what is the indicator for males in the sex column (M? 1? 2? ... )
-######  does your dataset contain patients (0 for no, 1 for yes)
-######  does your dataset contain related individuals (0 for no, 1 for yes)
-######  output folder to write formatted files into (doesn't have to exist yet!)
+######  1. path to your Covariates.csv file
+######  2. path to your local *.fam file
+######  3. path to your *_PCACovariates.eigenvec file
+######  4. path to your combinedROItableFILE (merged output from TBSS pipeline) file: Phenotypes.csv
+######  5. the column header for your age covariate
+######  6. the column header for your sex covariate
+######  7. what is the indicator for males in the sex column (M? 1? 2? ... )
+######  8. does your dataset contain patients (0 for no, 1 for yes)
+######  9. the column header for your AffectionStatus covariate
+######  10. what is the indicator for affected individuals in the sex column (A? 1? 2? ... )
+######  11. does your dataset contain related individuals (0 for no, 1 for yes)
+######  12. output directory to write formatted files into (doesn't have to exist yet!)
 ######  list of ROIs to run
-######  run_directory = SCRIPTS directory 
-######  eName; used in output 
+######  13. run_directory = SCRIPTS directory 
+######  14. eName; used in output 
 
 ####################################################################
 
@@ -92,25 +94,25 @@ if (is.na(as.numeric(related)) == "TRUE") {
   related <- as.numeric(related)
 }
 
-outFolder <- args[12]
-dir.create(outFolder, showWarnings = FALSE)
+outDir <- args[12]
+dir.create(outDir, showWarnings = FALSE)
 
 #ALL_ROIS <- args[11]
 #ALL_ROIS <- as.character(parse(text=ALL_ROIS))
 ALL_ROIS <- c("ACR","ACR.L","ACR.R","ALIC","ALIC.L","ALIC.R","GlobalAverage","BCC","CC","CGC","CGC.L","CGC.R","CGH","CGH.L","CGH.R","CR","CR.L","CR.R","CST","CST.L","CST.R","EC","EC.L","EC.R","FX","FX.ST.L","FX.ST.R","FXST","GCC","IC","IC.L","IC.R","IFO","IFO.L","IFO.R","PCR","PCR.L","PCR.R","PLIC","PLIC.L","PLIC.R","PTR","PTR.L","PTR.R","RLIC","RLIC.L","RLIC.R","SCC","SCR","SCR.L","SCR.R","SFO","SFO.L","SFO.R","SLF","SLF.L","SLF.R","SS","SS.L","SS.R","UNC","UNC.L","UNC.R")
 ALL_ROIS <- c(paste0("FA_", ALL_ROIS), 
-paste0("MD_", ALL_ROIS), 
-paste0("AD_", ALL_ROIS), 
-paste0("RD_", ALL_ROIS))
+              paste0("MD_", ALL_ROIS), 
+              paste0("AD_", ALL_ROIS), 
+              paste0("RD_", ALL_ROIS))
 
 run_dir <- args[13]
 
 eName <- args[14]
 
-paste0(outFolder, "/", eName, "_RUN_NOTES.txt")
+paste0(outDir, "/", eName, "_RUN_NOTES.txt")
 
 #Open a text file for writing (by subsequent commands)
-zz <- file(paste0(outFolder, "/", eName, "_RUN_NOTES.txt"), "w")
+zz <- file(paste0(outDir, "/", eName, "_RUN_NOTES.txt"), "w")
 
 ####################################################################
 
@@ -136,6 +138,7 @@ colnames(pca) <- c("FID", "IID", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7"
 #Read in fam file
 fam <- read.table(localfamFILE, colClasses = "character")
 colnames(fam) <- c("FID", "IID", "PID", "MID", "SEX", "PHENO")
+fam <- fam[,c("FID", "IID")]
 
 #Read in the phenotypes file
 InfoFile <- data.frame(read.csv(combinedROItableFILE, colClasses = "character")) 
@@ -255,6 +258,7 @@ for (s in c(1:3)) {
     #merged_temp[,sexColumnHeader]
     bad_vals <- merged_temp[,sexColumnHeader][!merged_temp[,sexColumnHeader] %in% c("M", "F") | is.na(merged_temp[,sexColumnHeader])]
     unique(bad_vals)
+
     ### What happens if there is missing sex? It assigns as female.
     sex=merged_temp[,which(columnnames==sexColumnHeader)]
     males=which(sex==maleIndicator)
@@ -352,7 +356,8 @@ for (s in c(1:3)) {
     nVar=dim(FullInfoFile)[2]
     Nset=Nids+Nrois
     nCov=nVar-Nset ### all the covariates that are left after removal of genetic-family columns and followup duration 
-    FullInfoFile=moveMe(FullInfoFile,ALL_ROIS,"after",sexColumnHeader)
+    #FullInfoFile=moveMe(FullInfoFile,ALL_ROIS,"after","Sex")
+    FullInfoFile[,sexColumnHeader] <- NULL
     
     numsubjects = length(FullInfoFile$IID);
     
@@ -473,10 +478,10 @@ for (s in c(1:3)) {
       writeLines(paste('    There are',numsubjects,'subjects.'),con=zz,sep="\n")
       writeLines(paste('    There are',nCov_irrespective,'covariates for all subjects irrespective of disease.'),con=zz,sep="\n")
       writeLines(paste('     -', cbind(colnames(FullInfoFile_irrespective)[(Nset+1):nVar_irrespective])),con=zz,sep="\n")
-      write.table(cbind(c(rep("T",Nrois),rep("C",nCov_irrespective)),c(colnames(FullInfoFile_irrespective)[(Nids+1):(nVar_irrespective)])),paste(outFolder,"/ENIGMA_",eName,"_DATfile_",suffix,"_irrespective.dat",sep=""),col.names=F,row.names=F,quote=F);
-      write.table(FullInfoFile_irrespective,paste(outFolder,"/ENIGMA_",eName,"_PEDfile_",suffix,"_irrespective.ped",sep=""),quote=F,col.names=F,row.names=F);
-      write.table(FullInfoFile_irrespective,paste(outFolder,"/ENIGMA_",eName,"_PEDfile_wColNames_",suffix,"_irrespective.tbl",sep=""),quote=F,col.names=T,row.names=F);
-      write.table(colnames(FullInfoFile_irrespective),paste(outFolder,"/ENIGMA_",eName,"_PEDfile_",suffix,"_irrespective.header",sep=""),quote=F,col.names=F,row.names=F);
+      write.table(cbind(c(rep("T",Nrois),rep("C",nCov_irrespective)),c(colnames(FullInfoFile_irrespective)[(Nids+1):(nVar_irrespective)])),paste(outDir,"/ENIGMA_",eName,"_DATfile_",suffix,"_irrespective.dat",sep=""),col.names=F,row.names=F,quote=F);
+      write.table(FullInfoFile_irrespective,paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_irrespective.ped",sep=""),quote=F,col.names=F,row.names=F);
+      write.table(FullInfoFile_irrespective,paste(outDir,"/ENIGMA_",eName,"_PEDfile_wColNames_",suffix,"_irrespective.tbl",sep=""),quote=F,col.names=T,row.names=F);
+      write.table(colnames(FullInfoFile_irrespective),paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_irrespective.header",sep=""),quote=F,col.names=F,row.names=F);
     } else {
       cat('	Not enough subjects for the ',suffix,' group, no files written.\n')
       writeLines(paste('    Not enough subjects for the ',suffix,' group, no files written.'),con=zz,sep="\n")
@@ -492,10 +497,10 @@ for (s in c(1:3)) {
       writeLines(paste('    There are',nCov_all_disease_corr,'covariates for all subjects correcting for disease.'),con=zz,sep="\n")
       if (nSub_irrespective >= nCov_all_disease_corr) {
         writeLines(paste('     -', cbind(colnames(FullInfoFile_all_disease_corrected)[(Nset+1):nVar_disease_corr])),con=zz,sep="\n")
-        write.table(FullInfoFile_all_disease_corrected,paste(outFolder,"/ENIGMA_",eName,"_PEDfile_",suffix,"_mixedHD.ped",sep=""),quote=F,col.names=F,row.names=F);
-        write.table(FullInfoFile_all_disease_corrected,paste(outFolder,"/ENIGMA_",eName,"_PEDfile_wColNames_",suffix,"_mixedHD.tbl",sep=""),quote=F,col.names=T,row.names=F);
-        write.table(colnames(FullInfoFile_all_disease_corrected),paste(outFolder,"/ENIGMA_",eName,"_PEDfile_",suffix,"_mixedHD.header",sep=""),quote=F,col.names=F,row.names=F);
-        write.table(cbind(c(rep("T",Nrois),rep("C",nCov_all_disease_corr)),c(colnames(FullInfoFile_all_disease_corrected)[(Nids+1):nVar_disease_corr])),paste(outFolder,"/ENIGMA_",eName,"_DATfile_",suffix,"_mixedHD.dat",sep=""),col.names=F,row.names=F,quote=F);
+        write.table(FullInfoFile_all_disease_corrected,paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_mixedHD.ped",sep=""),quote=F,col.names=F,row.names=F);
+        write.table(FullInfoFile_all_disease_corrected,paste(outDir,"/ENIGMA_",eName,"_PEDfile_wColNames_",suffix,"_mixedHD.tbl",sep=""),quote=F,col.names=T,row.names=F);
+        write.table(colnames(FullInfoFile_all_disease_corrected),paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_mixedHD.header",sep=""),quote=F,col.names=F,row.names=F);
+        write.table(cbind(c(rep("T",Nrois),rep("C",nCov_all_disease_corr)),c(colnames(FullInfoFile_all_disease_corrected)[(Nids+1):nVar_disease_corr])),paste(outDir,"/ENIGMA_",eName,"_DATfile_",suffix,"_mixedHD.dat",sep=""),col.names=F,row.names=F,quote=F);
       } else {
         cat('	Not enough subjects for the ',suffix,' group when controlling for disease, no files written.\n')
         writeLines(paste('    Not enough subjects for the ',suffix,' group when controlling for disease, no files written.'),con=zz,sep="\n")
@@ -507,10 +512,10 @@ for (s in c(1:3)) {
       writeLines(paste('    There are',nCov_healthy,'covariates for all healthy subjects.'),con=zz,sep="\n")
       if (nSub_healthy >= nCov_healthy) {
         writeLines(paste('     -', colnames(FullInfoFile_healthy)[(Nset+1):nVar_healthy]),con=zz,sep="\n")
-        write.table(FullInfoFile_healthy,paste(outFolder,"/ENIGMA_",eName,"_PEDfile_",suffix,"_healthy.ped",sep=""),quote=F,col.names=F,row.names=F);
-        write.table(FullInfoFile_healthy,paste(outFolder,"/ENIGMA_",eName,"_PEDfile_wColNames_",suffix,"_healthy.tbl",sep=""),quote=F,col.names=T,row.names=F);
-        write.table(colnames(FullInfoFile_healthy),paste(outFolder,"/ENIGMA_",eName,"_PEDfile_",suffix,"_healthy.header",sep=""),quote=F,col.names=F,row.names=F);
-        write.table(cbind(c(rep("T",Nrois),rep("C",nCov_healthy)),c(colnames(FullInfoFile_healthy)[(Nids+1):nVar_healthy])),paste(outFolder,"/ENIGMA_",eName,"_DATfile_",suffix,"_healthy.dat",sep=""),col.names=F,row.names=F,quote=F);
+        write.table(FullInfoFile_healthy,paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_healthy.ped",sep=""),quote=F,col.names=F,row.names=F);
+        write.table(FullInfoFile_healthy,paste(outDir,"/ENIGMA_",eName,"_PEDfile_wColNames_",suffix,"_healthy.tbl",sep=""),quote=F,col.names=T,row.names=F);
+        write.table(colnames(FullInfoFile_healthy),paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_healthy.header",sep=""),quote=F,col.names=F,row.names=F);
+        write.table(cbind(c(rep("T",Nrois),rep("C",nCov_healthy)),c(colnames(FullInfoFile_healthy)[(Nids+1):nVar_healthy])),paste(outDir,"/ENIGMA_",eName,"_DATfile_",suffix,"_healthy.dat",sep=""),col.names=F,row.names=F,quote=F);
       } else {
         cat('Not enough subjects for the ',suffix,'healthy group, no files written.\n')
         writeLines(paste('Not enough subjects for the ',suffix,' healthy group, no files written.'),con=zz,sep="\n")
@@ -522,10 +527,10 @@ for (s in c(1:3)) {
       writeLines(paste('    There are',nCov_patients,'covariates for all disease subjects.'),con=zz,sep="\n")
       if (nSub_patients <= nCov_healthy) { #TO CHECK
         writeLines(paste('     -', colnames(FullInfoFile_patients)[(Nset+1):nVar_patients]),con=zz,sep="\n")
-        write.table(FullInfoFile_patients,paste(outFolder,"/ENIGMA_",eName,"_PEDfile_",suffix,"_disease.ped",sep=""),quote=F,col.names=F,row.names=F);
-        write.table(FullInfoFile_patients,paste(outFolder,"/ENIGMA_",eName,"_PEDfile_wColNames_",suffix,"_disease.tbl",sep=""),quote=F,col.names=T,row.names=F);
-        write.table(colnames(FullInfoFile_patients),paste(outFolder,"/ENIGMA_",eName,"_PEDfile_",suffix,"_disease.header",sep=""),quote=F,col.names=F,row.names=F);
-        write.table(cbind(c(rep("T",Nrois),rep("C",nCov_patients)),c(colnames(FullInfoFile_patients)[(Nids+1):nVar_patients])),paste(outFolder,"/ENIGMA_",eName,"_DATfile_",suffix,"_disease.dat",sep=""),col.names=F,row.names=F,quote=F);
+        write.table(FullInfoFile_patients,paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_disease.ped",sep=""),quote=F,col.names=F,row.names=F);
+        write.table(FullInfoFile_patients,paste(outDir,"/ENIGMA_",eName,"_PEDfile_wColNames_",suffix,"_disease.tbl",sep=""),quote=F,col.names=T,row.names=F);
+        write.table(colnames(FullInfoFile_patients),paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_disease.header",sep=""),quote=F,col.names=F,row.names=F);
+        write.table(cbind(c(rep("T",Nrois),rep("C",nCov_patients)),c(colnames(FullInfoFile_patients)[(Nids+1):nVar_patients])),paste(outDir,"/ENIGMA_",eName,"_DATfile_",suffix,"_disease.dat",sep=""),col.names=F,row.names=F,quote=F);
       } else {
         cat('Not enough subjects for the ',suffix,'disease group, no files written.\n')
         writeLines(paste('Not enough subjects for the ',suffix,' disease group, no files written.'),con=zz,sep="\n")
@@ -536,7 +541,7 @@ for (s in c(1:3)) {
   }
 }
 
-cat('****** DONE ****** Files have been written to ',outFolder,'\n')
+cat('****** DONE ****** Files have been written to ',outDir,'\n')
 writeLines(paste('****** DONE ****** Files have been written. '),con=zz,sep="\n")
 close(zz)
 

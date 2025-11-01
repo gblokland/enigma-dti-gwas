@@ -64,12 +64,12 @@ maleIndicator="male" #maleIndicator="M" #What is the indicator for males in the 
 affectionStatusColumnHeader="AffectionStatus"; #Column header for your affection status covariate (Case sensitive); modify if different
 affectedIndicator="1" #affectedIndicator="A" #What is the indicator for affected (i.e. cases, patients) individuals?; modify if different
 related="0" #0 for unrelated cohorts; 1 for related cohorts
-pheno_covar_dir="${ENIGMA_DTI_GWAS_dir}/pheno_covar"
+outDir="${ENIGMA_DTI_GWAS_dir}/pheno_covar"
 run_dir="${run_directory}"
 eName="ENIGMA_DTI_GWAS"
 
 
-R --no-save --slave --args ${csvFILE} ${localfamFILE} ${pcaFILE} ${combinedROItableFILE} ${ageColumnHeader} ${sexColumnHeader} ${maleIndicator} ${CaseControlCohort} ${affectionStatusColumnHeader} ${affectedIndicator} ${related} ${pheno_covar_dir} ${run_dir} ${eName} <  ${run_directory}/enigma_backend/ENIGMA_DTI_create_formatted_files.R
+R --no-save --slave --args ${csvFILE} ${localfamFILE} ${pcaFILE} ${combinedROItableFILE} ${ageColumnHeader} ${sexColumnHeader} ${maleIndicator} ${CaseControlCohort} ${affectionStatusColumnHeader} ${affectedIndicator} ${related} ${outDir} ${run_dir} ${eName} <  ${run_directory}/enigma_backend/ENIGMA_DTI_create_formatted_files.R
 
 
 ###
