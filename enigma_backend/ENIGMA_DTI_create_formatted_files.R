@@ -474,7 +474,8 @@ if (Nset >= nVar) {
                       Max = numeric(),
                       stringsAsFactors = FALSE)
 
-    for (val in (Nset+1):nVar) {
+    #for (val in (Nset+1):nVar) {
+    for (val in 5:nVar) {
       #A=as.numeric(FullInfoFile[,val])
       #if ( length(which(is.na(A))) > 0) {
       #  A=A[-which(is.na(A))]
