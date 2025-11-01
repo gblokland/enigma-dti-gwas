@@ -460,17 +460,40 @@ for (s in c(1:3)) {
     
     cat('CHECKPOINT2\n')
 
-    test=NULL
+    #test=NULL
+    test <- data.frame(Variable = character(),
+                      Mean = numeric(),
+                      SD = numeric(),
+                      Min = numeric(),
+                      Max = numeric(),
+                      stringsAsFactors = FALSE)
+
     for (val in (Nset+1):nVar) {
-      A=as.numeric(FullInfoFile[,val])
-      if ( length(which(is.na(A))) > 0) {
-        A=A[-which(is.na(A))]
-      }
-      test=rbind(test,cbind(colnames(FullInfoFile)[val],
-                            (mean(as.numeric(A))),
-                            (sd(as.numeric(A))),
-                            (min(as.numeric(A))),
-                            (max(as.numeric(A)))))
+      #A=as.numeric(FullInfoFile[,val])
+      #if ( length(which(is.na(A))) > 0) {
+      #  A=A[-which(is.na(A))]
+      #}
+      #test=rbind(test,cbind(colnames(FullInfoFile)[val],
+      #                      (mean(as.numeric(A))),
+      #                      (sd(as.numeric(A))),
+      #                      (min(as.numeric(A))),
+      #                      (max(as.numeric(A)))))
+
+      A <- suppressWarnings(as.numeric(FullInfoFile[[val]]))
+      A <- A[!is.na(A)]
+  
+      # Skip column if all NA or constant
+      if (length(A) == 0) next
+
+      test <- rbind(test, data.frame(
+      Variable = colnames(FullInfoFile)[val],
+      Mean = mean(A),
+      SD = sd(A),
+      Min = min(A),
+      Max = max(A),
+      stringsAsFactors = FALSE
+      ))
+
     }
     header=(c('Covariate','Mean','SD','Min','Max'))
     write.table(test,file=zz,quote=F,col.names=header,row.names=FALSE,sep = "\t");
