@@ -185,7 +185,15 @@ if (Ldups > 0){
   print('    Duplicates have been removed.\n')
 }
 
-numsubjects = length(merged_temp$IID)
+### make sure there are no subjects with missing covariates
+cat("Subjects before incomplete cases are removed:", nrow(merged_temp), "\n")
+# Remove rows with missing covariates
+covariate_cols <- c(ageColumnHeader, sexColumnHeader, affectionStatusColumnHeader, "PC1")
+merged_temp <- merged_temp[complete.cases(merged_temp[, covariate_cols]), ]
+# Optional: report how many were dropped
+cat("Subjects retained:", nrow(merged_temp), "\n")
+
+numsubjects <- length(merged_temp$IID)
 
 writeLines(paste0('VERSION: ',format(Sys.Date(),"%m/%d/%Y")), con=zz, sep="\n")
 
@@ -193,8 +201,8 @@ writeLines(paste0('VERSION: ',format(Sys.Date(),"%m/%d/%Y")), con=zz, sep="\n")
 possible_subsets <- list(c(1,0,0), c("all","child","adult"), c(list(merged_temp,NULL,NULL)))
 
 age <- as.numeric(merged_temp[,ageColumnHeader])
-print(age)
-min(age) < 18 & max(age >= 18)
+#print(age)
+#min(age) < 18 & max(age >= 18)
 if (min(age) < 18 & max(age >= 18)) {
   cat("Separating data file into children and adults\n")
   writeLines(paste('Separating data file into children and adults'), con=zz, sep="\n")
