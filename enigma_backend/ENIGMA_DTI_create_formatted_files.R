@@ -7,7 +7,7 @@
 ###################################################################
 ## to run:
 # ${Rbin} --no-save --slave --args ${1} ${2} ...   ${10} <  ./.R
-# R --no-save --slave --args ${csvFILE} ${localfamFILE} ${combinedROItableFILE} ${pcaFILE} ${ageColumnHeader} ${sexColumnHeader} ${maleIndicator} ${CaseControlCohort} ${related} ${affectionStatusColumnHeader} ${pheno_covar_dir} <  ${run_directory}/ENIGMA_DTI_create_formatted_files.R
+# R --no-save --slave --args ${csvFILE} ${localfamFILE} ${pcaFILE} ${combinedROItableFILE} ${ageColumnHeader} ${sexColumnHeader} ${maleIndicator} ${CaseControlCohort} ${affectionStatusColumnHeader} ${affectedIndicator} ${related} ${pheno_covar_dir} ${run_dir} ${eName} <  ${run_directory}/ENIGMA_DTI_create_formatted_files.R
 ###################################################################
 
 # 14 INPUTS
@@ -125,14 +125,27 @@ Nrois=length(ALL_ROIS)
 
 ####################################################################
 
-InfoFile <- data.frame(read.csv(combinedROItableFILE,colClasses = "character")) #Read in the phenotypes + covariates file
+#Read in the covariates file
+covar <- data.frame(read.csv(csvFILE, colClasses = "character")) 
+
+#Read in the ancestry principal components
+pca <- read.table(pcaFILE, colClasses = "character")  #Read in the ancestry principal components
+pca$SOL <- NULL; #Remove the “SOL” column in the MDS components since this is not a covariate to be included
+
+#Read in fam file
+fam <- read.table(localfamFILE, colClasses = "character")
+colnames(fam) <- c("FID", "IID", "PID", "MID", "SEX", "PHENO")
+
+#Read in the phenotypes file
+InfoFile <- data.frame(read.csv(combinedROItableFILE, colClasses = "character")) 
 
 InfoFile$IID = InfoFile[,1] #This just renames a column for easier merging
 InfoFile$subjectID = NULL
 InfoFile$SubID_base = NULL
 InfoFile$SubID_fup = NULL
-pca <- read.table(pcaFILE,colClasses = "character")  #Read in the ancestry principal components
-pca$SOL <- NULL; #Remove the “SOL” column in the MDS components since this is not a covariate to be included
+
+#Merge the covariates and ROIs
+InfoFile <- merge(covar, InfoFile, by = c("FID", "IID"), all = TRUE)
 
 
 missing="";

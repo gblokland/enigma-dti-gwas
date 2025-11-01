@@ -34,6 +34,7 @@ cd $ENIGMA_DTI_GWAS_dir
 #wget "~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_plots_stats_demographics-simple-GB.R"
 
 rm -rf SCRIPTS; git clone git@github.com:gblokland/enigma-dti-gwas.git SCRIPTS
+run_directory=$HOME/enigma/DTIgenetics/SCRIPTS
 
 
 csvFILE_FA="${pheno_covar_dir}/combinedROItable_FA.csv"
@@ -41,15 +42,40 @@ csvFILE_MD="${pheno_covar_dir}/combinedROItable_MD.csv"
 csvFILE_AD="${pheno_covar_dir}/combinedROItable_AD.csv"
 csvFILE_RD="${pheno_covar_dir}/combinedROItable_RD.csv"
 #localfamFILE="$HOME/enigma/DTIgenetics/${datafile}_QC4.fam"
-localfamFILE="$HOME/enigma/DTIgenetics/DMS_ANCESTRY_ANALYST_DATE_QC4.fam"
+localfamFILE="$HOME/enigma/DTIgenetics/DMS_EUR_GB_20251031_QC4.fam"
 outFolder=$pheno_covar_dir
 
 
+R --no-save --slave --args ${csvFILE_FA} ${csvFILE_MD} ${csvFILE_AD} ${csvFILE_RD} ${localfamFILE} ${outFolder} < ${run_directory}/enigma_backend/ENIGMA_DTI_pheno_merge.R
+
+## Specify the inputs:
+csvFILE="${pheno_covar_dir}/Covariates.csv" # modify if different
+#localfamFILE="$HOME/enigma/DTIgenetics/${datafile}_QC4.fam" # Do we need another sanity check to make sure numbers of subjects match up?
+localfamFILE="$HOME/enigma/DTIgenetics/DMS_EUR_GB_20251031_QC4.fam"
+combinedROItableFILE="${pheno_covar_dir}/Phenotypes.csv" # Needed to get global DTI metrics
+#pcaFILE="${pheno_covar_dir}/${datafile}_PCACovariates.eigenvec" # modify if the path is different
+pcaFILE="${pheno_covar_dir}/DMS_PCACovariates.eigenvec" # modify if the path is different
+pcaFILE=$pcaFILE #specified location above
+#ageColumnHeader="Age" #Column header for your age covariate (Case sensitive); modify if different
+ageColumnHeader="Age_MRI" #Column header for your age covariate (Case sensitive); modify if different
+#sexColumnHeader="Sex" #Column header for your sex covariate (Case sensitive); modify if different
+sexColumnHeader="SEX" #Column header for your sex covariate (Case sensitive); modify if different
+maleIndicator="male" #maleIndicator="M" #What is the indicator for males in the sex column (M? 1?); modify if different. ### Please be EXTRA careful if using a numeric indicator: Triple-check that the indicator code is correct! CaseControlCohort="0" #Does your cohort have a case-control or a case-only design? (mark 0=population-based or control-only cohort and 1=case-control or case-only cohort);
+affectionStatusColumnHeader="AffectionStatus"; #Column header for your affection status covariate (Case sensitive); modify if different
+affectedIndicator="1" #affectedIndicator="A" #What is the indicator for affected (i.e. cases, patients) individuals?; modify if different
+related="0" #0 for unrelated cohorts; 1 for related cohorts
+pheno_covar_dir="${ENIGMA_DTI_GWAS_dir}/pheno_covar"
+run_dir="${run_directory}"
+eName="ENIGMA_DTI_GWAS"
+
+
+R --no-save --slave --args ${csvFILE} ${localfamFILE} ${pcaFILE} ${combinedROItableFILE} ${ageColumnHeader} ${sexColumnHeader} ${maleIndicator} ${CaseControlCohort} ${affectionStatusColumnHeader} ${affectedIndicator} ${related} ${pheno_covar_dir} ${run_dir} ${eName} <  ${run_directory}/enigma_backend/ENIGMA_DTI_create_formatted_files.R
+
+
+###
+
+
 ls ${ENIGMA_DTI_GWAS_dir}/QC_ENIGMA/
-
-
-
-
 
 Rscript ${ENIGMA_DTI_GWAS_dir}/SCRIPTS/enigma_backend/ENIGMA_DTI_plots_All_inclCohensd.R \
 --cohort ${COHORT} \
