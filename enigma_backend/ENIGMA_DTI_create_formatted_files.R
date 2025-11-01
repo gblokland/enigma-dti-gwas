@@ -190,7 +190,7 @@ numsubjects = length(merged_temp$IID)
 writeLines(paste0('VERSION: ',format(Sys.Date(),"%m/%d/%Y")), con=zz, sep="\n")
 
 # check whether we should also write files for subjects below AND above 18
-possible_subsets <- list(c(1,0,0),c("all","child","adult"),c(list(merged_temp,NULL,NULL)))
+possible_subsets <- list(c(1,0,0), c("all","child","adult"), c(list(merged_temp,NULL,NULL)))
 
 age=as.numeric(merged_temp[,ageColumnHeader])
 if (min(age) < 18 & max(age >= 18)) {
