@@ -443,7 +443,7 @@ for (s in c(1:3)) {
       cat('Done\n')
 
     }
-    cat('Done\n')
+    cat('CHECKPOINT\n')
 
     nVar=dim(FullInfoFile)[2] 
     nVar_healthy=dim(FullInfoFile_healthy)[2]
