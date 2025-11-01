@@ -167,7 +167,7 @@ if (l_missing > 0) {
 #Merge the PCA and other covariates
 cat('Merging your PCA files with your Phenotypes and Covariates Files...')
 merged_temp <- merge(pca, InfoFile, by = c("FID", "IID"))
-print(head(merged_temp))
+#print(head(merged_temp))
 cat('Done\n')
 
 ### make sure subject names match up!
@@ -195,7 +195,7 @@ possible_subsets <- list(c(1,0,0), c("all","child","adult"), c(list(merged_temp,
 age=as.numeric(merged_temp[,ageColumnHeader])
 if (min(age) < 18 & max(age >= 18)) {
   cat("Separating data file into children and adults\n")
-  writeLines(paste('Separating data file into children and adults'),con=zz,sep="\n")
+  writeLines(paste('Separating data file into children and adults'), con=zz, sep="\n")
   num_child=dim(merged_temp[which(as.numeric(merged_temp[,ageColumnHeader]) < 18),])[1]
   possible_subsets[[3]][[2]]  <- merged_temp[which(as.numeric(merged_temp[,ageColumnHeader]) < 18),]
   possible_subsets[[1]][[2]] <- 1
