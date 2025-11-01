@@ -423,27 +423,21 @@ for (s in c(1:3)) {
       }
       cat('Done\n')
 
-      # remove covariates without variance in the healthy group
+      # remove covariates without variance in the healthy group - TO FIX
       
       FullInfoFile_healthy <- subset(FullInfoFile_healthy,rowSums(data.frame(sapply(FullInfoFile_healthy[,patients_covars],as.numeric))[,,drop=FALSE])==0);
-      
-      if (nrow(FullInfoFile_healthy) > 0) {
-  VarNames <- colnames(FullInfoFile_healthy)
-  zero_sd_cols <- c()
-  
-  for (col in VarNames[(Nset+1):length(VarNames)]) {
-    sd_val <- suppressWarnings(sd(as.numeric(FullInfoFile_healthy[[col]]), na.rm = TRUE))
-    if (is.na(sd_val) || sd_val == 0) {
-      cat(paste('For healthy individuals only, the standard deviation of column', col, 'is zero. Therefore, the column will be removed.\n'))
-      zero_sd_cols <- c(zero_sd_cols, col)
-    }
-  }
-  
-  if (length(zero_sd_cols) > 0) {
-    FullInfoFile_healthy <- FullInfoFile_healthy[, !(colnames(FullInfoFile_healthy) %in% zero_sd_cols), drop = FALSE]
-  }
-}
 
+      if (nrow(FullInfoFile_healthy) > 0) {
+        VarNames=colnames(FullInfoFile_healthy)
+        columnnames = colnames(FullInfoFile_healthy);
+        for (l in (Nset+1):length(VarNames)){
+          columnnames = colnames(FullInfoFile_healthy);
+         # if (sd(FullInfoFile_healthy[,which(columnnames==VarNames[l])])==0) {
+          #  cat(paste('For healthy individuals only, the standard deviation of column', VarNames[l], 'is zero. Therefore, the column will be removed.\n'))
+          #  FullInfoFile_healthy=FullInfoFile_healthy[,-which(columnnames==VarNames[l])]
+          #}
+        }
+      }
       cat('Done\n')
 
     }
