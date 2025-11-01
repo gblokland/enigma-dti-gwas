@@ -193,7 +193,9 @@ writeLines(paste0('VERSION: ',format(Sys.Date(),"%m/%d/%Y")), con=zz, sep="\n")
 possible_subsets <- list(c(1,0,0), c("all","child","adult"), c(list(merged_temp,NULL,NULL)))
 
 age <- as.numeric(merged_temp[,ageColumnHeader])
-if (min(age) < 18 && max(age >= 18)) {
+
+min(age) < 18 & max(age >= 18)
+if (min(age) < 18 & max(age >= 18)) {
   cat("Separating data file into children and adults\n")
   writeLines(paste('Separating data file into children and adults'), con=zz, sep="\n")
   num_child=dim(merged_temp[which(as.numeric(merged_temp[,ageColumnHeader]) < 18),])[1]
