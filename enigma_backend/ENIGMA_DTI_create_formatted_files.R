@@ -384,7 +384,7 @@ for (s in c(1:3)) {
           next
         }
         else {
-          cat(paste('The standard deviation of column', VarNames[l], 'is zero. Therefore, the column will be removed.'))
+          cat(paste('The standard deviation of column', VarNames[l], 'is zero. Therefore, the column will be removed.\n'))
           columnnames = colnames(FullInfoFile)
           #FullInfoFile=FullInfoFile[,-which(columnnames==VarNames[l])]
           #FullInfoFile[,VarNames[l]] <- NULL  # remove the column safely
@@ -392,7 +392,8 @@ for (s in c(1:3)) {
         }
       }
     }	
-    
+    cat('Done\n')
+
     ## if diseases exist, make one .dat file without the AffectionStatus covariates
     ###### if when removing patients, all healthy individuals have the same value for a covariate, remove that as a covariate too
     
@@ -420,7 +421,8 @@ for (s in c(1:3)) {
           FullInfoFile_irrespective=FullInfoFile_irrespective[,-which(colnames(FullInfoFile_irrespective)==VarNames[l])]
         }
       }
-      
+      cat('Done\n')
+
       # remove covariates without variance in the healthy group
       
       FullInfoFile_healthy <- subset(FullInfoFile_healthy,rowSums(data.frame(sapply(FullInfoFile_healthy[,patients_covars],as.numeric))[,,drop=FALSE])==0);
@@ -436,7 +438,8 @@ for (s in c(1:3)) {
         }
       }
     }
-    
+    cat('Done\n')
+
     nVar=dim(FullInfoFile)[2] 
     nVar_healthy=dim(FullInfoFile_healthy)[2]
     nCov_healthy=nVar_healthy-Nset 
