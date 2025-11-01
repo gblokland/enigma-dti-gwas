@@ -223,7 +223,7 @@ for (s in c(1:3)) {
     cat(sprintf("PROCESSING %s SUBJECTS",suffix))
     writeLines(paste(''))
     writeLines(sprintf('PROCESSING %s SUBJECTS',suffix), con=zz, sep="\n")
-    columnnames = colnames(merged_temp);
+    columnnames = colnames(merged_temp)
     
     ### if no related individuals, create dummy paternal and maternal IDs
     # otherwise break to make sure these are entered
@@ -241,7 +241,7 @@ for (s in c(1:3)) {
     }
     
     ### Find age and sex columns, center, and create new age^2, age-x-sex and age^2-x-sex columns
-    columnnames = colnames(merged_temp);
+    columnnames <- colnames(merged_temp)
     age=as.numeric(merged_temp[,which(columnnames==ageColumnHeader)])
     age_mean=mean(age)
     age_md=median(age)
@@ -252,22 +252,22 @@ for (s in c(1:3)) {
     ageCsq=ageC*ageC
     
     ### Sanity check for missingness of sex variable
-#merged_temp[,sexColumnHeader]
-bad_vals <- merged_temp[,sexColumnHeader][!merged_temp[,sexColumnHeader] %in% c("M", "F") | is.na(merged_temp[,sexColumnHeader])]
-unique(bad_vals)
+    #merged_temp[,sexColumnHeader]
+    bad_vals <- merged_temp[,sexColumnHeader][!merged_temp[,sexColumnHeader] %in% c("M", "F") | is.na(merged_temp[,sexColumnHeader])]
+    unique(bad_vals)
     ### What happens if there is missing sex? It assigns as female.
     sex=merged_temp[,which(columnnames==sexColumnHeader)]
     males=which(sex==maleIndicator)
     sexC=matrix(0,nrow=dim(merged_temp)[1],ncol=1)
-    sexC[males]<- -0.5
+    sexC[males]<- -0.5  
     sexC[-males]<- 0.5
     
-	#Recode sex to match the needs of Plink: 1-2 coding
+	  #Recode sex to match the needs of Plink: 1-2 coding
     StandardSex=data.frame("Sex"=sexC)
     StandardSex[which(sexC==-.5),]<- 1
     StandardSex[which(sexC==.5),]<- 2
 
-#make sure this also happens for case-control status
+    #make sure this also happens for case-control status
     
     Nm=length(which(sexC==-.5))
     Nf=length(which(sexC==.5))
@@ -300,15 +300,15 @@ unique(bad_vals)
     
     ### Do not include sex or sex interaction variables if population is all M or all F or age stuff if all the same age
     if (sd(sexC) ==0) {
-      cat("	WARNING: It appears this study (or subgroup) is of a single sex. If this is not the case, please check your combinedROItable.csv file")
-      writeLines(paste('  WARNING: It appears this study (or subgroup) is of a single sex. If this is not the case, please check your combinedROItable.csv file.'),con=zz,sep="\n")
+      cat("	WARNING: It appears this study (or subgroup) is of a single sex. If this is not the case, please check your Covariates.csv file")
+      writeLines(paste('  WARNING: It appears this study (or subgroup) is of a single sex. If this is not the case, please check your Covariates.csv file.'), con=zz, sep="\n")
       age_sexC=age_sexC*0
       ageCsq_sexC=ageCsq_sexC*0
     }
     
     if (sd(ageC) ==0) {
-      cat("	WARNING: It appears this study (or subgroup) is of a single age group. If this is not the case, please check your combinedROItable.csv file")
-      writeLines(paste('  WARNING: It appears this study (or subgroup) is of a single age group. If this is not the case, please check your combinedROItable.csv file.'),con=zz,sep="\n")
+      cat("	WARNING: It appears this study (or subgroup) is of a single age group. If this is not the case, please check your Covariates.csv file")
+      writeLines(paste('  WARNING: It appears this study (or subgroup) is of a single age group. If this is not the case, please check your Covariates.csv file.'), con=zz, sep="\n")
       ageCsq=ageCsq*0
       ageC_sexC=ageC_sexC*0
       ageCsq_sexC=ageCsq_sexC*0
@@ -352,7 +352,7 @@ unique(bad_vals)
     nVar=dim(FullInfoFile)[2]
     Nset=Nids+Nrois
     nCov=nVar-Nset ### all the covariates that are left after removal of genetic-family columns and followup duration 
-    FullInfoFile=moveMe(FullInfoFile,ALL_ROIS,"after","Sex")
+    FullInfoFile=moveMe(FullInfoFile,ALL_ROIS,"after",sexColumnHeader)
     
     numsubjects = length(FullInfoFile$IID);
     
