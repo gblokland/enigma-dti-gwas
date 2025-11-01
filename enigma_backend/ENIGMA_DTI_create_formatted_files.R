@@ -443,7 +443,7 @@ for (s in c(1:3)) {
       cat('Done\n')
 
     }
-    cat('CHECKPOINT\n')
+    cat('CHECKPOINT1\n')
 
     nVar=dim(FullInfoFile)[2] 
     nVar_healthy=dim(FullInfoFile_healthy)[2]
@@ -458,6 +458,8 @@ for (s in c(1:3)) {
     nCov_all_disease_corr=nCov_irrespective + length(patients_covars)
     nVar_disease_corr=dim(FullInfoFile_all_disease_corrected)[2]
     
+    cat('CHECKPOINT2\n')
+
     test=NULL
     for (val in (Nset+1):nVar) {
       A=as.numeric(FullInfoFile[,val])
@@ -473,6 +475,7 @@ for (s in c(1:3)) {
     header=(c('Covariate','Mean','SD','Min','Max'))
     write.table(test,file=zz,quote=F,col.names=header,row.names=FALSE,sep = "\t");
     
+    cat('CHECKPOINT3\n')
     ################ now print out the .dat and the .ped files
     #
     # Output names have been hard-coded for formatting of follow-up scripts.
