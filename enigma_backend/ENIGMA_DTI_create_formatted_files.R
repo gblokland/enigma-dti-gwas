@@ -463,7 +463,7 @@ for (s in c(1:3)) {
 # Ensure Nset and nVar are consistent with current data
 nVar <- ncol(FullInfoFile)
 if (Nset >= nVar) {
-  stop("Nset is greater than or equal to number of columns in FullInfoFile.")
+  warning("Nset is greater than or equal to number of columns in FullInfoFile.")
 }
 
     #test=NULL
