@@ -146,8 +146,9 @@ InfoFile$SubID_base = NULL
 InfoFile$SubID_fup = NULL
 
 #Merge the covariates and ROIs
+cat('Merging your Phenotypes and Covariates Files...')
 InfoFile <- merge(covar, InfoFile, by = c("FID", "IID"), all = TRUE)
-
+cat('Done\n')
 
 missing="";
 l_missing=0;
@@ -163,26 +164,28 @@ if (l_missing > 0) {
   stop(paste("ERROR: You are missing the following ROIs:", missing ,". Please re-run latest ROI script!",sep=""))
 }
 
-cat('Merging your PCA files with your Phenotype and Covariates Files...')
-merged_temp <- merge(pca, InfoFile, by = c("FID", "IID")); #Merge the PCA and other covariates
+#Merge the PCA and other covariates
+cat('Merging your PCA files with your Phenotypes and Covariates Files...')
+merged_temp <- merge(pca, InfoFile, by = c("FID", "IID"))
+print(head(merged_temp))
 cat('Done\n')
 
 ### make sure subject names match up!
-numsubjects=length(merged_temp[,1])
+numsubjects = length(merged_temp[,1])
 if (numsubjects==0){
   stop("ERROR: Please make sure your subjectID's in your phenotype csv file are the same as those listed in your PCA file")
 }
 
 ### make sure there are no duplicates
-dups<-duplicated(merged_temp$IID)
-Ldups<-length(which(dups=="TRUE"))  ##**##** depending on R version this (& below) may have to be which(dups,"TRUE")
+dups <- duplicated(merged_temp$IID)
+Ldups <- length(which(dups=="TRUE"))  ##**##** depending on R version this (& below) may have to be which(dups,"TRUE")
 cat('    There are ',Ldups,' duplicate subjects.\n')
 if (Ldups > 0){
-  merged_temp<-merged_temp[-which(dups=="TRUE"),]
+  merged_temp <- merged_temp[-which(dups=="TRUE"),]
   print('    Duplicates have been removed.\n')
 }
 
-numsubjects = length(merged_temp$IID);
+numsubjects = length(merged_temp$IID)
 
 writeLines(paste0('VERSION: ',format(Sys.Date(),"%m/%d/%Y")), con=zz, sep="\n")
 
