@@ -131,6 +131,7 @@ covar <- data.frame(read.csv(csvFILE, colClasses = "character"))
 #Read in the ancestry principal components
 pca <- read.table(pcaFILE, colClasses = "character")  #Read in the ancestry principal components
 pca$SOL <- NULL; #Remove the “SOL” column in the MDS components since this is not a covariate to be included
+colnames(pca) <- c("FID", "IID", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "PC11", "PC12", "PC13", "PC14", "PC15", "PC16", "PC17", "PC18", "PC19", "PC20")
 
 #Read in fam file
 fam <- read.table(localfamFILE, colClasses = "character")
@@ -163,7 +164,7 @@ if (l_missing > 0) {
 }
 
 cat('Merging your PCA files with your Phenotype and Covariates Files...')
-merged_temp <- merge(pca, InfoFile, by="IID"); #Merge the PCA and other covariates
+merged_temp <- merge(pca, InfoFile, by = c("FID", "IID")); #Merge the PCA and other covariates
 cat('Done\n')
 
 ### make sure subject names match up!
