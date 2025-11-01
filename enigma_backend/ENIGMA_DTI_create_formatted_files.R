@@ -358,7 +358,7 @@ for (s in c(1:3)) {
     nCov=nVar-Nset ### all the covariates that are left after removal of genetic-family columns and followup duration 
     #FullInfoFile=moveMe(FullInfoFile,ALL_ROIS,"after","Sex")
     FullInfoFile[,sexColumnHeader] <- NULL
-    
+
     numsubjects = length(FullInfoFile$IID);
     
     if (sum(is.na(FullInfoFile$FID)) > 0 ) {
@@ -376,7 +376,8 @@ for (s in c(1:3)) {
     
     for (l in (Nset+1):length(VarNames)) {
       columnnames = colnames(FullInfoFile);
-      if (sd(as.numeric(FullInfoFile[,which(columnnames==VarNames[l])]),na.rm=T)==0) {
+      ###if (sd(as.numeric(FullInfoFile[,which(columnnames==VarNames[l])]),na.rm=T)==0) {
+      if (!is.na(sd_val <- sd(as.numeric(FullInfoFile[, which(columnnames == VarNames[l])]), na.rm = TRUE)) && sd_val > 0) {
         if (CaseControlCohort==1 && length(grep("AffectionStatus",VarNames[l])) > 0) {  # No need to take into account possible multiple diagnoses, in this case AffectionStatus itself will have variance.
           next
         } else if (CaseControlCohort!=0 && VarNames[l] == CaseControlCohort ) {
