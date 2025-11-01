@@ -460,6 +460,12 @@ for (s in c(1:3)) {
     
     cat('CHECKPOINT2\n')
 
+# Ensure Nset and nVar are consistent with current data
+nVar <- ncol(FullInfoFile)
+if (Nset >= nVar) {
+  stop("Nset is greater than or equal to number of columns in FullInfoFile.")
+}
+
     #test=NULL
     test <- data.frame(Variable = character(),
                       Mean = numeric(),
@@ -479,20 +485,22 @@ for (s in c(1:3)) {
       #                      (min(as.numeric(A))),
       #                      (max(as.numeric(A)))))
 
-      A <- suppressWarnings(as.numeric(FullInfoFile[[val]]))
-      A <- A[!is.na(A)]
+   # Defensive check
+  if (val > ncol(FullInfoFile)) next
   
-      # Skip column if all NA or constant
-      if (length(A) == 0) next
-
-      test <- rbind(test, data.frame(
-      Variable = colnames(FullInfoFile)[val],
-      Mean = mean(A),
-      SD = sd(A),
-      Min = min(A),
-      Max = max(A),
-      stringsAsFactors = FALSE
-      ))
+  A <- suppressWarnings(as.numeric(FullInfoFile[[val]]))
+  A <- A[!is.na(A)]
+  
+  if (length(A) == 0) next  # skip empty columns
+  
+  test <- rbind(test, data.frame(
+    Variable = colnames(FullInfoFile)[val],
+    Mean = mean(A),
+    SD = sd(A),
+    Min = min(A),
+    Max = max(A),
+    stringsAsFactors = FALSE
+  ))
 
     }
     header=(c('Covariate','Mean','SD','Min','Max'))
