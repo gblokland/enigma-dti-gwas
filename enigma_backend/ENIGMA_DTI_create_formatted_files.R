@@ -387,7 +387,7 @@ for (s in c(1:3)) {
           cat(paste('The standard deviation of column', VarNames[l], 'is zero. Therefore, the column will be removed.\n'))
           columnnames = colnames(FullInfoFile)
           #FullInfoFile=FullInfoFile[,-which(columnnames==VarNames[l])]
-          #FullInfoFile[,VarNames[l]] <- NULL  # remove the column safely
+          FullInfoFile[,VarNames[l]] <- NULL  # remove the column safely
           drp=drp+1
         }
       }
@@ -437,6 +437,8 @@ for (s in c(1:3)) {
           }
         }
       }
+      cat('Done\n')
+
     }
     cat('Done\n')
 
