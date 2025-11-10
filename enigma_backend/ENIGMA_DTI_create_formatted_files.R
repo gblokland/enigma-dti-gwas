@@ -264,7 +264,7 @@ for (s in c(1:3)) {
     #merged_temp[,sexColumnHeader]
     bad_vals <- merged_temp[,sexColumnHeader][!merged_temp[,sexColumnHeader] %in% c("M", "F") | is.na(merged_temp[,sexColumnHeader])]
     unique(bad_vals)
-
+    
     ### What happens if there is missing sex? It assigns as female.
     sex=merged_temp[,which(columnnames==sexColumnHeader)]
     males=which(sex==maleIndicator)
@@ -272,11 +272,11 @@ for (s in c(1:3)) {
     sexC[males]<- -0.5  
     sexC[-males]<- 0.5
     
-	  #Recode sex to match the needs of Plink: 1-2 coding
+    #Recode sex to match the needs of Plink: 1-2 coding
     StandardSex=data.frame("Sex"=sexC)
     StandardSex[which(sexC==-.5),]<- 1
     StandardSex[which(sexC==.5),]<- 2
-
+    
     #make sure this also happens for case-control status
     
     Nm=length(which(sexC==-.5))
@@ -354,7 +354,7 @@ for (s in c(1:3)) {
     
     VarNames=colnames(merged_temp_rest)
     print(VarNames)
-
+    
     FullInfoFile=cbind(merged_temp[,c('FID','IID','MID','PID')],StandardSex,sexC,age,ageCsq,age_sexC,ageCsq_sexC,merged_temp_rest)
     
     VarNames=colnames(FullInfoFile)
@@ -366,7 +366,7 @@ for (s in c(1:3)) {
     nCov=nVar-Nset ### all the covariates that are left after removal of genetic-family columns and followup duration 
     #FullInfoFile=moveMe(FullInfoFile,ALL_ROIS,"after","Sex")
     FullInfoFile[,sexColumnHeader] <- NULL
-
+    
     numsubjects = length(FullInfoFile$IID);
     
     if (sum(is.na(FullInfoFile$FID)) > 0 ) {
@@ -401,7 +401,7 @@ for (s in c(1:3)) {
       }
     }	
     cat('Done\n')
-
+    
     ## if diseases exist, make one .dat file without the AffectionStatus covariates
     ###### if when removing patients, all healthy individuals have the same value for a covariate, remove that as a covariate too
     
@@ -431,13 +431,13 @@ for (s in c(1:3)) {
         }
       }
       cat('Done\n')
-
+      
       # remove covariates without variance in the healthy group - TO FIX
       
       ##FullInfoFile_healthy <- subset(FullInfoFile_healthy,rowSums(data.frame(sapply(FullInfoFile_healthy[,patients_covars],as.numeric))[,,drop=FALSE])==0);
-
+      
       FullInfoFile_healthy <- FullInfoFile_healthy[complete.cases(FullInfoFile_healthy[, patients_covars]), ]
-
+      
       if (nrow(FullInfoFile_healthy) > 0) {
         VarNames=colnames(FullInfoFile_healthy)
         columnnames = colnames(FullInfoFile_healthy);
@@ -451,10 +451,10 @@ for (s in c(1:3)) {
         }
       }
       cat('Done\n')
-
+      
     }
     cat('CHECKPOINT1\n')
-
+    
     nVar=dim(FullInfoFile)[2] 
     nVar_healthy=dim(FullInfoFile_healthy)[2]
     nCov_healthy=nVar_healthy-Nset 
@@ -469,21 +469,21 @@ for (s in c(1:3)) {
     nVar_disease_corr=dim(FullInfoFile_all_disease_corrected)[2]
     
     cat('CHECKPOINT2\n')
-
-# Ensure Nset and nVar are consistent with current data
-nVar <- ncol(FullInfoFile)
-if (Nset >= nVar) {
-  warning("Nset is greater than or equal to number of columns in FullInfoFile.")
-}
-
+    
+    # Ensure Nset and nVar are consistent with current data
+    nVar <- ncol(FullInfoFile)
+    if (Nset >= nVar) {
+      warning("Nset is greater than or equal to number of columns in FullInfoFile.")
+    }
+    
     #test=NULL
     test <- data.frame(Variable = character(),
-                      Mean = numeric(),
-                      SD = numeric(),
-                      Min = numeric(),
-                      Max = numeric(),
-                      stringsAsFactors = FALSE)
-
+                       Mean = numeric(),
+                       SD = numeric(),
+                       Min = numeric(),
+                       Max = numeric(),
+                       stringsAsFactors = FALSE)
+    
     #for (val in (Nset+1):nVar) {
     for (val in 5:nVar) {
       #A=as.numeric(FullInfoFile[,val])
@@ -495,119 +495,119 @@ if (Nset >= nVar) {
       #                      (sd(as.numeric(A))),
       #                      (min(as.numeric(A))),
       #                      (max(as.numeric(A)))))
-
-   # Defensive check
-  if (val > ncol(FullInfoFile)) next
-  
-  A <- suppressWarnings(as.numeric(FullInfoFile[[val]]))
-  A <- A[!is.na(A)]
-  
-  if (length(A) == 0) next  # skip empty columns
-  
-  test <- rbind(test, data.frame(
-    Variable = colnames(FullInfoFile)[val],
-    Mean = mean(A),
-    SD = sd(A),
-    Min = min(A),
-    Max = max(A),
-    stringsAsFactors = FALSE
-  ))
-
+      
+      # Defensive check
+      if (val > ncol(FullInfoFile)) next
+      
+      A <- suppressWarnings(as.numeric(FullInfoFile[[val]]))
+      A <- A[!is.na(A)]
+      
+      if (length(A) == 0) next  # skip empty columns
+      
+      test <- rbind(test, data.frame(
+        Variable = colnames(FullInfoFile)[val],
+        Mean = mean(A),
+        SD = sd(A),
+        Min = min(A),
+        Max = max(A),
+        stringsAsFactors = FALSE
+      ))
+      
     }
     header=(c('Covariate','Mean','SD','Min','Max'))
     write.table(test,file=zz,quote=F,col.names=header,row.names=FALSE,sep = "\t");
     
-    cat('Now write the formatted output files.\n')
-
+    cat('Step 3: Now write the formatted output files.\n')
+    
     print(colnames(FullInfoFile))
-
+    print(head(FullInfoFile))
     
     if (output_format== "plink") {
       cat('Writing PLINK formatted phenotype/covariate files.\n')
       write.table(FullInfoFile[, c("FID", "IID", ALL_ROIS)], paste0(outDir, "/", cohort, "_enigma_dti_gwas.pheno"),quote=F,col.names=F,row.names=F);
       write.table(FullInfoFile[, c("FID", "IID", "StandardSex","sexC","age","ageCsq","age_sexC","ageCsq_sexC", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10")], paste0(outDir, "/", cohort, "_enigma_dti_gwas.covar"),quote=F,col.names=T,row.names=F);
     }
-
+    
     if (output_format== "saige") {
       cat('Writing SAIGE formatted phenotype/covariate files.\n')
       write.table(FullInfoFile[, c("FID", "IID", ALL_ROIS)], paste0(outDir, "/", cohort, "_enigma_dti_gwas.pheno.saige.txt"),quote=F,col.names=F,row.names=F);
       write.table(FullInfoFile[, c("FID", "IID", "StandardSex","sexC","age","ageCsq","age_sexC","ageCsq_sexC", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10")], paste0(outDir, "/", cohort, "_enigma_dti_gwas.covar.saige.txt"),quote=F,col.names=T,row.names=F);
     }
-
+    
     if (output_format== "PedDat") {
       ################ now print out the .dat and the .ped files
       #
       # Output names have been hard-coded for formatting of follow-up scripts.
       #
       # Write out ped file only if the number of subjects is larger than the number of covariates
-    
+      
       #### print out one file irrespective of disease -- without covarying for AffectionStatus 
       #### this is all output in healthy and patient-groups-only cohorts
-    
+      
       if (numsubjects >= nCov_irrespective) {
-      cat('    There are',numsubjects,'subjects irrespective of disease \n')
-      cat('    There are',nCov_irrespective,'covariates for all subjects irrespective of disease\n')
-      writeLines(paste('    There are',numsubjects,'subjects.'),con=zz,sep="\n")
-      writeLines(paste('    There are',nCov_irrespective,'covariates for all subjects irrespective of disease.'),con=zz,sep="\n")
-      writeLines(paste('     -', cbind(colnames(FullInfoFile_irrespective)[(Nset+1):nVar_irrespective])),con=zz,sep="\n")
-      write.table(cbind(c(rep("T",Nrois),rep("C",nCov_irrespective)),c(colnames(FullInfoFile_irrespective)[(Nids+1):(nVar_irrespective)])),paste(outDir,"/ENIGMA_",eName,"_DATfile_",suffix,"_irrespective.dat",sep=""),col.names=F,row.names=F,quote=F);
-      write.table(FullInfoFile_irrespective,paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_irrespective.ped",sep=""),quote=F,col.names=F,row.names=F);
-      write.table(FullInfoFile_irrespective,paste(outDir,"/ENIGMA_",eName,"_PEDfile_wColNames_",suffix,"_irrespective.tbl",sep=""),quote=F,col.names=T,row.names=F);
-      write.table(colnames(FullInfoFile_irrespective),paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_irrespective.header",sep=""),quote=F,col.names=F,row.names=F);
+        cat('    There are',numsubjects,'subjects irrespective of disease \n')
+        cat('    There are',nCov_irrespective,'covariates for all subjects irrespective of disease\n')
+        writeLines(paste('    There are',numsubjects,'subjects.'),con=zz,sep="\n")
+        writeLines(paste('    There are',nCov_irrespective,'covariates for all subjects irrespective of disease.'),con=zz,sep="\n")
+        writeLines(paste('     -', cbind(colnames(FullInfoFile_irrespective)[(Nset+1):nVar_irrespective])),con=zz,sep="\n")
+        write.table(cbind(c(rep("T",Nrois),rep("C",nCov_irrespective)),c(colnames(FullInfoFile_irrespective)[(Nids+1):(nVar_irrespective)])),paste(outDir,"/ENIGMA_",eName,"_DATfile_",suffix,"_irrespective.dat",sep=""),col.names=F,row.names=F,quote=F);
+        write.table(FullInfoFile_irrespective,paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_irrespective.ped",sep=""),quote=F,col.names=F,row.names=F);
+        write.table(FullInfoFile_irrespective,paste(outDir,"/ENIGMA_",eName,"_PEDfile_wColNames_",suffix,"_irrespective.tbl",sep=""),quote=F,col.names=T,row.names=F);
+        write.table(colnames(FullInfoFile_irrespective),paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_irrespective.header",sep=""),quote=F,col.names=F,row.names=F);
       } else {
-      cat('	Not enough subjects for the ',suffix,' group, no files written.\n')
-      writeLines(paste('    Not enough subjects for the ',suffix,' group, no files written.'),con=zz,sep="\n")
+        cat('	Not enough subjects for the ',suffix,' group, no files written.\n')
+        writeLines(paste('    Not enough subjects for the ',suffix,' group, no files written.'),con=zz,sep="\n")
       }
-    
+      
       ####
       #### when both patients and controls are present, print out files for healthy only, and one including covariates for disease 
       if (nSub_healthy > 0 && nSub_patients > 0) {
-
-      cat('    There are',nSub_irrespective,'subjects\n')
-      cat('    There are',nCov_all_disease_corr,'covariates for all subjects correcting for disease\n')
-      writeLines(paste('    There are',nSub_irrespective,'subjects.'),con=zz,sep="\n")
-      writeLines(paste('    There are',nCov_all_disease_corr,'covariates for all subjects correcting for disease.'),con=zz,sep="\n")
-      if (nSub_irrespective >= nCov_all_disease_corr) {
-        writeLines(paste('     -', cbind(colnames(FullInfoFile_all_disease_corrected)[(Nset+1):nVar_disease_corr])),con=zz,sep="\n")
-        write.table(FullInfoFile_all_disease_corrected,paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_mixedHD.ped",sep=""),quote=F,col.names=F,row.names=F);
-        write.table(FullInfoFile_all_disease_corrected,paste(outDir,"/ENIGMA_",eName,"_PEDfile_wColNames_",suffix,"_mixedHD.tbl",sep=""),quote=F,col.names=T,row.names=F);
-        write.table(colnames(FullInfoFile_all_disease_corrected),paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_mixedHD.header",sep=""),quote=F,col.names=F,row.names=F);
-        write.table(cbind(c(rep("T",Nrois),rep("C",nCov_all_disease_corr)),c(colnames(FullInfoFile_all_disease_corrected)[(Nids+1):nVar_disease_corr])),paste(outDir,"/ENIGMA_",eName,"_DATfile_",suffix,"_mixedHD.dat",sep=""),col.names=F,row.names=F,quote=F);
-      } else {
-        cat('	Not enough subjects for the ',suffix,' group when controlling for disease, no files written.\n')
-        writeLines(paste('    Not enough subjects for the ',suffix,' group when controlling for disease, no files written.'),con=zz,sep="\n")
-      }
-
-      cat('    There are',nSub_healthy,'healthy subjects\n')
-      cat('    There are',nCov_healthy,'covariates for all healthy subjects\n')
-      writeLines(paste('    There are',nSub_healthy,'healthy subjects.'),con=zz,sep="\n")
-      writeLines(paste('    There are',nCov_healthy,'covariates for all healthy subjects.'),con=zz,sep="\n")
-      if (nSub_healthy >= nCov_healthy) {
-        writeLines(paste('     -', colnames(FullInfoFile_healthy)[(Nset+1):nVar_healthy]),con=zz,sep="\n")
-        write.table(FullInfoFile_healthy,paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_healthy.ped",sep=""),quote=F,col.names=F,row.names=F);
-        write.table(FullInfoFile_healthy,paste(outDir,"/ENIGMA_",eName,"_PEDfile_wColNames_",suffix,"_healthy.tbl",sep=""),quote=F,col.names=T,row.names=F);
-        write.table(colnames(FullInfoFile_healthy),paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_healthy.header",sep=""),quote=F,col.names=F,row.names=F);
-        write.table(cbind(c(rep("T",Nrois),rep("C",nCov_healthy)),c(colnames(FullInfoFile_healthy)[(Nids+1):nVar_healthy])),paste(outDir,"/ENIGMA_",eName,"_DATfile_",suffix,"_healthy.dat",sep=""),col.names=F,row.names=F,quote=F);
-      } else {
-        cat('Not enough subjects for the ',suffix,'healthy group, no files written.\n')
-        writeLines(paste('Not enough subjects for the ',suffix,' healthy group, no files written.'),con=zz,sep="\n")
-      }
-      
-      cat('    There are',nSub_patients,'disease subjects\n')
-      cat('    There are',nCov_patients,'covariates for all disease subjects\n')
-      writeLines(paste('    There are',nSub_patients,'disease subjects.'),con=zz,sep="\n")
-      writeLines(paste('    There are',nCov_patients,'covariates for all disease subjects.'),con=zz,sep="\n")
-      if (nSub_patients <= nCov_healthy) { #TO CHECK
-        writeLines(paste('     -', colnames(FullInfoFile_patients)[(Nset+1):nVar_patients]),con=zz,sep="\n")
-        write.table(FullInfoFile_patients,paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_disease.ped",sep=""),quote=F,col.names=F,row.names=F);
-        write.table(FullInfoFile_patients,paste(outDir,"/ENIGMA_",eName,"_PEDfile_wColNames_",suffix,"_disease.tbl",sep=""),quote=F,col.names=T,row.names=F);
-        write.table(colnames(FullInfoFile_patients),paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_disease.header",sep=""),quote=F,col.names=F,row.names=F);
-        write.table(cbind(c(rep("T",Nrois),rep("C",nCov_patients)),c(colnames(FullInfoFile_patients)[(Nids+1):nVar_patients])),paste(outDir,"/ENIGMA_",eName,"_DATfile_",suffix,"_disease.dat",sep=""),col.names=F,row.names=F,quote=F);
-      } else {
-        cat('Not enough subjects for the ',suffix,'disease group, no files written.\n')
-        writeLines(paste('Not enough subjects for the ',suffix,' disease group, no files written.'),con=zz,sep="\n")
-      }
-      
+        
+        cat('    There are',nSub_irrespective,'subjects\n')
+        cat('    There are',nCov_all_disease_corr,'covariates for all subjects correcting for disease\n')
+        writeLines(paste('    There are',nSub_irrespective,'subjects.'),con=zz,sep="\n")
+        writeLines(paste('    There are',nCov_all_disease_corr,'covariates for all subjects correcting for disease.'),con=zz,sep="\n")
+        if (nSub_irrespective >= nCov_all_disease_corr) {
+          writeLines(paste('     -', cbind(colnames(FullInfoFile_all_disease_corrected)[(Nset+1):nVar_disease_corr])),con=zz,sep="\n")
+          write.table(FullInfoFile_all_disease_corrected,paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_mixedHD.ped",sep=""),quote=F,col.names=F,row.names=F);
+          write.table(FullInfoFile_all_disease_corrected,paste(outDir,"/ENIGMA_",eName,"_PEDfile_wColNames_",suffix,"_mixedHD.tbl",sep=""),quote=F,col.names=T,row.names=F);
+          write.table(colnames(FullInfoFile_all_disease_corrected),paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_mixedHD.header",sep=""),quote=F,col.names=F,row.names=F);
+          write.table(cbind(c(rep("T",Nrois),rep("C",nCov_all_disease_corr)),c(colnames(FullInfoFile_all_disease_corrected)[(Nids+1):nVar_disease_corr])),paste(outDir,"/ENIGMA_",eName,"_DATfile_",suffix,"_mixedHD.dat",sep=""),col.names=F,row.names=F,quote=F);
+        } else {
+          cat('	Not enough subjects for the ',suffix,' group when controlling for disease, no files written.\n')
+          writeLines(paste('    Not enough subjects for the ',suffix,' group when controlling for disease, no files written.'),con=zz,sep="\n")
+        }
+        
+        cat('    There are',nSub_healthy,'healthy subjects\n')
+        cat('    There are',nCov_healthy,'covariates for all healthy subjects\n')
+        writeLines(paste('    There are',nSub_healthy,'healthy subjects.'),con=zz,sep="\n")
+        writeLines(paste('    There are',nCov_healthy,'covariates for all healthy subjects.'),con=zz,sep="\n")
+        if (nSub_healthy >= nCov_healthy) {
+          writeLines(paste('     -', colnames(FullInfoFile_healthy)[(Nset+1):nVar_healthy]),con=zz,sep="\n")
+          write.table(FullInfoFile_healthy,paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_healthy.ped",sep=""),quote=F,col.names=F,row.names=F);
+          write.table(FullInfoFile_healthy,paste(outDir,"/ENIGMA_",eName,"_PEDfile_wColNames_",suffix,"_healthy.tbl",sep=""),quote=F,col.names=T,row.names=F);
+          write.table(colnames(FullInfoFile_healthy),paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_healthy.header",sep=""),quote=F,col.names=F,row.names=F);
+          write.table(cbind(c(rep("T",Nrois),rep("C",nCov_healthy)),c(colnames(FullInfoFile_healthy)[(Nids+1):nVar_healthy])),paste(outDir,"/ENIGMA_",eName,"_DATfile_",suffix,"_healthy.dat",sep=""),col.names=F,row.names=F,quote=F);
+        } else {
+          cat('Not enough subjects for the ',suffix,'healthy group, no files written.\n')
+          writeLines(paste('Not enough subjects for the ',suffix,' healthy group, no files written.'),con=zz,sep="\n")
+        }
+        
+        cat('    There are',nSub_patients,'disease subjects\n')
+        cat('    There are',nCov_patients,'covariates for all disease subjects\n')
+        writeLines(paste('    There are',nSub_patients,'disease subjects.'),con=zz,sep="\n")
+        writeLines(paste('    There are',nCov_patients,'covariates for all disease subjects.'),con=zz,sep="\n")
+        if (nSub_patients <= nCov_healthy) { #TO CHECK
+          writeLines(paste('     -', colnames(FullInfoFile_patients)[(Nset+1):nVar_patients]),con=zz,sep="\n")
+          write.table(FullInfoFile_patients,paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_disease.ped",sep=""),quote=F,col.names=F,row.names=F);
+          write.table(FullInfoFile_patients,paste(outDir,"/ENIGMA_",eName,"_PEDfile_wColNames_",suffix,"_disease.tbl",sep=""),quote=F,col.names=T,row.names=F);
+          write.table(colnames(FullInfoFile_patients),paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_disease.header",sep=""),quote=F,col.names=F,row.names=F);
+          write.table(cbind(c(rep("T",Nrois),rep("C",nCov_patients)),c(colnames(FullInfoFile_patients)[(Nids+1):nVar_patients])),paste(outDir,"/ENIGMA_",eName,"_DATfile_",suffix,"_disease.dat",sep=""),col.names=F,row.names=F,quote=F);
+        } else {
+          cat('Not enough subjects for the ',suffix,'disease group, no files written.\n')
+          writeLines(paste('Not enough subjects for the ',suffix,' disease group, no files written.'),con=zz,sep="\n")
+        }
+        
       } 
     } #end if (output_format== "PedDat")
   }
