@@ -7,7 +7,7 @@
 ###################################################################
 ## to run:
 # ${Rbin} --no-save --slave --args ${1} ${2} ...   ${10} <  ./.R
-# R --no-save --slave --args ${csvFILE} ${localfamFILE} ${pcaFILE} ${combinedROItableFILE} ${ageColumnHeader} ${sexColumnHeader} ${maleIndicator} ${CaseControlCohort} ${affectionStatusColumnHeader} ${affectedIndicator} ${related} ${outDir} ${run_dir} ${eName} <  ${run_directory}/ENIGMA_DTI_create_formatted_files.R
+# R --no-save --slave --args ${csvFILE} ${localfamFILE} ${pcaFILE} ${combinedROItableFILE} ${AgeColumnHeader} ${SexColumnHeader} ${maleIndicator} ${CaseControlCohort} ${affectionStatusColumnHeader} ${affectedIndicator} ${related} ${outDir} ${run_dir} ${eName} <  ${run_directory}/ENIGMA_DTI_create_formatted_files.R
 ###################################################################
 
 # 14 INPUTS
@@ -64,8 +64,8 @@ localfamFILE <- args[2] # IS THIS NEEDED HERE? DO WE NEED TO CHECK MATCHING SUBJ
 ####
 pcaFILE <- args[3]
 combinedROItableFILE <- args[4]
-ageColumnHeader <- args[5]
-sexColumnHeader <- args[6]
+AgeColumnHeader <- args[5]
+SexColumnHeader <- args[6]
 
 maleIndicator <- args[7]
 
@@ -208,7 +208,7 @@ if (Ldups > 0){
 ### make sure there are no subjects with missing covariates
 cat("Subjects before incomplete cases are removed:", nrow(merged_temp), "\n")
 # Remove rows with missing covariates
-covariate_cols <- c(ageColumnHeader, sexColumnHeader, affectionStatusColumnHeader, "PC1")
+covariate_cols <- c(AgeColumnHeader, SexColumnHeader, affectionStatusColumnHeader, "PC1")
 merged_temp <- merged_temp[complete.cases(merged_temp[, covariate_cols]), ]
 # Optional: report how many were dropped
 cat("Subjects retained:", nrow(merged_temp), "\n")
@@ -220,18 +220,18 @@ writeLines(paste0('VERSION: ',format(Sys.Date(),"%m/%d/%Y")), con=zz, sep="\n")
 # check whether we should also write files for subjects below AND above 18
 possible_subsets <- list(c(1,0,0), c("all","child","adult"), c(list(merged_temp,NULL,NULL)))
 
-age <- as.numeric(merged_temp[,ageColumnHeader])
+age <- as.numeric(merged_temp[,AgeColumnHeader])
 #print(age)
 #min(age) < 18 & max(age >= 18)
 if (min(age) < 18 & max(age >= 18)) {
   cat("Separating data file into children and adults\n")
   writeLines(paste('Separating data file into children and adults'), con=zz, sep="\n")
-  num_child=dim(merged_temp[which(as.numeric(merged_temp[,ageColumnHeader]) < 18),])[1]
-  possible_subsets[[3]][[2]]  <- merged_temp[which(as.numeric(merged_temp[,ageColumnHeader]) < 18),]
+  num_child=dim(merged_temp[which(as.numeric(merged_temp[,AgeColumnHeader]) < 18),])[1]
+  possible_subsets[[3]][[2]]  <- merged_temp[which(as.numeric(merged_temp[,AgeColumnHeader]) < 18),]
   possible_subsets[[1]][[2]] <- 1
-  num_adult=dim(merged_temp[which(as.numeric(merged_temp[,ageColumnHeader]) >= 18),])[1]
+  num_adult=dim(merged_temp[which(as.numeric(merged_temp[,AgeColumnHeader]) >= 18),])[1]
   possible_subsets[[1]][[3]] <- 1
-  possible_subsets[[3]][[3]] <- merged_temp[which(as.numeric(merged_temp[,ageColumnHeader]) >= 18),]
+  possible_subsets[[3]][[3]] <- merged_temp[which(as.numeric(merged_temp[,AgeColumnHeader]) >= 18),]
 }	
 
 for (s in c(1:3)) {
@@ -262,36 +262,36 @@ for (s in c(1:3)) {
     
     ### Find age and sex columns, center, and create new age^2, age-x-sex and age^2-x-sex columns
     columnnames <- colnames(merged_temp)
-    age=as.numeric(merged_temp[,which(columnnames==ageColumnHeader)])
-    age_mean=mean(age)
-    age_md=median(age)
-    min_age=min(age)
-    max_age=max(age)
+    Age=as.numeric(merged_temp[,which(columnnames==AgeColumnHeader)])
+    age_mean=mean(Age)
+    age_md=median(Age)
+    min_age=min(Age)
+    max_age=max(Age)
     
-    ageC=(age-age_mean)
-    ageCsq=ageC*ageC
+    AgeC=(Age-age_mean)
+    AgeCsq=AgeC*AgeC
     
     ### Sanity check for missingness of sex variable
-    #merged_temp[,sexColumnHeader]
-    bad_vals <- merged_temp[,sexColumnHeader][!merged_temp[,sexColumnHeader] %in% c("M", "F") | is.na(merged_temp[,sexColumnHeader])]
+    #merged_temp[,SexColumnHeader]
+    bad_vals <- merged_temp[,SexColumnHeader][!merged_temp[,SexColumnHeader] %in% c("M", "F") | is.na(merged_temp[,SexColumnHeader])]
     unique(bad_vals)
     
     ### What happens if there is missing sex? It assigns as female.
-    sex=merged_temp[,which(columnnames==sexColumnHeader)]
+    sex=merged_temp[,which(columnnames==SexColumnHeader)]
     males=which(sex==maleIndicator)
-    sexC=matrix(0,nrow=dim(merged_temp)[1],ncol=1)
-    sexC[males]<- -0.5  
-    sexC[-males]<- 0.5
+    SexC=matrix(0,nrow=dim(merged_temp)[1],ncol=1)
+    SexC[males]<- -0.5  
+    SexC[-males]<- 0.5
     
     #Recode sex to match the needs of Plink: 1-2 coding
-    StandardSex=data.frame("Sex"=sexC)
-    StandardSex[which(sexC==-.5),]<- 1
-    StandardSex[which(sexC==.5),]<- 2
+    StandardSex=data.frame("Sex"=SexC)
+    StandardSex[which(SexC==-.5),]<- 1
+    StandardSex[which(SexC==.5),]<- 2
     
     #make sure this also happens for case-control status
     
-    Nm=length(which(sexC==-.5))
-    Nf=length(which(sexC==.5))
+    Nm=length(which(SexC==-.5))
+    Nf=length(which(SexC==.5))
     
     ## Print some basic stats on age and sex to the RUN_NOTES.txt
     writeLines(paste(''))
@@ -316,23 +316,23 @@ for (s in c(1:3)) {
     writeLines(paste('There are',Nf,'females in this study.'), con=zz, sep="\n")
     ##################### end GB added #########################
     
-    age_sexC=age*sexC
-    ageCsq_sexC=ageCsq*sexC
+    Age_SexC=age*SexC
+    AgeCsqxSexC=AgeCsq*SexC
     
     ### Do not include sex or sex interaction variables if population is all M or all F or age stuff if all the same age
-    if (sd(sexC) ==0) {
+    if (sd(SexC) ==0) {
       cat("	WARNING: It appears this study (or subgroup) is of a single sex. If this is not the case, please check your Covariates.csv file")
       writeLines(paste('  WARNING: It appears this study (or subgroup) is of a single sex. If this is not the case, please check your Covariates.csv file.'), con=zz, sep="\n")
-      age_sexC=age_sexC*0
-      ageCsq_sexC=ageCsq_sexC*0
+      Age_SexC=Age_SexC*0
+      AgeCsqxSexC=AgeCsqxSexC*0
     }
     
-    if (sd(ageC) ==0) {
+    if (sd(AgeC) ==0) {
       cat("	WARNING: It appears this study (or subgroup) is of a single age group. If this is not the case, please check your Covariates.csv file")
       writeLines(paste('  WARNING: It appears this study (or subgroup) is of a single age group. If this is not the case, please check your Covariates.csv file.'), con=zz, sep="\n")
-      ageCsq=ageCsq*0
-      ageC_sexC=ageC_sexC*0
-      ageCsq_sexC=ageCsq_sexC*0
+      AgeCsq=AgeCsq*0
+      AgeC_SexC=AgeC_SexC*0
+      AgeCsqxSexC=AgeCsqxSexC*0
     }
     
     ## set columns as variables
@@ -344,7 +344,7 @@ for (s in c(1:3)) {
     columnnames <- colnames(merged_temp_rest)
     
     # Columns to remove (if they exist)
-    remove_cols <- c(ageColumnHeader, sexColumnHeader, "fup_duration", "FID", "IID", "MID", "PID") #"zygosity"
+    remove_cols <- c(AgeColumnHeader, SexColumnHeader, "fup_duration", "FID", "IID", "MID", "PID") #"zygosity"
     
     # Only keep columns that are NOT in remove_cols
     merged_temp_rest <- merged_temp_rest[, !(colnames(merged_temp_rest) %in% remove_cols), drop = FALSE]
@@ -355,7 +355,7 @@ for (s in c(1:3)) {
     VarNames=colnames(merged_temp_rest)
     print(VarNames)
     
-    FullInfoFile=cbind(merged_temp[,c('FID','IID','MID','PID')],StandardSex,sexC,age,ageCsq,age_sexC,ageCsq_sexC,merged_temp_rest)
+    FullInfoFile=cbind(merged_temp[,c('FID','IID','MID','PID')],StandardSex,SexC,age,AgeCsq,Age_SexC,AgeCsqxSexC,merged_temp_rest)
     
     VarNames=colnames(FullInfoFile)
     print(VarNames)
@@ -365,7 +365,7 @@ for (s in c(1:3)) {
     Nset=Nids+Nrois
     nCov=nVar-Nset ### all the covariates that are left after removal of genetic-family columns and followup duration 
     #FullInfoFile=moveMe(FullInfoFile,ALL_ROIS,"after","Sex")
-    FullInfoFile[,sexColumnHeader] <- NULL
+    FullInfoFile[,SexColumnHeader] <- NULL
     
     numsubjects = length(FullInfoFile$IID);
     
@@ -525,7 +525,10 @@ for (s in c(1:3)) {
     ALL_ROIS <- ALL_ROIS[ALL_ROIS %in% colnames(FullInfoFile)]
     print(ALL_ROIS)
     
-    covar_order <- c("Sex","sexC","age","ageCsq","age_sexC","ageCsq_sexC", "AffectionStatus", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10")
+    #FID, IID, Sex, Age, AgeCsq, AgexSex, AgeCsqxSex, AffectionStatus, PC1, PC2, …, PC10, FA_GlobalAverage, MD_GlobalAverage, RD_GlobalAverage, AD_GlobalAverage, Dummy1_MR, Dummy2_MR
+
+
+    covar_order <- c("Sex","SexC","age","AgeCsq","Age_SexC","AgeCsqxSexC", "AffectionStatus", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "FA_GlobalAverage", "MD_GlobalAverage", "RD_GlobalAverage", "AD_GlobalAverage")
     covar_order <- covar_order[covar_order %in% colnames(FullInfoFile)]
     print(covar_order)
     
