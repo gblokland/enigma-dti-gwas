@@ -173,7 +173,7 @@ if (l_missing > 0) {
   stop(paste("ERROR: You are missing the following ROIs:", missing ,". Please re-run latest ROI script!",sep=""))
 }
 
-#Merge the PCA and other covariates
+###Merge the PCA and other covariates
 cat('Merging your PCA files with your Phenotypes and Covariates Files...')
 merged_temp <- merge(pca, InfoFile, by = c("FID", "IID"))
 #print(head(merged_temp))
@@ -353,6 +353,7 @@ for (s in c(1:3)) {
     columnnames = colnames(merged_temp_rest);
     
     VarNames=names(merged_temp_rest)
+    print(VarNames)
     
     FullInfoFile=cbind(merged_temp[,c('FID','IID','MID','PID')],StandardSex,sexC,age,ageCsq,age_sexC,ageCsq_sexC,merged_temp_rest)
     
@@ -516,7 +517,7 @@ if (Nset >= nVar) {
     header=(c('Covariate','Mean','SD','Min','Max'))
     write.table(test,file=zz,quote=F,col.names=header,row.names=FALSE,sep = "\t");
     
-    cat('CHECKPOINT3\n')
+    cat('Now write the formatted output files.\n')
 
     print(colnames(FullInfoFile))
 
@@ -617,5 +618,5 @@ writeLines(paste('****** DONE ****** Files have been written. '),con=zz,sep="\n"
 close(zz)
 
 
+#The output file should be named: ${COHORT}_enigma_dti_gwas.pheno
 #The output file should be named: ${COHORT}_enigma_dti_gwas.covar
-
