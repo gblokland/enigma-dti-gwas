@@ -1,0 +1,1 @@
+python3 make_random_pca_file.py 100 DMS_PCACovariates.eigenvec
