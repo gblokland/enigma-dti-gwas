@@ -112,6 +112,8 @@ eName <- args[14]
 
 cohort <- args[15]
 
+output_format <- "plink"
+
 paste0(outDir, "/", eName, "_RUN_NOTES.txt")
 
 #Open a text file for writing (by subsequent commands)
@@ -131,30 +133,30 @@ Nrois=length(ALL_ROIS)
 
 ####################################################################
 
-#Read in the covariates file
+###Read in the covariates file
 covar <- data.frame(read.csv(csvFILE, colClasses = "character")) 
 
-#Read in the ancestry principal components
+###Read in the ancestry principal components
 pca <- read.table(pcaFILE, colClasses = "character")  #Read in the ancestry principal components
 pca$SOL <- NULL; #Remove the “SOL” column in the MDS components since this is not a covariate to be included
 colnames(pca) <- c("FID", "IID", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "PC11", "PC12", "PC13", "PC14", "PC15", "PC16", "PC17", "PC18", "PC19", "PC20")
 
-#Read in fam file
+###Read in fam file
 fam <- read.table(localfamFILE, colClasses = "character")
 colnames(fam) <- c("FID", "IID", "PID", "MID", "SEX", "PHENO")
 fam <- fam[,c("FID", "IID")]
 
-#Read in the phenotypes file
-InfoFile <- data.frame(read.csv(combinedROItableFILE, colClasses = "character")) 
+###Read in the phenotypes file
+pheno <- data.frame(read.csv(combinedROItableFILE, colClasses = "character")) 
 
-InfoFile$IID = InfoFile[,1] #This just renames a column for easier merging
-InfoFile$subjectID = NULL
-InfoFile$SubID_base = NULL
-InfoFile$SubID_fup = NULL
+#pheno$IID = pheno[,1] #This just renames a column for easier merging
+pheno$subjectID = NULL
+pheno$SubID_base = NULL
+pheno$SubID_fup = NULL
 
-#Merge the covariates and ROIs
+###Merge the covariates and ROIs
 cat('Merging your Phenotypes and Covariates Files...')
-InfoFile <- merge(covar, InfoFile, by = c("FID", "IID"), all = TRUE)
+InfoFile <- merge(covar, pheno, by = c("FID", "IID"), all = TRUE)
 cat('Done\n')
 
 missing="";
@@ -355,6 +357,7 @@ for (s in c(1:3)) {
     FullInfoFile=cbind(merged_temp[,c('FID','IID','MID','PID')],StandardSex,sexC,age,ageCsq,age_sexC,ageCsq_sexC,merged_temp_rest)
     
     VarNames=names(FullInfoFile)
+    print(VarNames)
     numsubjects = length(FullInfoFile$IID);
     
     nVar=dim(FullInfoFile)[2]
@@ -515,7 +518,7 @@ if (Nset >= nVar) {
 
     print(colnames(FullInfoFile))
 
-output_format <- "plink"
+    
     if (output_format== "plink") {
       cat('Writing PLINK formatted phenotype/covariate files.\n')
       write.table(FullInfoFile[, c("FID", "IID", ALL_ROIS)], paste0(outDir, "/", cohort, "_enigma_dti_gwas.pheno"),quote=F,col.names=F,row.names=F);
