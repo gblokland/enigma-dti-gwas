@@ -220,10 +220,10 @@ writeLines(paste0('VERSION: ',format(Sys.Date(),"%m/%d/%Y")), con=zz, sep="\n")
 # check whether we should also write files for subjects below AND above 18
 possible_subsets <- list(c(1,0,0), c("all","child","adult"), c(list(merged_temp,NULL,NULL)))
 
-age <- as.numeric(merged_temp[,AgeColumnHeader])
-#print(age)
-#min(age) < 18 & max(age >= 18)
-if (min(age) < 18 & max(age >= 18)) {
+Age <- as.numeric(merged_temp[,AgeColumnHeader])
+#print(Age)
+#min(Age) < 18 & max(Age >= 18)
+if (min(Age) < 18 & max(Age >= 18)) {
   cat("Separating data file into children and adults\n")
   writeLines(paste('Separating data file into children and adults'), con=zz, sep="\n")
   num_child=dim(merged_temp[which(as.numeric(merged_temp[,AgeColumnHeader]) < 18),])[1]
@@ -316,14 +316,14 @@ for (s in c(1:3)) {
     writeLines(paste('There are',Nf,'females in this study.'), con=zz, sep="\n")
     ##################### end GB added #########################
     
-    Age_SexC=age*SexC
+    AgexSexC=Age*SexC
     AgeCsqxSexC=AgeCsq*SexC
     
     ### Do not include sex or sex interaction variables if population is all M or all F or age stuff if all the same age
     if (sd(SexC) ==0) {
       cat("	WARNING: It appears this study (or subgroup) is of a single sex. If this is not the case, please check your Covariates.csv file")
       writeLines(paste('  WARNING: It appears this study (or subgroup) is of a single sex. If this is not the case, please check your Covariates.csv file.'), con=zz, sep="\n")
-      Age_SexC=Age_SexC*0
+      AgexSexC=AgexSexC*0
       AgeCsqxSexC=AgeCsqxSexC*0
     }
     
@@ -331,7 +331,7 @@ for (s in c(1:3)) {
       cat("	WARNING: It appears this study (or subgroup) is of a single age group. If this is not the case, please check your Covariates.csv file")
       writeLines(paste('  WARNING: It appears this study (or subgroup) is of a single age group. If this is not the case, please check your Covariates.csv file.'), con=zz, sep="\n")
       AgeCsq=AgeCsq*0
-      AgeC_SexC=AgeC_SexC*0
+      AgeCxSexC=AgeCxSexC*0
       AgeCsqxSexC=AgeCsqxSexC*0
     }
     
@@ -355,7 +355,7 @@ for (s in c(1:3)) {
     VarNames=colnames(merged_temp_rest)
     print(VarNames)
     
-    FullInfoFile=cbind(merged_temp[,c('FID','IID','MID','PID')],StandardSex,SexC,age,AgeCsq,Age_SexC,AgeCsqxSexC,merged_temp_rest)
+    FullInfoFile=cbind(merged_temp[,c('FID','IID','MID','PID')],StandardSex,SexC,Age,AgeCsq,AgexSexC,AgeCsqxSexC,merged_temp_rest)
     
     VarNames=colnames(FullInfoFile)
     print(VarNames)
@@ -528,7 +528,7 @@ for (s in c(1:3)) {
     #FID, IID, Sex, Age, AgeCsq, AgexSex, AgeCsqxSex, AffectionStatus, PC1, PC2, …, PC10, FA_GlobalAverage, MD_GlobalAverage, RD_GlobalAverage, AD_GlobalAverage, Dummy1_MR, Dummy2_MR
 
 
-    covar_order <- c("Sex","SexC","age","AgeCsq","Age_SexC","AgeCsqxSexC", "AffectionStatus", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "FA_GlobalAverage", "MD_GlobalAverage", "RD_GlobalAverage", "AD_GlobalAverage")
+    covar_order <- c("Sex","SexC","Age","AgeCsq","AgexSexC","AgeCsqxSexC", "AffectionStatus", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "FA_GlobalAverage", "MD_GlobalAverage", "RD_GlobalAverage", "AD_GlobalAverage")
     covar_order <- covar_order[covar_order %in% colnames(FullInfoFile)]
     print(covar_order)
     
