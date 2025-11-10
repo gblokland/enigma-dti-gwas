@@ -140,6 +140,8 @@ covar <- data.frame(read.csv(csvFILE, colClasses = "character"))
 exclude_cols <- c("FID", "IID", AgeColumnHeader, SexColumnHeader, affectionStatusColumnHeader)
 # Select all column names that are NOT in the exclude list
 ALL_DUMMIES <- setdiff(colnames(covar), exclude_cols)
+cat('Additional dummy covariates:\n')
+print(ALL_DUMMIES)
 
 ###Read in the ancestry principal components
 pca <- read.table(pcaFILE, colClasses = "character")  #Read in the ancestry principal components
