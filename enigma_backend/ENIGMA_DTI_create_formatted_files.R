@@ -355,6 +355,9 @@ for (s in c(1:3)) {
     # }
     columnnames = colnames(merged_temp_rest);
     
+    cat('CHECKPOINT2\n')
+    print(colnames(merged_temp_rest))
+    
     VarNames=colnames(merged_temp_rest)
     print(VarNames)
     
