@@ -352,12 +352,12 @@ for (s in c(1:3)) {
     # }
     columnnames = colnames(merged_temp_rest);
     
-    VarNames=names(merged_temp_rest)
+    VarNames=colnames(merged_temp_rest)
     print(VarNames)
-    
+
     FullInfoFile=cbind(merged_temp[,c('FID','IID','MID','PID')],StandardSex,sexC,age,ageCsq,age_sexC,ageCsq_sexC,merged_temp_rest)
     
-    VarNames=names(FullInfoFile)
+    VarNames=colnames(FullInfoFile)
     print(VarNames)
     numsubjects = length(FullInfoFile$IID);
     
