@@ -329,31 +329,15 @@ for (s in c(1:3)) {
     
     cat('CHECKPOINT1\n')
     print(colnames(merged_temp))
-    merged_temp_rest=as.data.frame(merged_temp)
-    columnnames = colnames(merged_temp_rest);
-    merged_temp_rest=merged_temp_rest[,-which(columnnames==ageColumnHeader)]
-    columnnames = colnames(merged_temp_rest);
-    merged_temp_rest=merged_temp_rest[,-which(columnnames==sexColumnHeader)]
-    columnnames = colnames(merged_temp_rest);
-    merged_temp_rest=merged_temp_rest[,-which(columnnames=="fup_duration")]
-    columnnames = colnames(merged_temp_rest);
-    merged_temp_rest=merged_temp_rest[,-which(columnnames=="FID")]
-    columnnames = colnames(merged_temp_rest);
-    merged_temp_rest=merged_temp_rest[,-which(columnnames=="IID")]
-    columnnames = colnames(merged_temp_rest);
-    if (length(merged_temp_rest[,which(columnnames=="MID")]) > 0) {
-      merged_temp_rest=merged_temp_rest[,-which(columnnames=="MID")]
-    }
-    columnnames = colnames(merged_temp_rest);
-    if (length(merged_temp_rest[,which(columnnames=="PID")]) > 0) {
-      merged_temp_rest=merged_temp_rest[,-which(columnnames=="PID")]
-    }
     
-    # columnnames = colnames(merged_temp_rest);
-    # if (length(merged_temp_rest[,which(columnnames=="zygosity")]) > 0) {
-    # merged_temp_rest=merged_temp_rest[,-which(columnnames=="zygosity")]
-    # }
-    columnnames = colnames(merged_temp_rest);
+    merged_temp_rest <- as.data.frame(merged_temp)
+    columnnames <- colnames(merged_temp_rest)
+    
+    # Columns to remove (if they exist)
+    remove_cols <- c(ageColumnHeader, sexColumnHeader, "fup_duration", "FID", "IID", "MID", "PID") #"zygosity"
+    
+    # Only keep columns that are NOT in remove_cols
+    merged_temp_rest <- merged_temp_rest[, !(colnames(merged_temp_rest) %in% remove_cols), drop = FALSE]
     
     cat('CHECKPOINT2\n')
     print(colnames(merged_temp_rest))
