@@ -135,7 +135,11 @@ Nrois=length(ALL_ROIS)
 ####################################################################
 
 ###Read in the covariates file
-covar <- data.frame(read.csv(csvFILE, colClasses = "character")) 
+covar <- data.frame(read.csv(csvFILE, colClasses = "character"))
+# Define the columns you want to exclude
+exclude_cols <- c("FID", "IID", AgeColumnHeader, SexColumnHeader, affectionStatusColumnHeader)
+# Select all column names that are NOT in the exclude list
+ALL_DUMMIES <- setdiff(colnames(covar), exclude_cols)
 
 ###Read in the ancestry principal components
 pca <- read.table(pcaFILE, colClasses = "character")  #Read in the ancestry principal components
@@ -527,8 +531,10 @@ for (s in c(1:3)) {
     
     #FID, IID, Sex, Age, AgeCsq, AgexSex, AgeCsqxSex, AffectionStatus, PC1, PC2, …, PC10, FA_GlobalAverage, MD_GlobalAverage, RD_GlobalAverage, AD_GlobalAverage, Dummy1_MR, Dummy2_MR
 
+    ALL_DUMMIES <- ALL_DUMMIES[ALL_DUMMIES %in% colnames(FullInfoFile)]
+    print(ALL_DUMMIES)
 
-    covar_order <- c("Sex","Age","AgeCsq","AgexSex","AgeCsqxSex", "AffectionStatus", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "FA_GlobalAverage", "MD_GlobalAverage", "RD_GlobalAverage", "AD_GlobalAverage")
+    covar_order <- c("Sex","Age","AgeCsq","AgexSex","AgeCsqxSex", "AffectionStatus", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "FA_GlobalAverage", "MD_GlobalAverage", "RD_GlobalAverage", "AD_GlobalAverage", ALL_DUMMIES)
     covar_order <- covar_order[covar_order %in% colnames(FullInfoFile)]
     print(covar_order)
     
