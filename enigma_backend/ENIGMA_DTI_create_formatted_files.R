@@ -316,15 +316,15 @@ for (s in c(1:3)) {
     writeLines(paste('There are',Nf,'females in this study.'), con=zz, sep="\n")
     ##################### end GB added #########################
     
-    AgexSexC=Age*SexC
-    AgeCsqxSexC=AgeCsq*SexC
+    AgexSex=Age*SexC
+    AgeCsqxSex=AgeCsq*SexC
     
     ### Do not include sex or sex interaction variables if population is all M or all F or age stuff if all the same age
     if (sd(SexC) ==0) {
       cat("	WARNING: It appears this study (or subgroup) is of a single sex. If this is not the case, please check your Covariates.csv file")
       writeLines(paste('  WARNING: It appears this study (or subgroup) is of a single sex. If this is not the case, please check your Covariates.csv file.'), con=zz, sep="\n")
-      AgexSexC=AgexSexC*0
-      AgeCsqxSexC=AgeCsqxSexC*0
+      AgexSex=AgexSex*0
+      AgeCsqxSex=AgeCsqxSex*0
     }
     
     if (sd(AgeC) ==0) {
@@ -332,7 +332,7 @@ for (s in c(1:3)) {
       writeLines(paste('  WARNING: It appears this study (or subgroup) is of a single age group. If this is not the case, please check your Covariates.csv file.'), con=zz, sep="\n")
       AgeCsq=AgeCsq*0
       AgeCxSexC=AgeCxSexC*0
-      AgeCsqxSexC=AgeCsqxSexC*0
+      AgeCsqxSex=AgeCsqxSex*0
     }
     
     ## set columns as variables
@@ -355,7 +355,7 @@ for (s in c(1:3)) {
     VarNames=colnames(merged_temp_rest)
     print(VarNames)
     
-    FullInfoFile=cbind(merged_temp[,c('FID','IID','MID','PID')],StandardSex,SexC,Age,AgeCsq,AgexSexC,AgeCsqxSexC,merged_temp_rest)
+    FullInfoFile=cbind(merged_temp[,c('FID','IID','MID','PID')],StandardSex,SexC,Age,AgeCsq,AgexSex,AgeCsqxSex,merged_temp_rest)
     
     VarNames=colnames(FullInfoFile)
     print(VarNames)
@@ -528,7 +528,7 @@ for (s in c(1:3)) {
     #FID, IID, Sex, Age, AgeCsq, AgexSex, AgeCsqxSex, AffectionStatus, PC1, PC2, …, PC10, FA_GlobalAverage, MD_GlobalAverage, RD_GlobalAverage, AD_GlobalAverage, Dummy1_MR, Dummy2_MR
 
 
-    covar_order <- c("Sex","SexC","Age","AgeCsq","AgexSexC","AgeCsqxSexC", "AffectionStatus", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "FA_GlobalAverage", "MD_GlobalAverage", "RD_GlobalAverage", "AD_GlobalAverage")
+    covar_order <- c("Sex","Age","AgeCsq","AgexSex","AgeCsqxSex", "AffectionStatus", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "FA_GlobalAverage", "MD_GlobalAverage", "RD_GlobalAverage", "AD_GlobalAverage")
     covar_order <- covar_order[covar_order %in% colnames(FullInfoFile)]
     print(covar_order)
     
