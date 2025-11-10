@@ -521,6 +521,8 @@ for (s in c(1:3)) {
     cat('Step 3: Now write the formatted output files.\n')
     
     print(colnames(FullInfoFile))
+    
+    ALL_ROIS <- ALL_ROIS[ALL_ROIS%in%colnames(FullInfoFile)==TRUE]
 
     if (output_format== "plink") {
       cat('Writing PLINK formatted phenotype/covariate files.\n')
