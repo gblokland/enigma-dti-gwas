@@ -525,12 +525,16 @@ for (s in c(1:3)) {
     ALL_ROIS <- ALL_ROIS[ALL_ROIS %in% colnames(FullInfoFile)]
     print(ALL_ROIS)
     
+    covar_order <- c("Sex","sexC","age","ageCsq","age_sexC","ageCsq_sexC", "AffectionStatus", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10")
+    covar_order <- covar_order[covar_order %in% colnames(FullInfoFile)]
+    print(covar_order)
+    
     if (output_format== "plink") {
       cat('Writing PLINK formatted phenotype/covariate files.\n')
       write.table(FullInfoFile[, c("FID", "IID", ALL_ROIS)], 
                   paste0(outDir, "/", cohort, "_enigma_dti_gwas.pheno"),
                   quote=F,col.names=T,row.names=F);
-      write.table(FullInfoFile[, c("FID", "IID", "StandardSex","sexC","age","ageCsq","age_sexC","ageCsq_sexC", "AffectionStatus", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10")], 
+      write.table(FullInfoFile[, c("FID", "IID", covar_order)], 
                   paste0(outDir, "/", cohort, "_enigma_dti_gwas.covar"),
                   quote=F,col.names=T,row.names=F);
     } #end if (output_format== "plink")
@@ -540,7 +544,7 @@ for (s in c(1:3)) {
       write.table(FullInfoFile[, c("FID", "IID", ALL_ROIS)], 
                   paste0(outDir, "/", cohort, "_enigma_dti_gwas.pheno.saige.txt"),
                   quote=F,col.names=T,row.names=F);
-      write.table(FullInfoFile[, c("FID", "IID", "StandardSex","sexC","age","ageCsq","age_sexC","ageCsq_sexC", "AffectionStatus", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10")], 
+      write.table(FullInfoFile[, c("FID", "IID", covar_order)], 
                   paste0(outDir, "/", cohort, "_enigma_dti_gwas.covar.saige.txt"),
                   quote=F,col.names=T,row.names=F);
     } #end if (output_format== "saige")
