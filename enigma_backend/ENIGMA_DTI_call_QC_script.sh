@@ -22,18 +22,6 @@ cd $ENIGMA_DTI_GWAS_dir
 
 pheno_covar_dir=$ENIGMA_DTI_GWAS_dir/pheno_covar
 
-#cp ~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_call_QC_script.sh ./
-#cp ~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_plots_ALL-GB.R ./
-#cp ~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_plots_ALL.R ./
-#cp ~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_plots_stats_demographics.R ./
-#cp ~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_plots_stats_demographics-simple-GB.R ./
-
-
-#wget "~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_call_QC_script.sh"
-#wget "~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_plots_ALL-GB.R"
-#wget "~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_plots_ALL.R"
-#wget "~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_plots_stats_demographics.R"
-#wget "~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_plots_stats_demographics-simple-GB.R"
 
 rm -rf SCRIPTS; git clone git@github.com:gblokland/enigma-dti-gwas.git SCRIPTS
 run_directory=$HOME/enigma/DTIgenetics/SCRIPTS
@@ -70,13 +58,12 @@ related="0" #0 for unrelated cohorts; 1 for related cohorts
 outDir="${ENIGMA_DTI_GWAS_dir}/pheno_covar"
 run_dir="${run_directory}"
 eName="ENIGMA_DTI_GWAS"
-cohort="DMS"
 
 echo "Inputs":
-echo ${csvFILE} ${localfamFILE} ${pcaFILE} ${combinedROItableFILE} ${ageColumnHeader} ${sexColumnHeader} ${maleIndicator} ${CaseControlCohort} ${affectionStatusColumnHeader} ${affectedIndicator} ${related} ${outDir} ${run_dir} ${eName} ${cohort}
+echo ${csvFILE} ${localfamFILE} ${pcaFILE} ${combinedROItableFILE} ${ageColumnHeader} ${sexColumnHeader} ${maleIndicator} ${CaseControlCohort} ${affectionStatusColumnHeader} ${affectedIndicator} ${related} ${outDir} ${run_dir} ${eName} ${COHORT}
 
 
-R --no-save --slave --args ${csvFILE} ${localfamFILE} ${pcaFILE} ${combinedROItableFILE} ${ageColumnHeader} ${sexColumnHeader} ${maleIndicator} ${CaseControlCohort} ${affectionStatusColumnHeader} ${affectedIndicator} ${related} ${outDir} ${run_directory} ${eName} ${cohort} <  ${run_directory}/enigma_backend/ENIGMA_DTI_create_formatted_files.R
+R --no-save --slave --args ${csvFILE} ${localfamFILE} ${pcaFILE} ${combinedROItableFILE} ${ageColumnHeader} ${sexColumnHeader} ${maleIndicator} ${CaseControlCohort} ${affectionStatusColumnHeader} ${affectedIndicator} ${related} ${outDir} ${run_directory} ${eName} ${COHORT} <  ${run_directory}/enigma_backend/ENIGMA_DTI_create_formatted_files.R
 
 
 ###
@@ -116,3 +103,15 @@ Rscript ${ENIGMA_DTI_GWAS_dir}/SCRIPTS/enigma_backend/ENIGMA_DTI_GWAS_QC_plots_s
 
 
 
+#cp ~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_call_QC_script.sh ./
+#cp ~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_plots_ALL-GB.R ./
+#cp ~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_plots_ALL.R ./
+#cp ~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_plots_stats_demographics.R ./
+#cp ~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_plots_stats_demographics-simple-GB.R ./
+
+
+#wget "~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_call_QC_script.sh"
+#wget "~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_plots_ALL-GB.R"
+#wget "~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_plots_ALL.R"
+#wget "~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_plots_stats_demographics.R"
+#wget "~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_plots_stats_demographics-simple-GB.R"

@@ -123,7 +123,8 @@ source(paste0(run_dir, "/enigma_backend/ENIGMA_functions_DTI.R"))
 
 ####################################################################
 
-ALL_IDS=c("FID", "IID", "MID", "PID", "Sex");
+#ALL_IDS=c("FID", "IID", "MID", "PID", "Sex");
+ALL_IDS=c("FID", "IID");
 
 Nids=length(ALL_IDS)
 Nrois=length(ALL_ROIS)
