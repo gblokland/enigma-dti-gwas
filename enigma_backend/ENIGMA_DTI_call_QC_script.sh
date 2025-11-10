@@ -70,12 +70,13 @@ related="0" #0 for unrelated cohorts; 1 for related cohorts
 outDir="${ENIGMA_DTI_GWAS_dir}/pheno_covar"
 run_dir="${run_directory}"
 eName="ENIGMA_DTI_GWAS"
+cohort="DMS"
 
 echo "Inputs":
-echo ${csvFILE} ${localfamFILE} ${pcaFILE} ${combinedROItableFILE} ${ageColumnHeader} ${sexColumnHeader} ${maleIndicator} ${CaseControlCohort} ${affectionStatusColumnHeader} ${affectedIndicator} ${related} ${outDir} ${run_dir} ${eName} ${run_directory}
+echo ${csvFILE} ${localfamFILE} ${pcaFILE} ${combinedROItableFILE} ${ageColumnHeader} ${sexColumnHeader} ${maleIndicator} ${CaseControlCohort} ${affectionStatusColumnHeader} ${affectedIndicator} ${related} ${outDir} ${run_dir} ${eName} ${cohort}
 
 
-R --no-save --slave --args ${csvFILE} ${localfamFILE} ${pcaFILE} ${combinedROItableFILE} ${ageColumnHeader} ${sexColumnHeader} ${maleIndicator} ${CaseControlCohort} ${affectionStatusColumnHeader} ${affectedIndicator} ${related} ${outDir} ${run_directory} ${eName} <  ${run_directory}/enigma_backend/ENIGMA_DTI_create_formatted_files.R
+R --no-save --slave --args ${csvFILE} ${localfamFILE} ${pcaFILE} ${combinedROItableFILE} ${ageColumnHeader} ${sexColumnHeader} ${maleIndicator} ${CaseControlCohort} ${affectionStatusColumnHeader} ${affectedIndicator} ${related} ${outDir} ${run_directory} ${eName} ${cohort} <  ${run_directory}/enigma_backend/ENIGMA_DTI_create_formatted_files.R
 
 
 ###

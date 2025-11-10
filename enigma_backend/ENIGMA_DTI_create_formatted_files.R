@@ -25,7 +25,8 @@
 ######  12. output directory to write formatted files into (doesn't have to exist yet!)
 ######  list of ROIs to run
 ######  13. run_directory = SCRIPTS directory 
-######  14. eName; used in output 
+######  14. eName; used in output
+######  15. Cohort Name; used in output
 
 ####################################################################
 
@@ -108,6 +109,8 @@ ALL_ROIS <- c(paste0("FA_", ALL_ROIS),
 run_dir <- args[13]
 
 eName <- args[14]
+
+cohort <- args[15]
 
 paste0(outDir, "/", eName, "_RUN_NOTES.txt")
 
@@ -509,7 +512,21 @@ if (Nset >= nVar) {
     
     cat('CHECKPOINT3\n')
 
+    print(colnames(FullInfoFile))
+
 output_format <- "plink"
+    if (output_format== "plink") {
+      cat('Writing PLINK formatted phenotype/covariate files.\n')
+      write.table(FullInfoFile[, c("FID", "IID", ALL_ROIS)], paste0(outDir, "/", cohort, "_enigma_dti_gwas.pheno"),quote=F,col.names=F,row.names=F);
+      write.table(FullInfoFile[, c("FID", "IID", "StandardSex","sexC","age","ageCsq","age_sexC","ageCsq_sexC", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10")], paste0(outDir, "/", cohort, "_enigma_dti_gwas.covar"),quote=F,col.names=T,row.names=F);
+    }
+
+    if (output_format== "saige") {
+      cat('Writing SAIGE formatted phenotype/covariate files.\n')
+      write.table(FullInfoFile[, c("FID", "IID", ALL_ROIS)], paste0(outDir, "/", cohort, "_enigma_dti_gwas.pheno.saige.txt"),quote=F,col.names=F,row.names=F);
+      write.table(FullInfoFile[, c("FID", "IID", "StandardSex","sexC","age","ageCsq","age_sexC","ageCsq_sexC", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10")], paste0(outDir, "/", cohort, "_enigma_dti_gwas.covar.saige.txt"),quote=F,col.names=T,row.names=F);
+    }
+
     if (output_format== "PedDat") {
       ################ now print out the .dat and the .ped files
       #
