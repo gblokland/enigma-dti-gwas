@@ -105,6 +105,7 @@ ALL_ROIS <- c(paste0("FA_", ALL_ROIS),
               paste0("MD_", ALL_ROIS), 
               paste0("AD_", ALL_ROIS), 
               paste0("RD_", ALL_ROIS))
+print(ALL_ROIS)
 
 run_dir <- args[13]
 
@@ -242,7 +243,7 @@ for (s in c(1:3)) {
     if (related==1) {
       writeLines(paste('STUDY DESIGN: There are related individuals.'), con=zz, sep="\n")
     } 
-    if ( (length(merged_temp[,which(columnnames=="MID")])==0 ) || (length(merged_temp[,which(columnnames=="PID")])	==0) ) {
+    if ( (length(merged_temp[,which(columnnames=="MID")])==0 ) || (length(merged_temp[,which(columnnames=="PID")])==0) ) {
       p=matrix(0, nrow=dim(merged_temp)[1], ncol=1)
       merged_temp$PID=p
       merged_temp$MID=p
@@ -326,6 +327,8 @@ for (s in c(1:3)) {
     
     ## set columns as variables
     
+    cat('CHECKPOINT1\n')
+    print(colnames(merged_temp))
     merged_temp_rest=as.data.frame(merged_temp)
     columnnames = colnames(merged_temp_rest);
     merged_temp_rest=merged_temp_rest[,-which(columnnames==ageColumnHeader)]
