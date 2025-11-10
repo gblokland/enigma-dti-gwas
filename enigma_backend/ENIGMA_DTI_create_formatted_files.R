@@ -423,7 +423,8 @@ for (s in c(1:3)) {
       columnnames = colnames(FullInfoFile_irrespective)
       
       for (l in (Nset+1):length(VarNames)) {
-        if (sd(FullInfoFile_irrespective[,which(columnnames==VarNames[l])])==0) {
+        #if (sd(FullInfoFile_irrespective[,which(columnnames==VarNames[l])])==0) {
+        if (!is.na(sd_val <- sd(as.numeric(FullInfoFile_irrespective[, which(columnnames == VarNames[l])]), na.rm = TRUE)) && sd_val > 0) {
           cat(paste('For all individuals combined, the standard deviation of column', VarNames[l], 'is zero. Therefore, the column will be removed.\n'))
           FullInfoFile_irrespective=FullInfoFile_irrespective[,-which(colnames(FullInfoFile_irrespective)==VarNames[l])]
         }
@@ -441,7 +442,8 @@ for (s in c(1:3)) {
         columnnames = colnames(FullInfoFile_healthy);
         for (l in (Nset+1):length(VarNames)){
           columnnames = colnames(FullInfoFile_healthy);
-          if (sd(FullInfoFile_healthy[,which(columnnames==VarNames[l])])==0) {
+          #if (sd(FullInfoFile_healthy[,which(columnnames==VarNames[l])])==0) {
+          if (!is.na(sd_val <- sd(as.numeric(FullInfoFile_healthy[, which(columnnames == VarNames[l])]), na.rm = TRUE)) && sd_val > 0) {
             cat(paste('For healthy individuals only, the standard deviation of column', VarNames[l], 'is zero. Therefore, the column will be removed.\n'))
             FullInfoFile_healthy=FullInfoFile_healthy[,-which(columnnames==VarNames[l])]
           }
