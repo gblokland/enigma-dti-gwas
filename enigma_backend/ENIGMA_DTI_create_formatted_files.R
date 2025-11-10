@@ -522,8 +522,8 @@ for (s in c(1:3)) {
     
     print(colnames(FullInfoFile))
     
-    ALL_ROIS <- ALL_ROIS[ALL_ROIS%in%colnames(FullInfoFile)==TRUE]
-
+    ALL_ROIS <- ALL_ROIS[ALL_ROIS %in% colnames(FullInfoFile)]
+    
     if (output_format== "plink") {
       cat('Writing PLINK formatted phenotype/covariate files.\n')
       write.table(FullInfoFile[, c("FID", "IID", ALL_ROIS)], 
