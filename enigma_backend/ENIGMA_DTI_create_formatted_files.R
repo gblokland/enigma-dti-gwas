@@ -443,6 +443,7 @@ for (s in c(1:3)) {
       cat('Done\n')
       
     }
+    
     cat('CHECKPOINT1\n')
     
     nVar=dim(FullInfoFile)[2] 
@@ -510,19 +511,26 @@ for (s in c(1:3)) {
     cat('Step 3: Now write the formatted output files.\n')
     
     print(colnames(FullInfoFile))
-    print(head(FullInfoFile))
-    
+
     if (output_format== "plink") {
       cat('Writing PLINK formatted phenotype/covariate files.\n')
-      write.table(FullInfoFile[, c("FID", "IID", ALL_ROIS)], paste0(outDir, "/", cohort, "_enigma_dti_gwas.pheno"),quote=F,col.names=F,row.names=F);
-      write.table(FullInfoFile[, c("FID", "IID", "StandardSex","sexC","age","ageCsq","age_sexC","ageCsq_sexC", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10")], paste0(outDir, "/", cohort, "_enigma_dti_gwas.covar"),quote=F,col.names=T,row.names=F);
-    }
+      write.table(FullInfoFile[, c("FID", "IID", ALL_ROIS)], 
+                  paste0(outDir, "/", cohort, "_enigma_dti_gwas.pheno"),
+                  quote=F,col.names=T,row.names=F);
+      write.table(FullInfoFile[, c("FID", "IID", "StandardSex","sexC","age","ageCsq","age_sexC","ageCsq_sexC", "AffectionStatus", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10")], 
+                  paste0(outDir, "/", cohort, "_enigma_dti_gwas.covar"),
+                  quote=F,col.names=T,row.names=F);
+    } #end if (output_format== "plink")
     
     if (output_format== "saige") {
       cat('Writing SAIGE formatted phenotype/covariate files.\n')
-      write.table(FullInfoFile[, c("FID", "IID", ALL_ROIS)], paste0(outDir, "/", cohort, "_enigma_dti_gwas.pheno.saige.txt"),quote=F,col.names=F,row.names=F);
-      write.table(FullInfoFile[, c("FID", "IID", "StandardSex","sexC","age","ageCsq","age_sexC","ageCsq_sexC", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10")], paste0(outDir, "/", cohort, "_enigma_dti_gwas.covar.saige.txt"),quote=F,col.names=T,row.names=F);
-    }
+      write.table(FullInfoFile[, c("FID", "IID", ALL_ROIS)], 
+                  paste0(outDir, "/", cohort, "_enigma_dti_gwas.pheno.saige.txt"),
+                  quote=F,col.names=T,row.names=F);
+      write.table(FullInfoFile[, c("FID", "IID", "StandardSex","sexC","age","ageCsq","age_sexC","ageCsq_sexC", "AffectionStatus", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10")], 
+                  paste0(outDir, "/", cohort, "_enigma_dti_gwas.covar.saige.txt"),
+                  quote=F,col.names=T,row.names=F);
+    } #end if (output_format== "saige")
     
     if (output_format== "PedDat") {
       ################ now print out the .dat and the .ped files
@@ -549,7 +557,6 @@ for (s in c(1:3)) {
         writeLines(paste('    Not enough subjects for the ',suffix,' group, no files written.'),con=zz,sep="\n")
       }
       
-      ####
       #### when both patients and controls are present, print out files for healthy only, and one including covariates for disease 
       if (nSub_healthy > 0 && nSub_patients > 0) {
         
@@ -603,6 +610,9 @@ for (s in c(1:3)) {
   }
 }
 
+#end for (s in c(1:3)) {
+  #end if (possible_subsets[[1]][[s]] == 1) {
+    
 cat('****** DONE ****** Files have been written to ',outDir,'\n')
 writeLines(paste('****** DONE ****** Files have been written. '),con=zz,sep="\n")
 close(zz)
