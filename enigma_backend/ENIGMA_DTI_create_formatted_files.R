@@ -148,7 +148,17 @@ colnames(fam) <- c("FID", "IID", "PID", "MID", "SEX", "PHENO")
 fam <- fam[,c("FID", "IID")]
 
 ###Read in the phenotypes file
-pheno <- data.frame(read.csv(combinedROItableFILE, colClasses = "character")) 
+# Read only the header (no data)
+header <- names(read.csv(combinedROItableFILE, nrows = 1, check.names = FALSE))
+# Build colClasses: first 2 as "character", rest as "numeric"
+colClasses <- c(rep("character", 2), rep("numeric", length(header) - 2))
+# Read full file with correct classes
+pheno <- read.csv(
+  combinedROItableFILE,
+  colClasses = colClasses,
+  stringsAsFactors = FALSE,
+  check.names = FALSE
+)
 
 #pheno$IID = pheno[,1] #This just renames a column for easier merging
 pheno$subjectID = NULL
