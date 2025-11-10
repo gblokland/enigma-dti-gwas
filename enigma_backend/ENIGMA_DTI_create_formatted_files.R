@@ -508,16 +508,19 @@ if (Nset >= nVar) {
     write.table(test,file=zz,quote=F,col.names=header,row.names=FALSE,sep = "\t");
     
     cat('CHECKPOINT3\n')
-    ################ now print out the .dat and the .ped files
-    #
-    # Output names have been hard-coded for formatting of follow-up scripts.
-    #
-    # Write out ped file only if the number of subjects is larger than the number of covariates
+
+output_format <- "plink"
+    if (output_format== "PedDat") {
+      ################ now print out the .dat and the .ped files
+      #
+      # Output names have been hard-coded for formatting of follow-up scripts.
+      #
+      # Write out ped file only if the number of subjects is larger than the number of covariates
     
-    #### print out one file irrespective of disease -- without covarying for AffectionStatus 
-    #### this is all output in healthy and patient-groups-only cohorts
+      #### print out one file irrespective of disease -- without covarying for AffectionStatus 
+      #### this is all output in healthy and patient-groups-only cohorts
     
-    if (numsubjects >= nCov_irrespective) {
+      if (numsubjects >= nCov_irrespective) {
       cat('    There are',numsubjects,'subjects irrespective of disease \n')
       cat('    There are',nCov_irrespective,'covariates for all subjects irrespective of disease\n')
       writeLines(paste('    There are',numsubjects,'subjects.'),con=zz,sep="\n")
@@ -527,14 +530,14 @@ if (Nset >= nVar) {
       write.table(FullInfoFile_irrespective,paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_irrespective.ped",sep=""),quote=F,col.names=F,row.names=F);
       write.table(FullInfoFile_irrespective,paste(outDir,"/ENIGMA_",eName,"_PEDfile_wColNames_",suffix,"_irrespective.tbl",sep=""),quote=F,col.names=T,row.names=F);
       write.table(colnames(FullInfoFile_irrespective),paste(outDir,"/ENIGMA_",eName,"_PEDfile_",suffix,"_irrespective.header",sep=""),quote=F,col.names=F,row.names=F);
-    } else {
+      } else {
       cat('	Not enough subjects for the ',suffix,' group, no files written.\n')
       writeLines(paste('    Not enough subjects for the ',suffix,' group, no files written.'),con=zz,sep="\n")
-    }
+      }
     
-    ####
-    #### when both patients and controls are present, print out files for healthy only, and one including covariates for disease 
-    if (nSub_healthy > 0 && nSub_patients > 0) {
+      ####
+      #### when both patients and controls are present, print out files for healthy only, and one including covariates for disease 
+      if (nSub_healthy > 0 && nSub_patients > 0) {
 
       cat('    There are',nSub_irrespective,'subjects\n')
       cat('    There are',nCov_all_disease_corr,'covariates for all subjects correcting for disease\n')
@@ -581,8 +584,8 @@ if (Nset >= nVar) {
         writeLines(paste('Not enough subjects for the ',suffix,' disease group, no files written.'),con=zz,sep="\n")
       }
       
-    }
-    
+      } 
+    } #end if (output_format== "PedDat")
   }
 }
 
