@@ -93,13 +93,14 @@ Rscript ${ENIGMA_DTI_GWAS_dir}/SCRIPTS/enigma_backend/ENIGMA_DTI_phenotype_and_c
 --phenoFILE "${ENIGMA_DTI_GWAS_dir}/pheno_covar/${COHORT}_enigma_dti_gwas.pheno" \
 --outDir "${ENIGMA_DTI_GWAS_dir}/QC_ENIGMA/" \
 
-
+#The following script combines the previous 3 scripts
 Rscript ${ENIGMA_DTI_GWAS_dir}/SCRIPTS/enigma_backend/ENIGMA_DTI_GWAS_QC_plots_stats.R \
 --cohort ${COHORT} \
 --covarFILE "${ENIGMA_DTI_GWAS_dir}/pheno_covar/${COHORT}_enigma_dti_gwas.covar" \
 --phenoFILE "${ENIGMA_DTI_GWAS_dir}/pheno_covar/${COHORT}_enigma_dti_gwas.pheno" \
+--icvFILE "${ENIGMA_DTI_GWAS_dir}/pheno_covar/ICV.csv" \
+--icvColumnHeader "segVOL_EstimatedTotalIntraCranialVol" \
 --outDir "${ENIGMA_DTI_GWAS_dir}/QC_ENIGMA/"
-
 
 
 #cp ~/enigma.dtigenetics\@gmail.com\ -\ Google\ Drive/My\ Drive/ENIGMA_DTI_GWAS_genetics_taskforce/ENIGMA_DTI_association_protocols/ENIGMA_DTI_call_QC_script.sh ./

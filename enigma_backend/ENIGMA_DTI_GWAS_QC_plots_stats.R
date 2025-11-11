@@ -22,10 +22,10 @@ suppressPackageStartupMessages({
 # ---------------- Argument parser ----------------
 parser <- ArgumentParser(description = "ENIGMA-DTI QC pipeline - combined")
 parser$add_argument("--cohort", required = TRUE, help = "Cohort name")
-parser$add_argument("--covarFILE", required = TRUE,
-                    help = "Covariate file (.covar, tab or csv)")
-parser$add_argument("--phenoFILE", required = TRUE,
-                    help = "Phenotype file (.pheno, tab or csv)")
+parser$add_argument("--covarFILE", required = TRUE, help = "Covariate file (.covar, tab or csv)")
+parser$add_argument("--phenoFILE", required = TRUE, help = "Phenotype file (.pheno, tab or csv)")
+parser$add_argument("--icvFILE", required = TRUE, help = "ICV file (.csv)")
+parser$add_argument("--icvColumnHeader", default = "ICV", help = "Name of ICV column")
 parser$add_argument("--ageColumnHeader", default = "Age", help = "Name of Age column")
 parser$add_argument("--sexColumnHeader", default = "Sex", help = "Name of Sex column")
 parser$add_argument("--maleIndicator", default = "1", help = "Value used for male")
@@ -33,8 +33,7 @@ parser$add_argument("--CaseControlCohort", default = "1", help = "CaseControlCoh
 parser$add_argument("--affectedStatusColumnHeader", default = "AffectionStatus", help = "AffectionStatus column name")
 parser$add_argument("--affectedIndicator", default = "2", help = "Value indicating affected/case")
 parser$add_argument("--related", default = "0", help = "Related cohort yes(1) or no(0)")
-parser$add_argument("--rois", default = "AverageFA;BCC;GCC;SCC;CC;CGC;CGH;CR;EC;FX;FXST;IC;IFO;PTR;SFO;SLF;SS;UNC;CST;ACR;ALIC;PCR;PLIC;RLIC;SCR;ACR.L;ACR.R;ALIC.L;ALIC.R;CGC.L;CGC.R;CGH.L;CGH.R;CR.L;CR.R;CST.L;CST.R;EC.L;EC.R;FX.ST.L;FX.ST.R;IC.L;IC.R;IFO.L;IFO.R;PCR.L;PCR.R;PLIC.L;PLIC.R;PTR.L;PTR.R;RLIC.L;RLIC.R;SCR.L;SCR.R;SFO.L;SFO.R;SLF.L;SLF.R;SS.L;SS.R;UNC.L;UNC.R",
-                    help = "Semicolon-separated list of ROIs (use same naming as pheno columns)")
+parser$add_argument("--rois", default = "GlobalAverage;BCC;GCC;SCC;CC;CGC;CGH;CR;EC;FX;FXST;IC;IFO;PTR;SFO;SLF;SS;UNC;CST;ACR;ALIC;PCR;PLIC;RLIC;SCR;ACR.L;ACR.R;ALIC.L;ALIC.R;CGC.L;CGC.R;CGH.L;CGH.R;CR.L;CR.R;CST.L;CST.R;EC.L;EC.R;FX.ST.L;FX.ST.R;IC.L;IC.R;IFO.L;IFO.R;PCR.L;PCR.R;PLIC.L;PLIC.R;PTR.L;PTR.R;RLIC.L;RLIC.R;SCR.L;SCR.R;SFO.L;SFO.R;SLF.L;SLF.R;SS.L;SS.R;UNC.L;UNC.R", help = "Semicolon-separated list of ROIs (use same naming as pheno columns)")
 parser$add_argument("--pheno_covar_dir", default = "./QC_ENIGMA/", help = "pheno/covar dir (not used heavily)")
 parser$add_argument("--outDir", default = "./QC_ENIGMA/", help = "Output directory")
 parser$add_argument("--outPDF", default = "ENIGMA_DTI_allROI_histograms.pdf", help = "output PDF name (multi hist)")
@@ -46,6 +45,8 @@ args <- parser$parse_args()
 cohort <- args$cohort
 covarFILE <- args$covarFILE
 phenoFILE <- args$phenoFILE
+icvFILE <- args$icvFILE
+icvColumnHeader <- args$icvColumnHeader
 ageColumnHeader <- args$ageColumnHeader
 sexColumnHeader <- args$sexColumnHeader
 maleIndicator <- args$maleIndicator
@@ -82,7 +83,7 @@ message("Reading phenotypes from: ", phenoFILE)
 pheno <- read_table_auto(phenoFILE)
 
 # Remove average columns from covar if present
-covar <- covar[ , !(names(covar) %in% c("FA_AverageFA", "MD_AverageMD", "RD_AverageRD", "AD_AverageAD"))]
+covar <- covar[ , !(names(covar) %in% c("FA_GlobalAverage", "MD_GlobalAverage", "RD_GlobalAverage", "AD_GlobalAverage"))]
 
 # replace literal "x" or "X" with NA across both tables for safety
 for (tbl in list(covar, pheno)) {
@@ -97,12 +98,24 @@ for (tbl in list(covar, pheno)) {
 for (col in names(covar)) if (is.character(covar[[col]])) covar[[col]][covar[[col]] %in% c("x","X")] <- NA
 for (col in names(pheno)) if (is.character(pheno[[col]])) pheno[[col]][pheno[[col]] %in% c("x","X")] <- NA
 
-# Merge by FID/IID (keep all)
+# Merge covar and pheno by FID/IID (keep all)
 if (!all(c("FID","IID") %in% names(covar)) || !all(c("FID","IID") %in% names(pheno))) {
   stop("FID and IID must be columns in both covar and pheno files.")
 }
 Table <- merge(covar, pheno, by = c("FID", "IID"), all = TRUE)
 message("Merged table rows: ", nrow(Table))
+
+if (!is.na(icvFILE)) {
+  icv <- read.csv("ICV.csv", header = TRUE)
+}
+
+# Merge ICV by FID/IID (keep all)
+if (!all(c("FID","IID") %in% names(icv)) || !all(c("FID","IID") %in% names(Table))) {
+  stop("FID and IID must be columns in both covar and pheno files.")
+}
+Table <- merge(icv, Table, by = c("FID", "IID"), all = TRUE)
+message("Merged table rows: ", nrow(Table))
+Table$ICV <- Table[,icvColumnHeader]
 
 # Normalize group variable
 Table$AffectionStatus <- trimws(as.character(Table$AffectionStatus))

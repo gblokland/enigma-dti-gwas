@@ -14,10 +14,13 @@ library(ggplot2)
 # Sample Table frame (replace this with your actual Table)
 # Assuming 'ICV' is the intracranial volume and 'Sex' is the Sex variable.
 # 'Sex' can be coded as "Male"/"Female", "1"/"2", or "M"/"F", etc.
-Table <- data.frame(
-  ICV = c(1400, 1600, 1550, 1500, 1350, 1700, 1450, 1600, 1550, 1450, 1750, 1650, 1800),
-  Sex = c("Male", "Female", "Female", "Male", "Male", "Female", "Female", "Male", "Male", "Female", "Male", "Female", "Male")
-)
+#Table <- data.frame(
+#  ICV = c(1400, 1600, 1550, 1500, 1350, 1700, 1450, 1600, 1550, 1450, 1750, 1650, 1800),
+#  Sex = c("Male", "Female", "Female", "Male", "Male", "Female", "Female", "Male", "Male", "Female", "Male", "Female", "Male")
+#)
+Table <- read.csv("pheno_covar/ICV.csv", header = TRUE)
+covars <- read.table("pheno_covar/DMS_enigma_dti_gwas.covar", header = TRUE)
+Table <- merge(Table, covars, by = c("FID", "IID"), all = TRUE))
 
 # Check unique values in the 'Sex' column
 print(unique(Table$Sex))
