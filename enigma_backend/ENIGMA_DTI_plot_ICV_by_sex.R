@@ -21,6 +21,8 @@ library(ggplot2)
 Table <- read.csv("pheno_covar/ICV.csv", header = TRUE)
 covars <- read.table("pheno_covar/DMS_enigma_dti_gwas.covar", header = TRUE)
 Table <- merge(Table, covars, by = c("FID", "IID"), all = TRUE))
+icvColumnHeader <- "segVOL_EstimatedTotalIntraCranialVol"
+Table$ICV <- Table[,icvColumnHeader]
 
 # Check unique values in the 'Sex' column
 print(unique(Table$Sex))
