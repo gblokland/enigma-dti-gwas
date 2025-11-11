@@ -39,7 +39,10 @@ parser$add_argument("--outDir", default = "./QC_ENIGMA/", help = "Output directo
 parser$add_argument("--outPDF", default = "ENIGMA_DTI_allROI_histograms.pdf", help = "output PDF name (multi hist)")
 parser$add_argument("--outTXT", default = "ENIGMA_DTI_allROI_stats.txt", help = "output stats txt")
 parser$add_argument("--eName", default = "ENIGMA_DTI_GWAS", help = "ENIGMA label")
+
 args <- parser$parse_args()
+cat("Inputs: \n")
+print(args)
 
 # assign
 cohort <- args$cohort

@@ -71,7 +71,7 @@ ls -ltr ${outDir}
 ls ${ENIGMA_DTI_GWAS_dir}/QC_ENIGMA/
 
 Rscript ${ENIGMA_DTI_GWAS_dir}/SCRIPTS/enigma_backend/ENIGMA_DTI_plots_All_inclCohensd.R \
---cohort ${COHORT} \
+--cohort "${COHORT}" \
 --covarFILE "${ENIGMA_DTI_GWAS_dir}/pheno_covar/${COHORT}_enigma_dti_gwas.covar" \
 --phenoFILE "${ENIGMA_DTI_GWAS_dir}/pheno_covar/${COHORT}_enigma_dti_gwas.pheno" \
 --rois "GlobalAverage;BCC;GCC;SCC;CC;CGC;CGH;CR;EC;FX;FXST;IC;IFO;PTR;SFO;SLF;SS;UNC;CST;ACR;ALIC;PCR;PLIC;RLIC;SCR;ACR.L;ACR.R;ALIC.L;ALIC.R;CGC.L;CGC.R;CGH.L;CGH.R;CR.L;CR.R;CST.L;CST.R;EC.L;EC.R;FX.ST.L;FX.ST.R;IC.L;IC.R;IFO.L;IFO.R;PCR.L;PCR.R;PLIC.L;PLIC.R;PTR.L;PTR.R;RLIC.L;RLIC.R;SCR.L;SCR.R;SFO.L;SFO.R;SLF.L;SLF.R;SS.L;SS.R;UNC.L;UNC.R" \
@@ -80,7 +80,7 @@ Rscript ${ENIGMA_DTI_GWAS_dir}/SCRIPTS/enigma_backend/ENIGMA_DTI_plots_All_inclC
 --outTXT "${COHORT}_ENIGMA_DTI_allROI_stats.txt"
 
 Rscript ${ENIGMA_DTI_GWAS_dir}/SCRIPTS/enigma_backend/ENIGMA_DTI_plots_stats_demographics.R \
---cohort ${COHORT} \
+--cohort "${COHORT}" \
 --covarFILE "${ENIGMA_DTI_GWAS_dir}/pheno_covar/${COHORT}_enigma_dti_gwas.covar" \
 --phenoFILE "${ENIGMA_DTI_GWAS_dir}/pheno_covar/${COHORT}_enigma_dti_gwas.pheno" \
 --outDir "${ENIGMA_DTI_GWAS_dir}/QC_ENIGMA/" \
@@ -88,14 +88,14 @@ Rscript ${ENIGMA_DTI_GWAS_dir}/SCRIPTS/enigma_backend/ENIGMA_DTI_plots_stats_dem
 --outTXT "${COHORT}_ENIGMA_DTI_Age_stats.txt"
 
 Rscript ${ENIGMA_DTI_GWAS_dir}/SCRIPTS/enigma_backend/ENIGMA_DTI_phenotype_and_covariate_sumstats.R \
---cohort ${COHORT} \
+--cohort "${COHORT}" \
 --covarFILE "${ENIGMA_DTI_GWAS_dir}/pheno_covar/${COHORT}_enigma_dti_gwas.covar" \
 --phenoFILE "${ENIGMA_DTI_GWAS_dir}/pheno_covar/${COHORT}_enigma_dti_gwas.pheno" \
 --outDir "${ENIGMA_DTI_GWAS_dir}/QC_ENIGMA/" \
 
 #The following script combines the previous 3 scripts
 Rscript ${ENIGMA_DTI_GWAS_dir}/SCRIPTS/enigma_backend/ENIGMA_DTI_GWAS_QC_plots_stats.R \
---cohort ${COHORT} \
+--cohort "${COHORT}" \
 --covarFILE "${ENIGMA_DTI_GWAS_dir}/pheno_covar/${COHORT}_enigma_dti_gwas.covar" \
 --phenoFILE "${ENIGMA_DTI_GWAS_dir}/pheno_covar/${COHORT}_enigma_dti_gwas.pheno" \
 --icvFILE "${ENIGMA_DTI_GWAS_dir}/pheno_covar/ICV.csv" \
