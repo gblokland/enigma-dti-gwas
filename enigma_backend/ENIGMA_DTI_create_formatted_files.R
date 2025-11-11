@@ -149,8 +149,9 @@ if (length(ALL_DUMMIES)>0) {
 
 ###Read in the ancestry principal components
 pca <- read.table(pcaFILE, colClasses = "character")  #Read in the ancestry principal components
-pca$SOL <- NULL; #Remove the “SOL” column in the MDS components since this is not a covariate to be included
-colnames(pca) <- c("FID", "IID", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "PC11", "PC12", "PC13", "PC14", "PC15", "PC16", "PC17", "PC18", "PC19", "PC20")
+#pca$SOL <- NULL; #Remove the “SOL” column in the MDS components since this is not a covariate to be included; this variable does not exist if it is an PCA eigenve file
+#colnames(pca) <- c("FID", "IID", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "PC11", "PC12", "PC13", "PC14", "PC15", "PC16", "PC17", "PC18", "PC19", "PC20")
+colnames(pca) <- c("FID", "IID", paste0("PC", 1:(ncol(pca)-2)))
 
 ###Read in fam file
 fam <- read.table(localfamFILE, colClasses = "character")
@@ -527,6 +528,8 @@ for (s in c(1:3)) {
     }
     header=(c('Covariate','Mean','SD','Min','Max'))
     write.table(test,file=zz,quote=F,col.names=header,row.names=FALSE,sep = "\t");
+
+    FullInfoFile <- complete.cases(FullInfoFile)
     
     cat('Step 3: Now write the formatted output files.\n')
     
