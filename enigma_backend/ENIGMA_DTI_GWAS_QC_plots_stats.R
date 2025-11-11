@@ -24,7 +24,7 @@ parser <- ArgumentParser(description = "ENIGMA-DTI QC pipeline - combined")
 parser$add_argument("--cohort", required = TRUE, help = "Cohort name")
 parser$add_argument("--covarFILE", required = TRUE, help = "Covariate file (.covar, tab or csv)")
 parser$add_argument("--phenoFILE", required = TRUE, help = "Phenotype file (.pheno, tab or csv)")
-parser$add_argument("--icvFILE", required = TRUE, help = "ICV file (.csv)")
+parser$add_argument("--icvFILE", required = TRUE, default = "ICV.csv", help = "ICV file (.csv)")
 parser$add_argument("--icvColumnHeader", required = TRUE, default = "ICV", help = "Name of ICV column")
 parser$add_argument("--ageColumnHeader", default = "Age", help = "Name of Age column")
 parser$add_argument("--sexColumnHeader", default = "Sex", help = "Name of Sex column")
@@ -109,7 +109,7 @@ Table <- merge(covar, pheno, by = c("FID", "IID"), all = TRUE)
 message("Merged table rows: ", nrow(Table))
 
 if (!is.na(icvFILE)) {
-  icv <- read.csv("ICV.csv", header = TRUE)
+  icv <- read.csv(icvFILE, header = TRUE)
 }
 
 # Merge ICV by FID/IID (keep all)
