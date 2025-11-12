@@ -115,8 +115,9 @@ if (!all(c("FID","IID") %in% names(icv)) || !all(c("FID","IID") %in% names(Table
 }
 Table <- merge(icv, Table, by = c("FID", "IID"), all = TRUE)
 message("Merged table rows: ", nrow(Table))
+if (icvColumnHeader %in% names(Table)) {
 Table$ICV <- Table[,icvColumnHeader]
-
+}
 # Normalize group variable
 Table$AffectionStatus <- trimws(as.character(Table$AffectionStatus))
 Table$AffectionStatus <- tolower(Table$AffectionStatus)
@@ -255,7 +256,7 @@ plot_icv_checks <- function(Table, outdir = outDir) {
     return(invisible(NULL))
   }
   if (sexColumnHeader %in% names(Table)) {
-    tmpTable <- Table[complete.cases(Table[, c(sexColumnHeader, ICV)])]  # remove NAs
+    tmpTable <- Table[complete.cases(Table[, c(sexColumnHeader, "ICV")]),]  # remove NAs
     # histogram
     p_hist <- ggplot(tmpTable, aes(x = ICV, fill = .data[[sexColumnHeader]])) +
       geom_histogram(aes(y = after_stat(count)), bins = 30, colour = "black") +
