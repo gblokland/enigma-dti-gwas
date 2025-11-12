@@ -302,14 +302,22 @@ write(
 
 # Define a function to process data for a specific group
 generate_stats_and_plots <- function(data, group_label, covariate) {
-  DATA <- as.numeric(as.vector(data[[covariate]]))
+  # Extract column and coerce to numeric
+  DATA <- suppressWarnings(as.numeric(as.vector(data[[covariate]])))
+  DATA <- DATA[!is.na(DATA)]  # remove NAs
+  
+  # If empty or all NA, skip gracefully
+  if (length(DATA) == 0) {
+    warning(paste("No valid numeric data for", covariate, "in group", group_label))
+    return(NULL)
+  }
   mu <- mean(DATA)
   sdev <- sd(DATA)
   N <- length(DATA)
   minV <- min(DATA)
   maxV <- max(DATA)
-  minSubj <- as.character(data[which(DATA == minV), 1])
-  maxSubj <- as.character(data[which(DATA == maxV), 1])
+  minSubj <- as.character(data[which(data[[covariate]] == minV)[1], 1])
+  maxSubj <- as.character(data[which(data[[covariate]] == maxV)[1], 1])
   minO <- which(DATA < mu - 5 * sdev)
   maxO <- which(DATA > mu + 5 * sdev)
   outliers <- if (length(minO) + length(maxO) > 0) {
@@ -320,42 +328,21 @@ generate_stats_and_plots <- function(data, group_label, covariate) {
   } else {
     "None"
   }
-  stats <- c(
-    cohort,
-    covariate,
-    group_label,
-    N,
-    mu,
-    sdev,
-    minV,
-    maxV,
-    minSubj,
-    maxSubj,
-    outliers
-  )
+  stats <- c(cohort, covariate, group_label, N, mu, sdev, 
+             minV, maxV, minSubj, maxSubj, outliers)
   write.table(
     t(as.matrix(stats)),
     file = paste0(outDir, "/", outTXT),
-    append = TRUE,
-    quote = FALSE,
-    col.names = FALSE,
-    row.names = FALSE,
-    sep = "\t"
+    append = TRUE, quote = FALSE, col.names = FALSE, row.names = FALSE, sep = "\t")
+  hist(
+    DATA, breaks = 20,
+    main = paste0(cohort, ": ", covariate, " (", group_label, ")"),
+    xlab = covariate, col = "lightblue"
   )
   hist(
-    DATA,
-    breaks = 20,
+    DATA, breaks = 20,
     main = paste0(cohort, ": ", covariate, " (", group_label, ")"),
-    xlab = covariate,
-    col = "lightblue"
-  )
-  hist(
-    DATA,
-    breaks = 20,
-    main = paste0(cohort, ": ", covariate, " (", group_label, ")"),
-    xlab = covariate,
-    col = "lightblue",
-    xlim = c(0, 100)
+    xlab = covariate, col = "lightblue", xlim = c(0, 100)
   )
   #hist(DATA, breaks = 20, main = paste0(cohort, ": ", "Age in Years"), xlab = "Age in Years", col = "lightgray")
   #hist(DATA, breaks = 20, main = paste0(cohort, ": ", "Age in Years"), xlab = "Age in Years", col = "lightgray", xlim = c(0, 100))
