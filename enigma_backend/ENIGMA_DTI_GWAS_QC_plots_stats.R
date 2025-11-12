@@ -63,8 +63,6 @@ if (!dir.exists(outDir)) {
 }
 message("Output dir: ", normalizePath(outDir))
 
-outPDF <- file.path(outDir, paste0(cohort, "_", eName, "_allROI_histograms.pdf"))
-outTXT <- file.path(outDir, paste0(cohort, "_", eName, "_allROI_stats.txt"))
 
 # ---------------- Read files (robust) ----------------
 read_table_auto <- function(path) {
@@ -346,7 +344,11 @@ generate_stats_and_plots <- function(data, group_label, covariate) {
   }
   stats <- c(cohort, covariate, group_label, N, mu, sdev, 
              minV, maxV, minSubj, maxSubj, outliers)
-  print(stats)
+  print(t(as.matrix(stats)))
+  
+  outPDF <- file.path(outDir, paste0(cohort, "_", eName, "_Age_histograms.pdf"))
+  outTXT <- file.path(outDir, paste0(cohort, "_", eName, "_Age_stats.txt"))
+  
   write.table(
     t(as.matrix(stats)),
     file = outTXT,
