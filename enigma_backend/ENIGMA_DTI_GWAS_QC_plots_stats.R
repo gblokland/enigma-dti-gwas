@@ -232,7 +232,7 @@ plot_single_histograms <- function(TableLong, metric, outdir = outDir) {
   # x limits if defined
   x_limits <- range_map[[metric]]
   
-  # output PDF
+  # output PDF 1
   fn <- file.path(outdir, paste0(cohort, "_", eName, "_ROIs_histograms_", metric, "_by_AffectionStatus.pdf"))
   pdf(fn, width = 12, height = 8) # one page per ROI
   for (roi in unique(metric_long$parsedROI)) {
@@ -252,12 +252,11 @@ plot_single_histograms <- function(TableLong, metric, outdir = outDir) {
         plot.title = element_text(size = 16, face = "bold", hjust = 0.5)
       )
     if (!is.null(x_limits)) p <- p + xlim(x_limits)
-    
     print(p)  # write this page to PDF
   }
   dev.off()
   
-  # output PDF
+  # output PDF 2
   fn <- file.path(outdir, paste0(cohort, "_", eName, "_ROIs_histograms_", metric, ".pdf"))
   pdf(fn, width = 12, height = 8) # one page per ROI
   for (roi in unique(metric_long$parsedROI)) {
@@ -276,7 +275,6 @@ plot_single_histograms <- function(TableLong, metric, outdir = outDir) {
         plot.title = element_text(size = 16, face = "bold", hjust = 0.5)
       )
     if (!is.null(x_limits)) p <- p + xlim(x_limits)
-    
     print(p)  # write this page to PDF
   }
   dev.off()
@@ -293,13 +291,32 @@ plot_multi_histogram <- function(Table, metric, outdir = outDir, ncol = 8) {
   }
   # set x limits if defined in range_map
   x_limits <- range_map[[metric]]
+  p <- ggplot(metric_long, aes(x = Value)) +
+    geom_histogram(aes(y = after_stat(count)), colour = "black", bins = 30) +
+    facet_wrap(~parsedROI, ncol = ncol, scales = "free_x") +
+    theme_bw() +
+    theme(
+      axis.title = element_text(size = 14),
+      axis.text = element_text(size = 12),
+      plot.title = element_text(size = 16, face = "bold", hjust = 0.5)
+    ) +
+    labs(x = metric, y = "Number of Subjects", title = paste0(cohort, " - ", metric))
+  if (!is.null(x_limits)) p <- p + xlim(x_limits)
+  fn <- file.path(outdir, paste0(cohort, "_", eName, "_ROIs_histograms_multi-panel_", metric, ".pdf"))
+  safe_ggsave(p, fn)
+  
   p <- ggplot(metric_long, aes(x = Value, fill = .data[[affectedStatusColumnHeader]])) +
     geom_histogram(aes(y = after_stat(count)), colour = "black", bins = 30) +
     facet_wrap(~parsedROI, ncol = ncol, scales = "free_x") +
     theme_bw() +
+    theme(
+      axis.title = element_text(size = 14),
+      axis.text = element_text(size = 12),
+      plot.title = element_text(size = 16, face = "bold", hjust = 0.5)
+    ) +
     labs(x = metric, y = "Number of Subjects", fill = "AffectionStatus", title = paste0(cohort, " - ", metric))
   if (!is.null(x_limits)) p <- p + xlim(x_limits)
-  fn <- file.path(outdir, paste0(cohort, "_", eName, "_histogram_multi-panel_", metric, "_by_AffectionStatus.pdf"))
+  fn <- file.path(outdir, paste0(cohort, "_", eName, "_ROIs_histograms_multi-panel_", metric, "_by_AffectionStatus.pdf"))
   safe_ggsave(p, fn)
 }
 
