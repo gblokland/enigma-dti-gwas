@@ -393,11 +393,18 @@ plot_pc <- function(covar, outdir = outDir, pc_cols, phenotype_col = NULL) {
   
   # --- 4. Outlier detection ---
   outlier_matrix <- apply(covar[pc_cols], 1, function(x) abs(x) > 6)
+  outlier_matrix[is.na(outlier_matrix)] <- FALSE  # handle NAs safely
+  
   outlier_flags <- apply(outlier_matrix, 1, any)
-  cat("Number of samples flagged as PC outliers (>6 SD):", sum(outlier_flags), "\n")
-  if(sum(outlier_flags) > 0){
+  outlier_flags[is.na(outlier_flags)] <- FALSE
+  
+  n_outliers <- sum(outlier_flags, na.rm = TRUE)
+  
+  cat("Number of samples flagged as PC outliers (>6 SD):", n_outliers, "\n")
+  if (n_outliers > 0) {
+    outlier_indices <- which(outlier_flags)
     cat("Outlier sample indices:\n")
-    print(which(outlier_flags))
+    print(outlier_indices)
   }
   
   # --- 5. Correlation heatmap ---
