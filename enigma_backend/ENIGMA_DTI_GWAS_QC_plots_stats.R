@@ -233,9 +233,8 @@ plot_single_histograms <- function(TableLong, metric, outdir = outDir) {
   x_limits <- range_map[[metric]]
   
   # output PDF
-  fn <- file.path(outdir, paste0(cohort, "_", eName, "_ROIs_histograms_", metric, ".pdf"))
+  fn <- file.path(outdir, paste0(cohort, "_", eName, "_ROIs_histograms_", metric, "_by_AffectionStatus.pdf"))
   pdf(fn, width = 12, height = 8) # one page per ROI
-  
   for (roi in unique(metric_long$parsedROI)) {
     roi_data <- metric_long %>% filter(parsedROI == roi)
     p <- ggplot(roi_data, aes(x = Value, fill = .data[[affectedStatusColumnHeader]])) +
@@ -256,8 +255,32 @@ plot_single_histograms <- function(TableLong, metric, outdir = outDir) {
     
     print(p)  # write this page to PDF
   }
-  
   dev.off()
+  
+  # output PDF
+  fn <- file.path(outdir, paste0(cohort, "_", eName, "_ROIs_histograms_", metric, ".pdf"))
+  pdf(fn, width = 12, height = 8) # one page per ROI
+  for (roi in unique(metric_long$parsedROI)) {
+    roi_data <- metric_long %>% filter(parsedROI == roi)
+    p <- ggplot(roi_data, aes(x = Value)) +
+      geom_histogram(aes(y = after_stat(count)), colour = "black", bins = 30) +
+      theme_bw() +
+      labs(
+        x = metric,
+        y = "Number of Subjects",
+        title = paste0(cohort, " - ", metric, " - ", roi)
+      ) +
+      theme(
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5)
+      )
+    if (!is.null(x_limits)) p <- p + xlim(x_limits)
+    
+    print(p)  # write this page to PDF
+  }
+  dev.off()
+  
   message("Saved single-ROI histograms for ", metric, " to ", fn)
 }
 
