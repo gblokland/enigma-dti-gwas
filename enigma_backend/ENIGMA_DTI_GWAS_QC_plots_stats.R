@@ -37,7 +37,6 @@ parser$add_argument("--rois", default = "GlobalAverage;BCC;GCC;SCC;CC;CGC;CGH;CR
 parser$add_argument("--outDir", default = "./QC_ENIGMA/", help = "Output directory")
 parser$add_argument("--eName", default = "ENIGMA_DTI_GWAS", help = "ENIGMA label")
 
-args <- list() #clear args and reinitialize to empty
 args <- parser$parse_args()
 cat("Inputs: \n")
 print(args)
@@ -59,7 +58,9 @@ rois <- args$rois
 outDir <- args$outDir
 eName <- args$eName
 
-dir.create(outDir, recursive = TRUE, showWarnings = FALSE)
+if (!dir.exists(outDir)) {
+  dir.create(outDir, recursive = TRUE, showWarnings = FALSE)
+}
 message("Output dir: ", normalizePath(outDir))
 
 outPDF <- file.path(outDir, paste0(cohort, "_", eName, "_allROI_histograms.pdf"))
@@ -345,9 +346,10 @@ generate_stats_and_plots <- function(data, group_label, covariate) {
   }
   stats <- c(cohort, covariate, group_label, N, mu, sdev, 
              minV, maxV, minSubj, maxSubj, outliers)
+  print(stats)
   write.table(
     t(as.matrix(stats)),
-    file = paste0(outDir, "/", outTXT),
+    file = outTXT,
     append = TRUE, quote = FALSE, col.names = FALSE, row.names = FALSE, sep = "\t")
   # Safe histogram (guarded)
   tryCatch({
