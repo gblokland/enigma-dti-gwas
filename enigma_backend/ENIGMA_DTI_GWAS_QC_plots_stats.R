@@ -418,19 +418,24 @@ generate_overlapping_histograms <- function(data, group_var, covariate, group_la
   
   # Build histograms for each group
   for (group in groups) {
-    group_data <- as.numeric(as.vector(data[
-      data[[group_var]] == group,
-      covariate
-    ]))
-    if (length(group_data) > 0) {
-      # Only include non-empty groups
-      hist_list[[length(hist_list) + 1]] <- hist(
-        group_data,
-        breaks = 20,
-        plot = FALSE
-      )
-      valid_groups <- c(valid_groups, group) # Track valid groups
+    group_data <- data[data[[group_var]] == group, covariate]
+    
+    # Convert to numeric safely
+    group_data <- suppressWarnings(as.numeric(as.vector(group_data)))
+    
+    # Skip if empty or all NA
+    if (length(group_data) == 0 || all(is.na(group_data))) {
+      warning(paste0("Skipping group '", group, "' for covariate '", covariate, "' — no valid data."))
+      next
     }
+    
+    # Only include non-empty valid groups
+    hist_list[[length(hist_list) + 1]] <- hist(
+      group_data,
+      breaks = 20,
+      plot = FALSE
+    )
+    valid_groups <- c(valid_groups, group) # Track valid groups
   }
   
   # Check if there are valid histograms
