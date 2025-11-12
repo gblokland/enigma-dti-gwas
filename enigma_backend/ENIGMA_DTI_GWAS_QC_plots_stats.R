@@ -59,11 +59,12 @@ related <- args$related
 rois <- args$rois
 outDir <- args$outDir
 eName <- args$eName
-outPDF <- paste0(cohort, "_", eName, "_allROI_histograms.pdf")
-outTXT <- paste0(cohort, "_", eName, "_allROI_histograms.txt")
-                 
+
 dir.create(outDir, recursive = TRUE, showWarnings = FALSE)
 message("Output dir: ", normalizePath(outDir))
+
+outPDF <- file.path(outDir, paste0(cohort, "_", eName, "_allROI_histograms.pdf"))
+outTXT <- file.path(outDir, paste0(cohort, "_", eName, "_allROI_stats.txt"))
 
 # ---------------- Read files (robust) ----------------
 read_table_auto <- function(path) {
@@ -212,9 +213,12 @@ AD_range <- c(1.0e-3, 1.75e-3)
 range_map <- list(FA = FA_range, MD = MD_range, RD = RD_range, AD = AD_range)
 
 # ---------------- Functions: plotting & stats ----------------
-safe_ggsave <- function(plot, filename, width = 36, height = 24) {
-  ggsave(filename = filename, plot = plot, width = width, height = height, units = "cm", dpi = 600)
-  message("Saved: ", filename)
+#safe_ggsave <- function(plot, filename, width = 36, height = 24) {
+safe_ggsave <- function(plot, filename, width = 24, height = 18) {
+  tryCatch({
+    ggsave(filename, plot = plot, width = width, height = height, dpi = 300)
+    message("Saved: ", filename)
+  }, error = function(e) message("ggsave failed for ", filename, ": ", e$message))
 }
 
 plot_multi_histogram <- function(Table, metric, outdir = outDir, ncol = 8) {
@@ -252,13 +256,13 @@ plot_icv_checks <- function(Table, outdir = outDir) {
     message("ICV not present - skipping ICV checks.")
     return(invisible(NULL))
   }
-  # histogram
-  p_hist <- ggplot(Table, aes(x = ICV, fill = .data[[sexColumnHeader]])) +
-    geom_histogram(aes(y = after_stat(count)), bins = 30, colour = "black") +
-    theme_bw() + labs(title = paste0(cohort, " - ICV distribution by Sex"))
-  safe_ggsave(p_hist, file.path(outdir, paste0(cohort, "_", eName, "_ICV_hist_by_Sex.pdf")), width = 20, height = 15)
-  # boxplot
   if (sexColumnHeader %in% names(Table)) {
+    # histogram
+    p_hist <- ggplot(Table, aes(x = ICV, fill = .data[[sexColumnHeader]])) +
+      geom_histogram(aes(y = after_stat(count)), bins = 30, colour = "black") +
+      theme_bw() + labs(title = paste0(cohort, " - ICV distribution by Sex"))
+    safe_ggsave(p_hist, file.path(outdir, paste0(cohort, "_", eName, "_ICV_hist_by_Sex.pdf")), width = 20, height = 15)
+    # boxplot
     p_box <- ggplot(Table, aes(x = .data[[sexColumnHeader]], y = ICV, fill = .data[[sexColumnHeader]])) +
       geom_boxplot() + theme_bw() + labs(title = paste0(cohort, " - ICV by Sex"))
     safe_ggsave(p_box, file.path(outdir, paste0(cohort, "_", eName, "_ICV_box_by_Sex.pdf")), width = 12, height = 9)
@@ -381,7 +385,7 @@ generate_group_size_plots <- function(data, group_var, group_label) {
 # Function to create overlapping histograms
 generate_overlapping_histograms <- function(data, group_var, covariate, group_label) {
   groups <- unique(data[[group_var]])
-
+  
   # Generate a palette excluding red
   color_palette <- c(
     "blue",
@@ -394,10 +398,10 @@ generate_overlapping_histograms <- function(data, group_var, covariate, group_la
     "brown"
   )
   colors <- color_palette[seq_along(groups)]
-
+  
   hist_list <- list()
   valid_groups <- character()
-
+  
   # Build histograms for each group
   for (group in groups) {
     group_data <- as.numeric(as.vector(data[
@@ -414,7 +418,7 @@ generate_overlapping_histograms <- function(data, group_var, covariate, group_la
       valid_groups <- c(valid_groups, group) # Track valid groups
     }
   }
-
+  
   # Check if there are valid histograms
   if (length(hist_list) > 0) {
     # Set up the base plot using the first valid histogram
@@ -428,7 +432,7 @@ generate_overlapping_histograms <- function(data, group_var, covariate, group_la
       border = colors[1]
     ) # Set border color to match bar color
     #border = NA)  # No border for transparency
-
+    
     # Add additional histograms
     if (length(hist_list) > 1) {
       for (i in 2:length(hist_list)) {
@@ -441,7 +445,7 @@ generate_overlapping_histograms <- function(data, group_var, covariate, group_la
         #border = NA) # No border for transparency
       }
     }
-
+    
     # Add a legend for the valid groups
     legend(
       "topright",
@@ -456,7 +460,7 @@ generate_overlapping_histograms <- function(data, group_var, covariate, group_la
 # Process Age for the entire cohort
 if ("Age" %in% colnames(Table)) {
   generate_stats_and_plots(Table, "All", "Age")
-
+  
   # Split by Sex if the variable exists
   if ("Sex" %in% colnames(Table)) {
     for (sex in unique(Table$Sex)) {
@@ -466,7 +470,7 @@ if ("Age" %in% colnames(Table)) {
     generate_group_size_plots(Table, "Sex", "All")
     generate_overlapping_histograms(Table, "Sex", "Age", "All")
   }
-
+  
   # Split by AffectionStatus if the variable exists
   if ("AffectionStatus" %in% colnames(Table)) {
     for (status in unique(Table$AffectionStatus)) {
@@ -476,7 +480,7 @@ if ("Age" %in% colnames(Table)) {
     generate_group_size_plots(Table, "AffectionStatus", "All")
     generate_overlapping_histograms(Table, "AffectionStatus", "Age", "All")
   }
-
+  
   # Split by both Sex and AffectionStatus if both variables exist
   if ("Sex" %in% colnames(Table) && "AffectionStatus" %in% colnames(Table)) {
     for (sex in unique(Table$Sex)) {
@@ -515,7 +519,7 @@ compute_cohens_d <- function(Table, parsedROIs, roiLabels, roiColors, outdir = o
     message("Not enough subjects per group for Cohen's d (n_CON=", n_CON, ", n_AFF=", n_AFF, ").")
     return(results)
   }
-
+  
   for (metric in c("FA","MD","AD","RD")) {
     for (i in seq_along(parsedROIs)) {
       colname <- paste0(metric, "_", parsedROIs[i])
@@ -566,7 +570,7 @@ compute_cohens_d <- function(Table, parsedROIs, roiLabels, roiColors, outdir = o
       results <- bind_rows(results, row)
     } # end roi
   } # end metric
-
+  
   # Save results
   out_csv <- file.path(outdir, paste0(cohort, "_", eName, "_cohensd_results.csv"))
   write.csv(results, out_csv, row.names = FALSE)
@@ -599,7 +603,7 @@ if (nrow(cohens_d_results) > 0) {
   cohens_d_results <- cohens_d_results %>%
     mutate(varlabel = factor(varlabel, levels = unique(varlabel))) %>%
     arrange(metric, varlabel)
-
+  
   # Plot Cohen's d (faceted by metric)
   p_cd <- ggplot(cohens_d_results, aes(x = varlabel, y = cohens_d_smd, fill = metric)) +
     geom_col(colour = "black") +
