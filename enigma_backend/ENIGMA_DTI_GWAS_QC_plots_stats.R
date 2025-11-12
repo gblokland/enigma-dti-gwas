@@ -5,7 +5,7 @@
 options(repos = c(CRAN = "https://cloud.r-project.org/"))
 
 # ---------------- Setup / packages ----------------
-needed <- c("argparse", "ggplot2", "dplyr", "tidyr", "stringr", "MBESS", "readr")
+needed <- c("argparse", "ggplot2", "dplyr", "tidyr", "stringr", "MBESS", "readr", "reshape2")
 for (p in needed) {
   if (!requireNamespace(p, quietly = TRUE)) install.packages(p)
 }
@@ -17,6 +17,7 @@ suppressPackageStartupMessages({
   library(stringr)
   library(MBESS)
   library(readr)
+  library(reshape2)
 })
 
 # ---------------- Argument parser ----------------
@@ -408,8 +409,6 @@ plot_pc <- function(covar, outdir = outDir, pc_cols, phenotype_col = NULL) {
   }
   
   # --- 5. Correlation heatmap ---
-  library(ggplot2)
-  library(reshape2)
   pc_cor <- cor(covar[pc_cols])
   melted_cor <- melt(pc_cor)
   ggplot(melted_cor, aes(Var1, Var2, fill=value)) +
