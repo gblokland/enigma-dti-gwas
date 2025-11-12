@@ -309,7 +309,7 @@ generate_stats_and_plots <- function(data, group_label, covariate) {
   # If empty or all NA, skip gracefully
   if (length(DATA) == 0) {
     warning(paste("No valid numeric data for", covariate, "in group", group_label))
-    return(NULL)
+    return(invisible(NULL))
   }
   mu <- mean(DATA)
   sdev <- sd(DATA)
@@ -334,16 +334,26 @@ generate_stats_and_plots <- function(data, group_label, covariate) {
     t(as.matrix(stats)),
     file = paste0(outDir, "/", outTXT),
     append = TRUE, quote = FALSE, col.names = FALSE, row.names = FALSE, sep = "\t")
-  hist(
-    DATA, breaks = 20,
-    main = paste0(cohort, ": ", covariate, " (", group_label, ")"),
-    xlab = covariate, col = "lightblue"
-  )
-  hist(
-    DATA, breaks = 20,
-    main = paste0(cohort, ": ", covariate, " (", group_label, ")"),
-    xlab = covariate, col = "lightblue", xlim = c(0, 100)
-  )
+  # Safe histogram (guarded)
+  tryCatch({
+    hist(
+      DATA, breaks = 20,
+      main = paste0(cohort, ": ", covariate, " (", group_label, ")"),
+      xlab = covariate, col = "lightblue"
+    )
+  }, error = function(e) {
+    warning(paste("Skipping histogram for", covariate, ":", e$message))
+  })
+  # Safe histogram (guarded)
+  tryCatch({
+    hist(
+      DATA, breaks = 20,
+      main = paste0(cohort, ": ", covariate, " (", group_label, ")"),
+      xlab = covariate, col = "lightblue", xlim = c(0, 100)
+    )
+  }, error = function(e) {
+    warning(paste("Skipping histogram with xlim = c(0, 100) for", covariate, ":", e$message))
+  })
   #hist(DATA, breaks = 20, main = paste0(cohort, ": ", "Age in Years"), xlab = "Age in Years", col = "lightgray")
   #hist(DATA, breaks = 20, main = paste0(cohort, ": ", "Age in Years"), xlab = "Age in Years", col = "lightgray", xlim = c(0, 100))
   #hist(DATA, breaks = 20, main = paste0(cohort, ": ", "Age in Years"), xlab = "Age in Years", col = "lightblue")
