@@ -541,6 +541,47 @@ compute_cohens_d <- function(Table, parsedROIs, roiLabels, roiColors, outdir = o
   return(results)
 }
 
+# ---------------- Run the steps ----------------
+message("Running QC pipeline...")
+
+# Per-metric multi-panel histograms
+for (m in c("FA","MD","AD","RD")) {
+  plot_multi_histogram(Table, m, outdir = outDir)
+}
+
+# Build & save summary table from long data
+summary_table <- compute_summary_table(TableLong, outDir)
+
+# Compute Cohen's d and produce plot if results exist
+cohens_d_results <- compute_cohens_d(Table, parsedROIs, roiLabels, roiColors, outDir)
+
+if (nrow(cohens_d_results) > 0) {
+  # ensure ordering & factor levels
+  cohens_d_results <- cohens_d_results %>%
+    mutate(varlabel = factor(varlabel, levels = unique(varlabel))) %>%
+    arrange(metric, varlabel)
+  
+  # Plot Cohen's d (faceted by metric)
+  p_cd <- ggplot(cohens_d_results, aes(x = varlabel, y = cohens_d_smd, fill = metric)) +
+    geom_col(colour = "black") +
+    geom_errorbar(aes(ymin = cohens_d_smd - cohens_d_se, ymax = cohens_d_smd + cohens_d_se), width = 0.25) +
+    facet_wrap(~metric, ncol = 2, scales = "free_y") +
+    coord_flip() +
+    geom_hline(yintercept = 0) +
+    labs(x = "", y = "Cohen's d ± SE", title = paste0(cohort, ": Cohen's d (AFF vs CON)")) +
+    theme_bw() +
+    theme(strip.text = element_text(face = "bold"), axis.text.y = element_text(size = 6))
+  safe_ggsave(p_cd, file.path(outDir, paste0(cohort, "_", eName, "_Cohensd_bar_graph_AFF-CON.png")), width = 18, height = 24)
+} else {
+  message("No Cohen's d results to plot.")
+}
+
+# Age histograms and group breakdowns
+plot_age_histograms(Table, outDir)
+
+# ICV checks
+plot_icv_checks(Table, outDir)
+
 # Open PDF for plots
 pdf(file = paste0(outDir, "/", cohort, "_", eName, "_Age_histograms.pdf"))
 write(
@@ -595,47 +636,5 @@ if ("Age" %in% colnames(Table)) {
 
 # Close PDF device
 dev.off()
-
-
-# ---------------- Run the steps ----------------
-message("Running QC pipeline...")
-
-# Age histograms and group breakdowns
-plot_age_histograms(Table, outDir)
-
-# ICV checks
-plot_icv_checks(Table, outDir)
-
-# Per-metric multi-panel histograms
-for (m in c("FA","MD","AD","RD")) {
-  plot_multi_histogram(Table, m, outdir = outDir)
-}
-
-# Build & save summary table from long data
-summary_table <- compute_summary_table(TableLong, outDir)
-
-# Compute Cohen's d and produce plot if results exist
-cohens_d_results <- compute_cohens_d(Table, parsedROIs, roiLabels, roiColors, outDir)
-
-if (nrow(cohens_d_results) > 0) {
-  # ensure ordering & factor levels
-  cohens_d_results <- cohens_d_results %>%
-    mutate(varlabel = factor(varlabel, levels = unique(varlabel))) %>%
-    arrange(metric, varlabel)
-  
-  # Plot Cohen's d (faceted by metric)
-  p_cd <- ggplot(cohens_d_results, aes(x = varlabel, y = cohens_d_smd, fill = metric)) +
-    geom_col(colour = "black") +
-    geom_errorbar(aes(ymin = cohens_d_smd - cohens_d_se, ymax = cohens_d_smd + cohens_d_se), width = 0.25) +
-    facet_wrap(~metric, ncol = 2, scales = "free_y") +
-    coord_flip() +
-    geom_hline(yintercept = 0) +
-    labs(x = "", y = "Cohen's d ± SE", title = paste0(cohort, ": Cohen's d (AFF vs CON)")) +
-    theme_bw() +
-    theme(strip.text = element_text(face = "bold"), axis.text.y = element_text(size = 6))
-  safe_ggsave(p_cd, file.path(outDir, paste0(cohort, "_", eName, "_Cohensd_bar_graph_AFF-CON.png")), width = 18, height = 24)
-} else {
-  message("No Cohen's d results to plot.")
-}
 
 message("QC pipeline finished. Outputs in: ", normalizePath(outDir))
