@@ -244,7 +244,7 @@ plot_single_histograms <- function(TableLong, metric, outdir = outDir) {
         x = metric,
         y = "Number of Subjects",
         fill = "AffectionStatus",
-        title = paste0(cohort, " - ", metric, " - ", roi)
+        title = paste0(cohort, ": ", metric, " - ", roi)
       ) +
       theme(
         axis.title = element_text(size = 14),
@@ -262,12 +262,12 @@ plot_single_histograms <- function(TableLong, metric, outdir = outDir) {
   for (roi in unique(metric_long$parsedROI)) {
     roi_data <- metric_long %>% filter(parsedROI == roi)
     p <- ggplot(roi_data, aes(x = Value)) +
-      geom_histogram(aes(y = after_stat(count)), colour = "black", bins = 30) +
+      geom_histogram(aes(y = after_stat(count)), colour = "black", fill = "lightblue", bins = 30) +
       theme_bw() +
       labs(
         x = metric,
         y = "Number of Subjects",
-        title = paste0(cohort, " - ", metric, " - ", roi)
+        title = paste0(cohort, ": ", metric, " - ", roi)
       ) +
       theme(
         axis.title = element_text(size = 14),
@@ -292,7 +292,7 @@ plot_multi_histogram <- function(Table, metric, outdir = outDir, ncol = 8) {
   # set x limits if defined in range_map
   x_limits <- range_map[[metric]]
   p <- ggplot(metric_long, aes(x = Value)) +
-    geom_histogram(aes(y = after_stat(count)), colour = "black", bins = 30) +
+    geom_histogram(aes(y = after_stat(count)), colour = "black", fill = "lightblue", bins = 30) +
     facet_wrap(~parsedROI, ncol = ncol, scales = "free_x") +
     theme_bw() +
     theme(
@@ -300,7 +300,7 @@ plot_multi_histogram <- function(Table, metric, outdir = outDir, ncol = 8) {
       axis.text = element_text(size = 12),
       plot.title = element_text(size = 16, face = "bold", hjust = 0.5)
     ) +
-    labs(x = metric, y = "Number of Subjects", title = paste0(cohort, " - ", metric))
+    labs(x = metric, y = "Number of Subjects", title = paste0(cohort, ": ", metric))
   if (!is.null(x_limits)) p <- p + xlim(x_limits)
   fn <- file.path(outdir, paste0(cohort, "_", eName, "_ROIs_histograms_multi-panel_", metric, ".pdf"))
   safe_ggsave(p, fn)
@@ -314,7 +314,7 @@ plot_multi_histogram <- function(Table, metric, outdir = outDir, ncol = 8) {
       axis.text = element_text(size = 12),
       plot.title = element_text(size = 16, face = "bold", hjust = 0.5)
     ) +
-    labs(x = metric, y = "Number of Subjects", fill = "AffectionStatus", title = paste0(cohort, " - ", metric))
+    labs(x = metric, y = "Number of Subjects", fill = "AffectionStatus", title = paste0(cohort, ": ", metric))
   if (!is.null(x_limits)) p <- p + xlim(x_limits)
   fn <- file.path(outdir, paste0(cohort, "_", eName, "_ROIs_histograms_multi-panel_", metric, "_by_AffectionStatus.pdf"))
   safe_ggsave(p, fn)
@@ -328,7 +328,7 @@ plot_age_histograms <- function(Table, outdir = outDir) {
   p_all <- ggplot(Table, aes(x = Age, fill = .data[[affectedStatusColumnHeader]])) +
     geom_histogram(aes(y = after_stat(count)), colour = "black", bins = 30) +
     theme_bw() + labs(x = "Age (Years)", y = "Number of Subjects", title = paste0(cohort, " - Age"))
-  safe_ggsave(p_all, file.path(outdir, paste0(cohort, "_", eName, "_histogram_Age.pdf")))
+  safe_ggsave(p_all, file.path(outdir, paste0(cohort, "_", eName, "_Age_histogram.pdf")))
 }
 
 plot_icv_checks <- function(Table, outdir = outDir) {
@@ -404,7 +404,7 @@ compute_summary_table <- function(TableLong, outdir = outDir) {
     arrange(Metric, parsedROI, AffectionStatus)
   
   # Save output
-  out_csv <- file.path(outdir, paste0(cohort, "_", eName, "_SummaryStats_ROIs.csv"))
+  out_csv <- file.path(outdir, paste0(cohort, "_", eName, "_ROIs_SummaryStats.csv"))
   write.csv(summary_table, out_csv, row.names = FALSE)
   message("Saved summary table: ", out_csv)
   
