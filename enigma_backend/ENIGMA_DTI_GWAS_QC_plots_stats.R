@@ -263,18 +263,20 @@ plot_icv_checks <- function(Table, outdir = outDir) {
       theme_bw() + 
       theme(
         axis.title = element_text(size = 16),   # axis titles (x and y)
-        axis.text = element_text(size = 12)     # axis tick labels
+        axis.text = element_text(size = 12),     # axis tick labels
+        plot.title = element_text(size = 18, face = "bold", hjust = 0.5) # bold & centered
       ) +
       labs(title = paste0(cohort, " - ICV distribution by Sex"), x = expression("ICV in mm"^3)) +
       scale_fill_manual(values = c("blue", "red"))  # Optional: Customize the colors
-    safe_ggsave(p_hist, file.path(outdir, paste0(cohort, "_", eName, "_ICV_hist_by_Sex.pdf")), width = 20, height = 15)
+    safe_ggsave(p_hist, file.path(outdir, paste0(cohort, "_", eName, "_ICV_hist_by_Sex.pdf")), width = 12, height = 10)
     # boxplot
     p_box <- ggplot(tmpTable, aes(x = .data[[sexColumnHeader]], y = ICV, fill = .data[[sexColumnHeader]])) +
       geom_boxplot() + 
       theme_bw() + 
       theme(
         axis.title = element_text(size = 16),   # axis titles (x and y)
-        axis.text = element_text(size = 12)     # axis tick labels
+        axis.text = element_text(size = 12),     # axis tick labels
+        plot.title = element_text(size = 18, face = "bold", hjust = 0.5) # bold & centered
       ) +
       labs(title = paste0(cohort, " - ICV by Sex"), y = expression("ICV in mm"^3)) +
       scale_fill_manual(values = c("blue", "red"))  # Optional: Customize the colors
