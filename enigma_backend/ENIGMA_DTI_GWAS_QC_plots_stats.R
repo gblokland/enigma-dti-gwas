@@ -116,7 +116,7 @@ if (!all(c("FID","IID") %in% names(icv)) || !all(c("FID","IID") %in% names(Table
 Table <- merge(icv, Table, by = c("FID", "IID"), all = TRUE)
 message("Merged table rows: ", nrow(Table))
 if (icvColumnHeader %in% names(Table)) {
-Table$ICV <- Table[,icvColumnHeader]
+  Table$ICV <- Table[,icvColumnHeader]
 }
 # Normalize group variable
 Table$AffectionStatus <- trimws(as.character(Table$AffectionStatus))
@@ -220,6 +220,47 @@ safe_ggsave <- function(plot, filename, width = 24, height = 18) {
   }, error = function(e) message("ggsave failed for ", filename, ": ", e$message))
 }
 
+plot_single_histograms <- function(TableLong, metric, outdir = outDir) {
+  metric <- toupper(metric)
+  metric_long <- TableLong %>% filter(Metric == metric)
+  
+  if (nrow(metric_long) == 0) {
+    message("No data for metric: ", metric)
+    return(invisible(NULL))
+  }
+  
+  # x limits if defined
+  x_limits <- range_map[[metric]]
+  
+  # output PDF
+  fn <- file.path(outdir, paste0(cohort, "_", eName, "_ROIs_histograms_", metric, ".pdf"))
+  pdf(fn, width = 12, height = 8) # one page per ROI
+  
+  for (roi in unique(metric_long$parsedROI)) {
+    roi_data <- metric_long %>% filter(parsedROI == roi)
+    p <- ggplot(roi_data, aes(x = Value, fill = .data[[affectedStatusColumnHeader]])) +
+      geom_histogram(aes(y = after_stat(count)), colour = "black", bins = 30) +
+      theme_bw() +
+      labs(
+        x = metric,
+        y = "Number of Subjects",
+        fill = "AffectionStatus",
+        title = paste0(cohort, " - ", metric, " - ", roi)
+      ) +
+      theme(
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5)
+      )
+    if (!is.null(x_limits)) p <- p + xlim(x_limits)
+    
+    print(p)  # write this page to PDF
+  }
+  
+  dev.off()
+  message("Saved single-ROI histograms for ", metric, " to ", fn)
+}
+
 plot_multi_histogram <- function(Table, metric, outdir = outDir, ncol = 8) {
   metric <- toupper(metric)
   metric_long <- TableLong %>% filter(Metric == metric)
@@ -266,7 +307,7 @@ plot_icv_checks <- function(Table, outdir = outDir) {
         axis.text = element_text(size = 12),     # axis tick labels
         plot.title = element_text(size = 18, face = "bold", hjust = 0.5) # bold & centered
       ) +
-      labs(title = paste0(cohort, " - ICV distribution by Sex"), x = expression("ICV in mm"^3)) +
+      labs(title = paste0(cohort, " - ICV distribution by Sex"), x = expression("Intracranial Volume in mm"^3)) +
       scale_fill_manual(values = c("blue", "red"))  # Optional: Customize the colors
     safe_ggsave(p_hist, file.path(outdir, paste0(cohort, "_", eName, "_ICV_hist_by_Sex.pdf")), width = 12, height = 10)
     # boxplot
@@ -278,7 +319,7 @@ plot_icv_checks <- function(Table, outdir = outDir) {
         axis.text = element_text(size = 12),     # axis tick labels
         plot.title = element_text(size = 18, face = "bold", hjust = 0.5) # bold & centered
       ) +
-      labs(title = paste0(cohort, " - ICV by Sex"), y = expression("ICV in mm"^3)) +
+      labs(title = paste0(cohort, " - ICV by Sex"), y = expression("Intracranial Volume in mm"^3)) +
       scale_fill_manual(values = c("blue", "red"))  # Optional: Customize the colors
     safe_ggsave(p_box, file.path(outdir, paste0(cohort, "_", eName, "_ICV_box_by_Sex.pdf")), width = 12, height = 9)
   }
@@ -361,7 +402,7 @@ generate_stats_and_plots <- function(data, group_label, covariate) {
   }
   stats <- c(cohort, covariate, group_label, N, mu, sdev, 
              minV, maxV, minSubj, maxSubj, outliers)
-  print(t(as.matrix(stats)))
+  #print(t(as.matrix(stats)))
   
   outPDF <- file.path(outDir, paste0(cohort, "_", eName, "_Age_histograms.pdf"))
   outTXT <- file.path(outDir, paste0(cohort, "_", eName, "_Age_stats.txt"))
@@ -574,6 +615,7 @@ message("Running QC pipeline...")
 # Per-metric multi-panel histograms
 for (m in c("FA","MD","AD","RD")) {
   plot_multi_histogram(Table, m, outdir = outDir)
+  plot_single_histograms(TableLong, metric = m, outdir = outDir)
 }
 
 # Build & save summary table from long data
