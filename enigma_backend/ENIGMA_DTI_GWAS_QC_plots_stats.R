@@ -35,8 +35,6 @@ parser$add_argument("--affectedIndicator", default = "2", help = "Value indicati
 parser$add_argument("--related", default = "0", help = "Related cohort yes(1) or no(0)")
 parser$add_argument("--rois", default = "GlobalAverage;BCC;GCC;SCC;CC;CGC;CGH;CR;EC;FX;FXST;IC;IFO;PTR;SFO;SLF;SS;UNC;CST;ACR;ALIC;PCR;PLIC;RLIC;SCR;ACR.L;ACR.R;ALIC.L;ALIC.R;CGC.L;CGC.R;CGH.L;CGH.R;CR.L;CR.R;CST.L;CST.R;EC.L;EC.R;FX.ST.L;FX.ST.R;IC.L;IC.R;IFO.L;IFO.R;PCR.L;PCR.R;PLIC.L;PLIC.R;PTR.L;PTR.R;RLIC.L;RLIC.R;SCR.L;SCR.R;SFO.L;SFO.R;SLF.L;SLF.R;SS.L;SS.R;UNC.L;UNC.R", help = "Semicolon-separated list of ROIs (use same naming as pheno columns)")
 parser$add_argument("--outDir", default = "./QC_ENIGMA/", help = "Output directory")
-parser$add_argument("--outPDF", default = "ENIGMA_DTI_allROI_histograms.pdf", help = "output PDF name (multi hist)")
-parser$add_argument("--outTXT", default = "ENIGMA_DTI_allROI_stats.txt", help = "output stats txt")
 parser$add_argument("--eName", default = "ENIGMA_DTI_GWAS", help = "ENIGMA label")
 
 args <- parser$parse_args()
@@ -293,13 +291,6 @@ compute_summary_table <- function(TableLong, outdir = outDir) {
   return(summary_table)
 }
 
-# Open PDF for plots
-pdf(file = paste0(outDir, "/", cohort, "_", eName, "_Age_histograms.pdf"))
-write(
-  "Cohort\tCovariate\tGroup\tNumberIncluded\tMean\tStandDev\tMinValue\tMaxValue\tMinSubject\tMaxSubject\t5StDev_Off",
-  file = paste0(outDir, "/", cohort, "_", eName, "_Age_stats.txt")
-)
-
 # Define a function to process data for a specific group
 generate_stats_and_plots <- function(data, group_label, covariate) {
   # Extract column and coerce to numeric
@@ -454,54 +445,6 @@ generate_overlapping_histograms <- function(data, group_var, covariate, group_la
   }
 }
 
-# Process Age for the entire cohort
-if ("Age" %in% colnames(Table)) {
-  generate_stats_and_plots(Table, "All", "Age")
-  
-  # Split by Sex if the variable exists
-  if ("Sex" %in% colnames(Table)) {
-    for (sex in unique(Table$Sex)) {
-      subset_sex <- Table[Table$Sex == sex, ]
-      generate_stats_and_plots(subset_sex, paste0("Sex: ", sex), "Age")
-    }
-    generate_group_size_plots(Table, "Sex", "All")
-    generate_overlapping_histograms(Table, "Sex", "Age", "All")
-  }
-  
-  # Split by AffectionStatus if the variable exists
-  if ("AffectionStatus" %in% colnames(Table)) {
-    for (status in unique(Table$AffectionStatus)) {
-      subset_status <- Table[Table$AffectionStatus == status, ]
-      generate_stats_and_plots(subset_status, paste0("AffectionStatus: ", status), "Age")
-    }
-    generate_group_size_plots(Table, "AffectionStatus", "All")
-    generate_overlapping_histograms(Table, "AffectionStatus", "Age", "All")
-  }
-  
-  # Split by both Sex and AffectionStatus if both variables exist
-  if ("Sex" %in% colnames(Table) && "AffectionStatus" %in% colnames(Table)) {
-    for (sex in unique(Table$Sex)) {
-      for (status in unique(Table$AffectionStatus)) {
-        subset_combined <- Table[
-          Table$Sex == sex & Table$AffectionStatus == status,
-        ]
-        if (nrow(subset_combined) > 0) {
-          generate_stats_and_plots(subset_combined, paste0("Sex: ", sex, ", AffectionStatus: ", status), "Age")
-        }
-      }
-    }
-    generate_group_size_plots(Table, "Sex", "Grouped by Sex and AffectionStatus")
-    generate_group_size_plots(Table,"AffectionStatus","Grouped by Sex and AffectionStatus")
-    generate_overlapping_histograms(Table,"Sex","Age","Grouped by Sex and AffectionStatus")
-    generate_overlapping_histograms(Table,"AffectionStatus","Age","Grouped by Sex and AffectionStatus")
-  }
-} else {
-  cat("Covariate not found in the table:", "Age", "\n")
-}
-
-# Close PDF device
-dev.off()
-
 # ---------------- Cohen's d per metric x ROI ----------------
 compute_cohens_d <- function(Table, parsedROIs, roiLabels, roiColors, outdir = outDir) {
   results <- data.frame()
@@ -569,11 +512,67 @@ compute_cohens_d <- function(Table, parsedROIs, roiLabels, roiColors, outdir = o
   } # end metric
   
   # Save results
-  out_csv <- file.path(outdir, paste0(cohort, "_", eName, "_cohensd_results.csv"))
+  out_csv <- file.path(outdir, paste0(cohort, "_", eName, "_Cohensd_results.csv"))
   write.csv(results, out_csv, row.names = FALSE)
   message("Saved Cohen's d results: ", out_csv)
   return(results)
 }
+
+# Open PDF for plots
+pdf(file = paste0(outDir, "/", cohort, "_", eName, "_Age_histograms.pdf"))
+write(
+  "Cohort\tCovariate\tGroup\tNumberIncluded\tMean\tStandDev\tMinValue\tMaxValue\tMinSubject\tMaxSubject\t5StDev_Off",
+  file = paste0(outDir, "/", cohort, "_", eName, "_Age_stats.txt")
+)
+
+# Process Age for the entire cohort
+if ("Age" %in% colnames(Table)) {
+  generate_stats_and_plots(Table, "All", "Age")
+  
+  # Split by Sex if the variable exists
+  if ("Sex" %in% colnames(Table)) {
+    for (sex in unique(Table$Sex)) {
+      subset_sex <- Table[Table$Sex == sex, ]
+      generate_stats_and_plots(subset_sex, paste0("Sex: ", sex), "Age")
+    }
+    generate_group_size_plots(Table, "Sex", "All")
+    generate_overlapping_histograms(Table, "Sex", "Age", "All")
+  }
+  
+  # Split by AffectionStatus if the variable exists
+  if ("AffectionStatus" %in% colnames(Table)) {
+    for (status in unique(Table$AffectionStatus)) {
+      subset_status <- Table[Table$AffectionStatus == status, ]
+      generate_stats_and_plots(subset_status, paste0("AffectionStatus: ", status), "Age")
+    }
+    generate_group_size_plots(Table, "AffectionStatus", "All")
+    generate_overlapping_histograms(Table, "AffectionStatus", "Age", "All")
+  }
+  
+  # Split by both Sex and AffectionStatus if both variables exist
+  if ("Sex" %in% colnames(Table) && "AffectionStatus" %in% colnames(Table)) {
+    for (sex in unique(Table$Sex)) {
+      for (status in unique(Table$AffectionStatus)) {
+        subset_combined <- Table[
+          Table$Sex == sex & Table$AffectionStatus == status,
+        ]
+        if (nrow(subset_combined) > 0) {
+          generate_stats_and_plots(subset_combined, paste0("Sex: ", sex, ", AffectionStatus: ", status), "Age")
+        }
+      }
+    }
+    generate_group_size_plots(Table, "Sex", "Grouped by Sex and AffectionStatus")
+    generate_group_size_plots(Table,"AffectionStatus","Grouped by Sex and AffectionStatus")
+    generate_overlapping_histograms(Table,"Sex","Age","Grouped by Sex and AffectionStatus")
+    generate_overlapping_histograms(Table,"AffectionStatus","Age","Grouped by Sex and AffectionStatus")
+  }
+} else {
+  cat("Covariate not found in the table:", "Age", "\n")
+}
+
+# Close PDF device
+dev.off()
+
 
 # ---------------- Run the steps ----------------
 message("Running QC pipeline...")
@@ -611,7 +610,7 @@ if (nrow(cohens_d_results) > 0) {
     labs(x = "", y = "Cohen's d ± SE", title = paste0(cohort, ": Cohen's d (AFF vs CON)")) +
     theme_bw() +
     theme(strip.text = element_text(face = "bold"), axis.text.y = element_text(size = 6))
-  safe_ggsave(p_cd, file.path(outDir, paste0(cohort, "_", eName, "_cohensd_bar_graph_AFF-CON.png")), width = 18, height = 24)
+  safe_ggsave(p_cd, file.path(outDir, paste0(cohort, "_", eName, "_Cohensd_bar_graph_AFF-CON.png")), width = 18, height = 24)
 } else {
   message("No Cohen's d results to plot.")
 }
