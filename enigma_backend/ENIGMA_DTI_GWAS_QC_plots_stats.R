@@ -273,23 +273,46 @@ compute_summary_table <- function(TableLong, outdir = outDir) {
     warning("No long DTI data to summarise.")
     return(data.frame())
   }
-  summary_table <- TableLong %>%
+  
+  # Compute summary by AffectionStatus
+  summary_by_status <- TableLong %>%
     group_by(Metric, parsedROI, !!sym(affectedStatusColumnHeader)) %>%
     summarise(
       Mean = mean(Value, na.rm = TRUE),
       SD = sd(Value, na.rm = TRUE),
       N = sum(!is.na(Value)),
+      Min = min(Value, na.rm = TRUE),
+      Max = max(Value, na.rm = TRUE),
+      .groups = "drop"
+    )
+  
+  # Compute overall summary (no AffectionStatus grouping)
+  summary_all <- TableLong %>%
+    group_by(Metric, parsedROI) %>%
+    summarise(
+      Mean = mean(Value, na.rm = TRUE),
+      SD = sd(Value, na.rm = TRUE),
+      N = sum(!is.na(Value)),
+      Min = min(Value, na.rm = TRUE),
+      Max = max(Value, na.rm = TRUE),
       .groups = "drop"
     ) %>%
+    mutate(!!sym(affectedStatusColumnHeader) := "All")
+  
+  # Combine both tables
+  summary_table <- bind_rows(summary_by_status, summary_all) %>%
     mutate(Mean_SD = sprintf("%.6g \u00B1 %.6g", Mean, SD)) %>%
     rename(AffectionStatus = !!sym(affectedStatusColumnHeader)) %>%
     arrange(Metric, parsedROI, AffectionStatus)
-  # save
-  out_csv <- file.path(outdir, paste0(cohort, "_", eName, "_Summary_MeanSD_byMetricGroup.csv"))
+  
+  # Save output
+  out_csv <- file.path(outdir, paste0(cohort, "_", eName, "_SummaryStats_ROIs.csv"))
   write.csv(summary_table, out_csv, row.names = FALSE)
   message("Saved summary table: ", out_csv)
+  
   return(summary_table)
 }
+
 
 # Define a function to process data for a specific group
 generate_stats_and_plots <- function(data, group_label, covariate) {
