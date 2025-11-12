@@ -365,6 +365,57 @@ plot_icv_checks <- function(Table, outdir = outDir) {
   }
 }
 
+plot_pc <- function(covar, outdir = outDir, pc_cols, phenotype_col = NULL) {
+  if (!all(pc_cols %in% colnames(covar))) stop("Some PCs not found in covar")
+  
+  # --- Define output file ---
+  outPDF <- file.path(outdir, paste0(cohort, "_", eName, "_PC_plots.pdf"))
+  
+  # --- Open PDF device ---
+  pdf(outPDF, width = 10, height = 8)
+  
+  # --- 1. Histograms per PC ---
+  for(pc in pc_cols) {
+    hist(covar[[pc]], breaks = 30, col = "lightblue", main = paste("Histogram:", pc),
+         xlab = pc)
+  }
+  
+  # --- 2. Boxplots of all PCs ---
+  boxplot(covar[pc_cols], las = 2, col = "lightgreen", main = "Boxplots of PCs")
+  
+  # --- 3. Pairwise scatter plots ---
+  if(length(pc_cols) >= 2){
+    pairs(covar[pc_cols], main="Pairwise PC Scatter Plots", pch=19,
+          col=if(!is.null(phenotype_col) && phenotype_col %in% colnames(covar)) {
+            as.factor(covar[[phenotype_col]])
+          } else "blue")
+  }
+  
+  # --- 4. Outlier detection ---
+  outlier_matrix <- apply(covar[pc_cols], 1, function(x) abs(x) > 6)
+  outlier_flags <- apply(outlier_matrix, 1, any)
+  cat("Number of samples flagged as PC outliers (>6 SD):", sum(outlier_flags), "\n")
+  if(sum(outlier_flags) > 0){
+    cat("Outlier sample indices:\n")
+    print(which(outlier_flags))
+  }
+  
+  # --- 5. Correlation heatmap ---
+  library(ggplot2)
+  library(reshape2)
+  pc_cor <- cor(covar[pc_cols])
+  melted_cor <- melt(pc_cor)
+  ggplot(melted_cor, aes(Var1, Var2, fill=value)) +
+    geom_tile() +
+    scale_fill_gradient2(midpoint=0, low="blue", mid="white", high="red") +
+    theme_minimal() +
+    labs(title="Correlation Heatmap of PCs", x="", y="") +
+    theme(axis.text.x = element_text(angle=45, hjust=1))
+  
+  dev.off()
+  message("PC QC plots saved to: ", outPDF)
+}
+
 # ---------------- Summary table: mean ± SD by metric x group ----------------
 compute_summary_table <- function(TableLong, outdir = outDir) {
   if (nrow(TableLong) == 0) {
@@ -544,7 +595,7 @@ generate_overlapping_histograms <- function(data, group_var, covariate, group_la
     plot(
       hist_list[[1]],
       col = adjustcolor(colors[1], alpha.f = 0.5),
-      main = paste0(cohort, ": Histograms of ", covariate, " by ", group_var, " (", group_label, ")"),
+      main = paste0(cohort, ": ", covariate, " by ", group_var, " (", group_label, ")"),
       xlab = covariate,
       xlim = range(unlist(lapply(hist_list, function(h) h$breaks))),
       ylim = range(unlist(lapply(hist_list, function(h) h$counts))),
@@ -661,35 +712,15 @@ for (m in c("FA","MD","AD","RD")) {
 # Build & save summary table from long data
 summary_table <- compute_summary_table(TableLong, outDir)
 
-# Compute Cohen's d and produce plot if results exist
-cohens_d_results <- compute_cohens_d(Table, parsedROIs, roiLabels, roiColors, outDir)
-
-if (nrow(cohens_d_results) > 0) {
-  # ensure ordering & factor levels
-  cohens_d_results <- cohens_d_results %>%
-    mutate(varlabel = factor(varlabel, levels = unique(varlabel))) %>%
-    arrange(metric, varlabel)
-  
-  # Plot Cohen's d (faceted by metric)
-  p_cd <- ggplot(cohens_d_results, aes(x = varlabel, y = cohens_d_smd, fill = metric)) +
-    geom_col(colour = "black") +
-    geom_errorbar(aes(ymin = cohens_d_smd - cohens_d_se, ymax = cohens_d_smd + cohens_d_se), width = 0.25) +
-    facet_wrap(~metric, ncol = 2, scales = "free_y") +
-    coord_flip() +
-    geom_hline(yintercept = 0) +
-    labs(x = "", y = "Cohen's d ± SE", title = paste0(cohort, ": Cohen's d (AFF vs CON)")) +
-    theme_bw() +
-    theme(strip.text = element_text(face = "bold"), axis.text.y = element_text(size = 6))
-  safe_ggsave(p_cd, file.path(outDir, paste0(cohort, "_", eName, "_Cohensd_bar_graph_AFF-CON.png")), width = 18, height = 24)
-} else {
-  message("No Cohen's d results to plot.")
-}
-
 # Age histograms and group breakdowns
 plot_age_histograms(Table, outDir)
 
 # ICV checks
 plot_icv_checks(Table, outDir)
+
+# PC checks
+# optional: phenotype column for coloring scatter plots
+plot_pc(Table, outDir, pc_cols = pc_columns, phenotype_col = "CaseControl")
 
 # Open PDF for plots
 pdf(file = paste0(outDir, "/", cohort, "_", eName, "_Age_histograms.pdf"))
@@ -745,5 +776,29 @@ if ("Age" %in% colnames(Table)) {
 
 # Close PDF device
 dev.off()
+
+# Compute Cohen's d and produce plot if results exist
+cohens_d_results <- compute_cohens_d(Table, parsedROIs, roiLabels, roiColors, outDir)
+
+if (nrow(cohens_d_results) > 0) {
+  # ensure ordering & factor levels
+  cohens_d_results <- cohens_d_results %>%
+    mutate(varlabel = factor(varlabel, levels = unique(varlabel))) %>%
+    arrange(metric, varlabel)
+  
+  # Plot Cohen's d (faceted by metric)
+  p_cd <- ggplot(cohens_d_results, aes(x = varlabel, y = cohens_d_smd, fill = metric)) +
+    geom_col(colour = "black") +
+    geom_errorbar(aes(ymin = cohens_d_smd - cohens_d_se, ymax = cohens_d_smd + cohens_d_se), width = 0.25) +
+    facet_wrap(~metric, ncol = 2, scales = "free_y") +
+    coord_flip() +
+    geom_hline(yintercept = 0) +
+    labs(x = "", y = "Cohen's d ± SE", title = paste0(cohort, ": Cohen's d (AFF vs CON)")) +
+    theme_bw() +
+    theme(strip.text = element_text(face = "bold"), axis.text.y = element_text(size = 6))
+  safe_ggsave(p_cd, file.path(outDir, paste0(cohort, "_", eName, "_Cohensd_bar_graph_AFF-CON.png")), width = 18, height = 24)
+} else {
+  message("No Cohen's d results to plot.")
+}
 
 message("QC pipeline finished. Outputs in: ", normalizePath(outDir))
