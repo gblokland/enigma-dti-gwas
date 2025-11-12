@@ -720,7 +720,7 @@ plot_icv_checks(Table, outDir)
 
 # PC checks
 # optional: phenotype column for coloring scatter plots
-plot_pc(Table, outDir, pc_cols = pc_columns, phenotype_col = "CaseControl")
+plot_pc(Table, outDir, pc_cols = paste0("PC", 1:10), phenotype_col = "CaseControl")
 
 # Open PDF for plots
 pdf(file = paste0(outDir, "/", cohort, "_", eName, "_Age_histograms.pdf"))
