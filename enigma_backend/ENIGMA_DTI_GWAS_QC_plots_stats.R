@@ -37,6 +37,7 @@ parser$add_argument("--rois", default = "GlobalAverage;BCC;GCC;SCC;CC;CGC;CGH;CR
 parser$add_argument("--outDir", default = "./QC_ENIGMA/", help = "Output directory")
 parser$add_argument("--eName", default = "ENIGMA_DTI_GWAS", help = "ENIGMA label")
 
+args <- list() #clear args and reinitialize to empty
 args <- parser$parse_args()
 cat("Inputs: \n")
 print(args)
