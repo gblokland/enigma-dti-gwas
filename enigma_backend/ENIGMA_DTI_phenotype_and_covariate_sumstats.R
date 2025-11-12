@@ -51,7 +51,7 @@ parser$add_argument("--CaseControlCohort",  default = "1",  help = "CaseControlC
 parser$add_argument("--affectedStatusColumnHeader",  default = "AffectionStatus",  help = "Column header for Affection Status (case-control status)")
 parser$add_argument("--affectedIndicator",  default = "2",  help = "value used for affected individuals")
 parser$add_argument("--related",  default = "0",  help = "related cohort yes(1) or no(0)")
-parser$add_argument("--rois",  default = "AverageFA;BCC;GCC;SCC;CC;CGC;CGH;CR;EC;FX;FXST;IC;IFO;PTR;SFO;SLF;SS;UNC;CST;ACR;ALIC;PCR;PLIC;RLIC;SCR;ACR.L;ACR.R;ALIC.L;ALIC.R;CGC.L;CGC.R;CGH.L;CGH.R;CR.L;CR.R;CST.L;CST.R;EC.L;EC.R;FX.ST.L;FX.ST.R;IC.L;IC.R;IFO.L;IFO.R;PCR.L;PCR.R;PLIC.L;PLIC.R;PTR.L;PTR.R;RLIC.L;RLIC.R;SCR.L;SCR.R;SFO.L;SFO.R;SLF.L;SLF.R;SS.L;SS.R;UNC.L;UNC.R",  help = "Semicolon-separated list of ROIs")
+parser$add_argument("--rois",  default = "GlobalAverage;BCC;GCC;SCC;CC;CGC;CGH;CR;EC;FX;FXST;IC;IFO;PTR;SFO;SLF;SS;UNC;CST;ACR;ALIC;PCR;PLIC;RLIC;SCR;ACR.L;ACR.R;ALIC.L;ALIC.R;CGC.L;CGC.R;CGH.L;CGH.R;CR.L;CR.R;CST.L;CST.R;EC.L;EC.R;FX.ST.L;FX.ST.R;IC.L;IC.R;IFO.L;IFO.R;PCR.L;PCR.R;PLIC.L;PLIC.R;PTR.L;PTR.R;RLIC.L;RLIC.R;SCR.L;SCR.R;SFO.L;SFO.R;SLF.L;SLF.R;SS.L;SS.R;UNC.L;UNC.R",  help = "Semicolon-separated list of ROIs")
 parser$add_argument("--pheno_covar_dir", default = "./QC_ENIGMA/",  help = "Output directory")
 parser$add_argument("--outDir",  default = "./QC_ENIGMA/",  help = "Output directory")
 parser$add_argument("--eName",  default = "ENIGMA_DTI_GWAS",  help = "Output label for ENIGMA project")
@@ -80,7 +80,7 @@ eName <- args$eName
 dir.create(outDir, showWarnings = FALSE)
 
 covar <- read.table(covarFILE, header = TRUE)
-covar <- covar[ , !(names(covar) %in% c("FA_AverageFA", "MD_AverageMD", "RD_AverageRD", "AD_AverageAD"))]
+covar <- covar[ , !(names(covar) %in% c("FA_GlobalAverage", "MD_GlobalAverage", "RD_GlobalAverage", "AD_GlobalAverage"))]
 pheno <- read.table(phenoFILE, header = TRUE)
 Table <- merge(covar, pheno, by = c("FID", "IID"), all = TRUE)
 #print(head(Table))

@@ -34,7 +34,6 @@ parser$add_argument("--affectedStatusColumnHeader", default = "AffectionStatus",
 parser$add_argument("--affectedIndicator", default = "2", help = "Value indicating affected/case")
 parser$add_argument("--related", default = "0", help = "Related cohort yes(1) or no(0)")
 parser$add_argument("--rois", default = "GlobalAverage;BCC;GCC;SCC;CC;CGC;CGH;CR;EC;FX;FXST;IC;IFO;PTR;SFO;SLF;SS;UNC;CST;ACR;ALIC;PCR;PLIC;RLIC;SCR;ACR.L;ACR.R;ALIC.L;ALIC.R;CGC.L;CGC.R;CGH.L;CGH.R;CR.L;CR.R;CST.L;CST.R;EC.L;EC.R;FX.ST.L;FX.ST.R;IC.L;IC.R;IFO.L;IFO.R;PCR.L;PCR.R;PLIC.L;PLIC.R;PTR.L;PTR.R;RLIC.L;RLIC.R;SCR.L;SCR.R;SFO.L;SFO.R;SLF.L;SLF.R;SS.L;SS.R;UNC.L;UNC.R", help = "Semicolon-separated list of ROIs (use same naming as pheno columns)")
-parser$add_argument("--pheno_covar_dir", default = "./QC_ENIGMA/", help = "pheno/covar dir (not used heavily)")
 parser$add_argument("--outDir", default = "./QC_ENIGMA/", help = "Output directory")
 parser$add_argument("--outPDF", default = "ENIGMA_DTI_allROI_histograms.pdf", help = "output PDF name (multi hist)")
 parser$add_argument("--outTXT", default = "ENIGMA_DTI_allROI_stats.txt", help = "output stats txt")
@@ -58,12 +57,11 @@ affectedStatusColumnHeader <- args$affectedStatusColumnHeader
 affectedIndicator <- args$affectedIndicator
 related <- args$related
 rois <- args$rois
-pheno_covar_dir <- args$pheno_covar_dir
 outDir <- args$outDir
-outPDF <- args$outPDF
-outTXT <- args$outTXT
 eName <- args$eName
-
+outPDF <- paste0(cohort, "_", eName, "_allROI_histograms.pdf")
+outTXT <- paste0(cohort, "_", eName, "_allROI_histograms.txt")
+                 
 dir.create(outDir, recursive = TRUE, showWarnings = FALSE)
 message("Output dir: ", normalizePath(outDir))
 
@@ -123,10 +121,8 @@ Table$ICV <- Table[,icvColumnHeader]
 # Normalize group variable
 Table$AffectionStatus <- trimws(as.character(Table$AffectionStatus))
 Table$AffectionStatus <- tolower(Table$AffectionStatus)
-Table$AffectionStatus <- ifelse(Table$AffectionStatus %in% c("affected", "1", "case"),
-                                "Affected",
-                                ifelse(Table$AffectionStatus %in% c("control", "0", "healthy"),
-                                       "Control", NA))
+Table$AffectionStatus <- ifelse(Table$AffectionStatus %in% c("affected", "1", "case"), "Affected",
+                                ifelse(Table$AffectionStatus %in% c("control", "0", "healthy"), "Control", NA))
 Table$AffectionStatus <- factor(Table$AffectionStatus, levels = c("Control", "Affected"))
 
 # Check
@@ -236,7 +232,7 @@ plot_multi_histogram <- function(Table, metric, outdir = outDir, ncol = 8) {
     theme_bw() +
     labs(x = metric, y = "Number of Subjects", fill = "AffectionStatus", title = paste0(cohort, " - ", metric))
   if (!is.null(x_limits)) p <- p + xlim(x_limits)
-  fn <- file.path(outdir, paste0(cohort, "_histogram_multi-panel_", metric, "_by_AffectionStatus.pdf"))
+  fn <- file.path(outdir, paste0(cohort, "_", eName, "_histogram_multi-panel_", metric, "_by_AffectionStatus.pdf"))
   safe_ggsave(p, fn)
 }
 
@@ -248,7 +244,7 @@ plot_age_histograms <- function(Table, outdir = outDir) {
   p_all <- ggplot(Table, aes(x = Age, fill = .data[[affectedStatusColumnHeader]])) +
     geom_histogram(aes(y = after_stat(count)), colour = "black", bins = 30) +
     theme_bw() + labs(x = "Age (Years)", y = "Number of Subjects", title = paste0(cohort, " - Age"))
-  safe_ggsave(p_all, file.path(outdir, paste0(cohort, "_histogram_Age.pdf")))
+  safe_ggsave(p_all, file.path(outdir, paste0(cohort, "_", eName, "_histogram_Age.pdf")))
 }
 
 plot_icv_checks <- function(Table, outdir = outDir) {
@@ -260,12 +256,12 @@ plot_icv_checks <- function(Table, outdir = outDir) {
   p_hist <- ggplot(Table, aes(x = ICV, fill = .data[[sexColumnHeader]])) +
     geom_histogram(aes(y = after_stat(count)), bins = 30, colour = "black") +
     theme_bw() + labs(title = paste0(cohort, " - ICV distribution by Sex"))
-  safe_ggsave(p_hist, file.path(outdir, paste0(cohort, "_ICV_hist_by_Sex.pdf")), width = 20, height = 15)
+  safe_ggsave(p_hist, file.path(outdir, paste0(cohort, "_", eName, "_ICV_hist_by_Sex.pdf")), width = 20, height = 15)
   # boxplot
   if (sexColumnHeader %in% names(Table)) {
     p_box <- ggplot(Table, aes(x = .data[[sexColumnHeader]], y = ICV, fill = .data[[sexColumnHeader]])) +
       geom_boxplot() + theme_bw() + labs(title = paste0(cohort, " - ICV by Sex"))
-    safe_ggsave(p_box, file.path(outdir, paste0(cohort, "_ICV_box_by_Sex.pdf")), width = 12, height = 9)
+    safe_ggsave(p_box, file.path(outdir, paste0(cohort, "_", eName, "_ICV_box_by_Sex.pdf")), width = 12, height = 9)
   }
 }
 
@@ -287,7 +283,7 @@ compute_summary_table <- function(TableLong, outdir = outDir) {
     rename(AffectionStatus = !!sym(affectedStatusColumnHeader)) %>%
     arrange(Metric, parsedROI, AffectionStatus)
   # save
-  out_csv <- file.path(outdir, paste0(cohort, "_Summary_MeanSD_byMetricGroup.csv"))
+  out_csv <- file.path(outdir, paste0(cohort, "_", eName, "_Summary_MeanSD_byMetricGroup.csv"))
   write.csv(summary_table, out_csv, row.names = FALSE)
   message("Saved summary table: ", out_csv)
   return(summary_table)
@@ -383,12 +379,7 @@ generate_group_size_plots <- function(data, group_var, group_label) {
 }
 
 # Function to create overlapping histograms
-generate_overlapping_histograms <- function(
-  data,
-  group_var,
-  covariate,
-  group_label
-) {
+generate_overlapping_histograms <- function(data, group_var, covariate, group_label) {
   groups <- unique(data[[group_var]])
 
   # Generate a palette excluding red
@@ -480,11 +471,7 @@ if ("Age" %in% colnames(Table)) {
   if ("AffectionStatus" %in% colnames(Table)) {
     for (status in unique(Table$AffectionStatus)) {
       subset_status <- Table[Table$AffectionStatus == status, ]
-      generate_stats_and_plots(
-        subset_status,
-        paste0("AffectionStatus: ", status),
-        "Age"
-      )
+      generate_stats_and_plots(subset_status, paste0("AffectionStatus: ", status), "Age")
     }
     generate_group_size_plots(Table, "AffectionStatus", "All")
     generate_overlapping_histograms(Table, "AffectionStatus", "Age", "All")
@@ -498,36 +485,14 @@ if ("Age" %in% colnames(Table)) {
           Table$Sex == sex & Table$AffectionStatus == status,
         ]
         if (nrow(subset_combined) > 0) {
-          generate_stats_and_plots(
-            subset_combined,
-            paste0("Sex: ", sex, ", AffectionStatus: ", status),
-            "Age"
-          )
+          generate_stats_and_plots(subset_combined, paste0("Sex: ", sex, ", AffectionStatus: ", status), "Age")
         }
       }
     }
-    generate_group_size_plots(
-      Table,
-      "Sex",
-      "Grouped by Sex and AffectionStatus"
-    )
-    generate_group_size_plots(
-      Table,
-      "AffectionStatus",
-      "Grouped by Sex and AffectionStatus"
-    )
-    generate_overlapping_histograms(
-      Table,
-      "Sex",
-      "Age",
-      "Grouped by Sex and AffectionStatus"
-    )
-    generate_overlapping_histograms(
-      Table,
-      "AffectionStatus",
-      "Age",
-      "Grouped by Sex and AffectionStatus"
-    )
+    generate_group_size_plots(Table, "Sex", "Grouped by Sex and AffectionStatus")
+    generate_group_size_plots(Table,"AffectionStatus","Grouped by Sex and AffectionStatus")
+    generate_overlapping_histograms(Table,"Sex","Age","Grouped by Sex and AffectionStatus")
+    generate_overlapping_histograms(Table,"AffectionStatus","Age","Grouped by Sex and AffectionStatus")
   }
 } else {
   cat("Covariate not found in the table:", "Age", "\n")
@@ -603,7 +568,7 @@ compute_cohens_d <- function(Table, parsedROIs, roiLabels, roiColors, outdir = o
   } # end metric
 
   # Save results
-  out_csv <- file.path(outdir, paste0(cohort, "_cohensd_results.csv"))
+  out_csv <- file.path(outdir, paste0(cohort, "_", eName, "_cohensd_results.csv"))
   write.csv(results, out_csv, row.names = FALSE)
   message("Saved Cohen's d results: ", out_csv)
   return(results)
@@ -645,7 +610,7 @@ if (nrow(cohens_d_results) > 0) {
     labs(x = "", y = "Cohen's d ± SE", title = paste0(cohort, ": Cohen's d (AFF vs CON)")) +
     theme_bw() +
     theme(strip.text = element_text(face = "bold"), axis.text.y = element_text(size = 6))
-  safe_ggsave(p_cd, file.path(outDir, paste0(cohort, "_cohensd_bar_graph_AFF-CON.png")), width = 18, height = 24)
+  safe_ggsave(p_cd, file.path(outDir, paste0(cohort, "_", eName, "_cohensd_bar_graph_AFF-CON.png")), width = 18, height = 24)
 } else {
   message("No Cohen's d results to plot.")
 }

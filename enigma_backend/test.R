@@ -35,7 +35,7 @@ parser$add_argument("--CaseControlCohort", default = "1")
 parser$add_argument("--affectedStatusColumnHeader", default = "AffectionStatus")
 parser$add_argument("--affectedIndicator", default = "2")
 parser$add_argument("--related", default = "0")
-parser$add_argument("--rois", default = "GlobalAverage;BCC;GCC;SCC;CC;CGC;CGH;CR;EC;FX;FXST;IC;IFO;PTR;SFO;SLF;SS;UNC")
+parser$add_argument("--rois",  default = "GlobalAverage;BCC;GCC;SCC;CC;CGC;CGH;CR;EC;FX;FXST;IC;IFO;PTR;SFO;SLF;SS;UNC;CST;ACR;ALIC;PCR;PLIC;RLIC;SCR;ACR.L;ACR.R;ALIC.L;ALIC.R;CGC.L;CGC.R;CGH.L;CGH.R;CR.L;CR.R;CST.L;CST.R;EC.L;EC.R;FX.ST.L;FX.ST.R;IC.L;IC.R;IFO.L;IFO.R;PCR.L;PCR.R;PLIC.L;PLIC.R;PTR.L;PTR.R;RLIC.L;RLIC.R;SCR.L;SCR.R;SFO.L;SFO.R;SLF.L;SLF.R;SS.L;SS.R;UNC.L;UNC.R",  help = "Semicolon-separated list of ROIs")
 parser$add_argument("--outDir", default = "./QC_ENIGMA/")
 parser$add_argument("--outPDF", default = "ENIGMA_DTI_allROI_histograms.pdf")
 parser$add_argument("--outTXT", default = "ENIGMA_DTI_allROI_stats.txt")
@@ -125,14 +125,14 @@ for (metric in c("FA","MD","AD","RD")) {
     facet_wrap(~ROI, scales = "free_x") +
     theme_bw() +
     labs(title = paste0(cohort, " - ", metric), x = metric, y = "Count")
-  safe_ggsave(p, file.path(outDir, paste0(cohort, "_", metric, "_histograms.pdf")))
+  safe_ggsave(p, file.path(outDir, paste0(cohort, "_", eName, "_", metric, "_histograms.pdf")))
 }
 
 # ---------------- Compute summary stats ----------------
 summary_table <- TableLong %>%
   group_by(Metric, ROI, !!sym(affectedStatusColumnHeader)) %>%
   summarise(Mean = mean(Value, na.rm = TRUE), SD = sd(Value, na.rm = TRUE), N = sum(!is.na(Value)), .groups = "drop")
-write.csv(summary_table, file.path(outDir, paste0(cohort, "_SummaryStats.csv")), row.names = FALSE)
+write.csv(summary_table, file.path(outDir, paste0(cohort, "_", eName, "_SummaryStats.csv")), row.names = FALSE)
 message("Saved summary stats")
 
 # ---------------- Compute Cohen's d ----------------
@@ -149,7 +149,7 @@ compute_cohens_d <- function(Table, metric, roi) {
 parsedROIs <- unlist(strsplit(rois, ";"))
 results <- expand.grid(Metric = c("FA","MD","AD","RD"), ROI = parsedROIs, stringsAsFactors = FALSE)
 results$d <- mapply(compute_cohens_d, Table = list(Table), metric = results$Metric, roi = results$ROI)
-write.csv(results, file.path(outDir, paste0(cohort, "_CohensD.csv")), row.names = FALSE)
+write.csv(results, file.path(outDir, paste0(cohort, "_", eName, "_CohensD.csv")), row.names = FALSE)
 message("Saved Cohen's d values")
 
 # ---------------- Done ----------------

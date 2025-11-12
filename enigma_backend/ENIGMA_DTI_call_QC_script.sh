@@ -75,9 +75,7 @@ Rscript ${ENIGMA_DTI_GWAS_dir}/SCRIPTS/enigma_backend/ENIGMA_DTI_plots_All_inclC
 --covarFILE "${ENIGMA_DTI_GWAS_dir}/pheno_covar/${COHORT}_enigma_dti_gwas.covar" \
 --phenoFILE "${ENIGMA_DTI_GWAS_dir}/pheno_covar/${COHORT}_enigma_dti_gwas.pheno" \
 --rois "GlobalAverage;BCC;GCC;SCC;CC;CGC;CGH;CR;EC;FX;FXST;IC;IFO;PTR;SFO;SLF;SS;UNC;CST;ACR;ALIC;PCR;PLIC;RLIC;SCR;ACR.L;ACR.R;ALIC.L;ALIC.R;CGC.L;CGC.R;CGH.L;CGH.R;CR.L;CR.R;CST.L;CST.R;EC.L;EC.R;FX.ST.L;FX.ST.R;IC.L;IC.R;IFO.L;IFO.R;PCR.L;PCR.R;PLIC.L;PLIC.R;PTR.L;PTR.R;RLIC.L;RLIC.R;SCR.L;SCR.R;SFO.L;SFO.R;SLF.L;SLF.R;SS.L;SS.R;UNC.L;UNC.R" \
---outDir "${ENIGMA_DTI_GWAS_dir}/QC_ENIGMA/" \
---outPDF "${COHORT}_ENIGMA_DTI_allROI_histograms.pdf" \
---outTXT "${COHORT}_ENIGMA_DTI_allROI_stats.txt"
+--outDir "${ENIGMA_DTI_GWAS_dir}/QC_ENIGMA/"
 
 Rscript ${ENIGMA_DTI_GWAS_dir}/SCRIPTS/enigma_backend/ENIGMA_DTI_plots_stats_demographics.R \
 --cohort "${COHORT}" \
