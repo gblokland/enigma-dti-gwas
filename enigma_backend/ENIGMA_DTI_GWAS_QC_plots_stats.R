@@ -500,8 +500,6 @@ compute_summary_table <- function(TableLong, outdir = outDir) {
   # ----------------------------
   # Generate ggplot from CSV
   # ----------------------------
-  library(ggplot2)
-  
   # Define ROI order
   roi_order <- c("GlobalAverage","BCC","GCC","SCC","CC","CGC","CGH","CR","EC","FX","FXST","IC","IFO",
                  "PTR","SFO","SLF","SS","UNC","CST","ACR","ALIC","PCR","PLIC","RLIC","SCR",
@@ -515,16 +513,16 @@ compute_summary_table <- function(TableLong, outdir = outDir) {
   # Plot
   p <- ggplot(summary_table, aes(x = varlabel, y = Mean, fill = AffectionStatus)) +
     geom_bar(stat = "identity", position = position_dodge(width = 0.8)) +
-    facet_wrap(~metric, scales = "free_y") +
+    facet_wrap(~Metric, scales = "free_y") +
     labs(x = "ROI", y = "Mean Value", fill = "Affection Status", title = paste0(cohort, " - ROI Summary")) +
     theme_bw() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
           plot.title = element_text(hjust = 0.5, face = "bold"))
   
   # Save plot to PDF
-  out_pdf <- file.path(outdir, paste0(cohort, "_", eName, "_ROIs_SummaryStats_plot.pdf"))
-  ggsave(out_pdf, p, width = 16, height = 8)
-  message("Saved plot: ", out_pdf)
+  out_png <- file.path(outdir, paste0(cohort, "_", eName, "_ROIs_SummaryStats_plot.png"))
+  ggsave(out_png, p, units = "cm", width = 16, height = 8)
+  message("Saved plot: ", out_png)
   
   return(summary_table)
 }
