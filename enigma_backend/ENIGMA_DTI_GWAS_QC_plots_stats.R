@@ -429,17 +429,26 @@ compute_summary_table <- function(TableLong, outdir = outDir) {
     return(data.frame())
   }
   
-  # Compute summary by AffectionStatus
-  summary_by_status <- TableLong %>%
-    group_by(Metric, parsedROI, !!sym(affectedStatusColumnHeader)) %>%
-    summarise(
-      Mean = mean(Value, na.rm = TRUE),
-      SD = sd(Value, na.rm = TRUE),
-      N = sum(!is.na(Value)),
-      Min = min(Value, na.rm = TRUE),
-      Max = max(Value, na.rm = TRUE),
-      .groups = "drop"
-    )
+  # Remove rows with missing key fields
+  TableLong <- TableLong %>%
+    filter(!is.na(Metric), !is.na(parsedROI), !is.na(Value))
+  
+  # Compute summary by AffectionStatus (only if column exists)
+  if (affectedStatusColumnHeader %in% colnames(TableLong)) {
+    summary_by_status <- TableLong %>%
+      filter(!is.na(.data[[affectedStatusColumnHeader]])) %>%
+      group_by(Metric, parsedROI, !!sym(affectedStatusColumnHeader)) %>%
+      summarise(
+        Mean = mean(Value, na.rm = TRUE),
+        SD   = sd(Value, na.rm = TRUE),
+        N    = sum(!is.na(Value)),
+        Min  = suppressWarnings(min(Value, na.rm = TRUE)),
+        Max  = suppressWarnings(max(Value, na.rm = TRUE)),
+        .groups = "drop"
+      )
+  } else {
+    summary_by_status <- data.frame()
+  }
   
   # Compute overall summary (no AffectionStatus grouping)
   summary_all <- TableLong %>%
@@ -456,9 +465,13 @@ compute_summary_table <- function(TableLong, outdir = outDir) {
   
   # Combine both tables
   summary_table <- bind_rows(summary_by_status, summary_all) %>%
-    mutate(Mean_SD = sprintf("%.6g \u00B1 %.6g", Mean, SD)) %>%
+    mutate(Mean_SD = sprintf("%.6g ± %.6g", Mean, SD)) %>%
     rename(AffectionStatus = !!sym(affectedStatusColumnHeader)) %>%
     arrange(Metric, parsedROI, AffectionStatus)
+  
+  # Remove any remaining rows that have NA for Mean or SD
+  summary_table <- summary_table %>%
+    filter(!is.na(Mean), !is.na(SD), is.finite(Mean), is.finite(SD))
   
   # Save output
   out_csv <- file.path(outdir, paste0(cohort, "_", eName, "_ROIs_SummaryStats.csv"))
