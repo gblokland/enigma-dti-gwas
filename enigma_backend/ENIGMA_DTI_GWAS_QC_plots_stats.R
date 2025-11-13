@@ -489,6 +489,9 @@ compute_summary_table <- function(TableLong, outdir = outDir) {
   summary_table <- summary_table %>%
     filter(!is.na(Mean), !is.na(SD), is.finite(Mean), is.finite(SD))
   
+  # Change column order
+  summary_table <- summary_table[,c("Metric",	"parsedROI",	"variable",	"varlabel", "AffectionStatus",	"Mean",	"SD",	"N",	"Min",	"Max",	"Mean_SD"	)]
+  
   # Save output
   out_csv <- file.path(outdir, paste0(cohort, "_", eName, "_ROIs_SummaryStats.csv"))
   write.csv(summary_table, out_csv, quote = FALSE, row.names = FALSE, fileEncoding = "UTF-8")
