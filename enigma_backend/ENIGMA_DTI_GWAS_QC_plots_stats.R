@@ -475,8 +475,14 @@ compute_summary_table <- function(TableLong, outdir = outDir) {
   
   # Combine both tables
   summary_table <- bind_rows(summary_by_status, summary_all) %>%
-    mutate(Mean_SD = sprintf("%.6g ± %.6g", Mean, SD)) %>%
-    rename(AffectionStatus = !!sym(affectedStatusColumnHeader)) %>%
+    mutate(
+      Mean_SD = sprintf("%.6g ± %.6g", Mean, SD),
+      AffectionStatus = !!sym(affectedStatusColumnHeader),
+      variable = paste0(Metric, "_", parsedROI),
+      varlabel = gsub("\\.L$", " Left",
+                      gsub("\\.R$", " Right",
+                           gsub("\\.ST", ".ST", parsedROI))) # keeps special cases like FX.ST
+    ) %>%
     arrange(Metric, parsedROI, AffectionStatus)
   
   # Remove any remaining rows that have NA for Mean or SD
