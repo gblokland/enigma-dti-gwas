@@ -475,7 +475,7 @@ compute_summary_table <- function(TableLong, outdir = outDir) {
   
   # Save output
   out_csv <- file.path(outdir, paste0(cohort, "_", eName, "_ROIs_SummaryStats.csv"))
-  write.csv(summary_table, out_csv, row.names = FALSE, fileEncoding = "UTF-8")
+  write.csv(summary_table, out_csv, quote = FALSE, row.names = FALSE, fileEncoding = "UTF-8")
   message("Saved summary table: ", out_csv)
   
   return(summary_table)
