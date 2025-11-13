@@ -513,15 +513,18 @@ compute_summary_table <- function(TableLong, outdir = outDir) {
   # Plot
   p <- ggplot(summary_table, aes(x = varlabel, y = Mean, fill = AffectionStatus)) +
     geom_bar(stat = "identity", position = position_dodge(width = 0.8)) +
-    facet_wrap(~Metric, scales = "free_y") +
-    labs(x = "ROI", y = "Mean Value", fill = "Affection Status", title = paste0(cohort, " - ROI Summary")) +
+    geom_errorbar(aes(ymin = Mean - SD, ymax = Mean + SD),
+                  width = 0.2,
+                  position = position_dodge(width = 0.8)) +
+    facet_wrap(~Metric, scales = "free_y", ncol = 1) +
+    labs(x = "ROI", y = "Mean ± SD", fill = "Affection Status", title = paste0(cohort, " - ROI Summary")) +
     theme_bw() +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
           plot.title = element_text(hjust = 0.5, face = "bold"))
   
   # Save plot to PDF
   out_png <- file.path(outdir, paste0(cohort, "_", eName, "_ROIs_SummaryStats_plot.png"))
-  ggsave(out_png, p, units = "cm", width = 16, height = 8)
+  ggsave(out_png, p, units = "cm", width = 16, height = 23)
   message("Saved plot: ", out_png)
   
   return(summary_table)
