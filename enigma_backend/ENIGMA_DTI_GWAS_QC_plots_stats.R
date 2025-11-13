@@ -465,7 +465,7 @@ compute_summary_table <- function(TableLong, outdir = outDir) {
   
   # Combine both tables
   summary_table <- bind_rows(summary_by_status, summary_all) %>%
-    mutate(Mean_SD = sprintf("%.6g +/- %.6g", Mean, SD)) %>%
+    mutate(Mean_SD = sprintf("%.6g ± %.6g", Mean, SD)) %>%
     rename(AffectionStatus = !!sym(affectedStatusColumnHeader)) %>%
     arrange(Metric, parsedROI, AffectionStatus)
   
