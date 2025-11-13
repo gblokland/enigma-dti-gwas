@@ -34,6 +34,7 @@ parser$add_argument("--CaseControlCohort", default = "1", help = "CaseControlCoh
 parser$add_argument("--affectedStatusColumnHeader", default = "AffectionStatus", help = "AffectionStatus column name")
 parser$add_argument("--affectedIndicator", default = "2", help = "Value indicating affected/case")
 parser$add_argument("--related", default = "0", help = "Related cohort yes(1) or no(0)")
+#parser$add_argument("--rois", default = "GlobalAverage;BCC;GCC;SCC;CC;CGC;CGH;CR;EC;FX;FXST;IC;IFO;PTR;SFO;SLF;SS;UNC;CST;ACR;ALIC;PCR;PLIC;RLIC;SCR;ACR.L;ACR.R;ALIC.L;ALIC.R;CGC.L;CGC.R;CGH.L;CGH.R;CR.L;CR.R;CST.L;CST.R;EC.L;EC.R;FX.ST.L;FX.ST.R;IC.L;IC.R;IFO.L;IFO.R;PCR.L;PCR.R;PLIC.L;PLIC.R;PTR.L;PTR.R;RLIC.L;RLIC.R;SCR.L;SCR.R;SFO.L;SFO.R;SLF.L;SLF.R;SS.L;SS.R;UNC.L;UNC.R", help = "Semicolon-separated list of ROIs (use same naming as pheno columns)")
 parser$add_argument("--rois", default = "GlobalAverage;BCC;GCC;SCC;CC;CGC;CGH;CR;EC;FX;FXST;IC;IFO;PTR;SFO;SLF;SS;UNC;CST;ACR;ALIC;PCR;PLIC;RLIC;SCR;ACR.L;ACR.R;ALIC.L;ALIC.R;CGC.L;CGC.R;CGH.L;CGH.R;CR.L;CR.R;CST.L;CST.R;EC.L;EC.R;FX.ST.L;FX.ST.R;IC.L;IC.R;IFO.L;IFO.R;PCR.L;PCR.R;PLIC.L;PLIC.R;PTR.L;PTR.R;RLIC.L;RLIC.R;SCR.L;SCR.R;SFO.L;SFO.R;SLF.L;SLF.R;SS.L;SS.R;UNC.L;UNC.R", help = "Semicolon-separated list of ROIs (use same naming as pheno columns)")
 parser$add_argument("--outDir", default = "./QC_ENIGMA/", help = "Output directory")
 parser$add_argument("--eName", default = "ENIGMA_DTI_GWAS", help = "ENIGMA label")
@@ -204,6 +205,15 @@ if (length(dti_cols) == 0) {
     )
   message("TableLong rows: ", nrow(TableLong), " (DTI values long)")
 }
+
+# Define desired ROI order, alphabetical except for GlobalAverage
+roi_order <- c(
+  "GlobalAverage",
+  sort(setdiff(unique(TableLong$parsedROI), "GlobalAverage"))
+)
+
+# Ensure parsedROI follows this order
+TableLong$parsedROI <- factor(TableLong$parsedROI, levels = roi_order)
 
 # ---------------- Numeric ranges for plotting ----------------
 FA_range <- c(0, 1)
